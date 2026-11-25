@@ -20,10 +20,14 @@ function stopAll(){var was=!!ST;ST=null;try{A.pause();}catch(e){}try{A.removeAtt
  window.__stops=(window.__stops||0)+(was?1:0);}
 window.stopAll=stopAll;
 document.getElementById('pstop').addEventListener('click',stopAll);
-document.addEventListener('visibilitychange',function(){if(document.hidden)stopAll();});
-window.addEventListener('pagehide',stopAll);window.addEventListener('blur',stopAll);window.addEventListener('popstate',stopAll);
-document.addEventListener('freeze',stopAll);
-if('mediaSession' in navigator){['pause','stop'].forEach(function(k){try{navigator.mediaSession.setActionHandler(k,stopAll);}catch(e){}});}
+/* window.deKeepPlaying (app setting "화면 꺼도 계속 듣기"): screen-off / app-switch do not stop; back/leave still do */
+document.addEventListener('visibilitychange',function(){if(document.hidden&&!window.deKeepPlaying)stopAll();});
+window.addEventListener('pagehide',stopAll);window.addEventListener('blur',function(){if(!window.deKeepPlaying)stopAll();});window.addEventListener('popstate',stopAll);
+document.addEventListener('freeze',function(){if(!window.deKeepPlaying)stopAll();});
+if('mediaSession' in navigator){try{navigator.mediaSession.setActionHandler('stop',stopAll);}catch(e){}
+ try{navigator.mediaSession.setActionHandler('pause',function(){if(window.deKeepPlaying&&ST){A.pause();try{navigator.mediaSession.playbackState='paused';}catch(e){}}else stopAll();});}catch(e){}
+ try{navigator.mediaSession.setActionHandler('play',function(){if(ST&&A.getAttribute('src')){A.play();try{navigator.mediaSession.playbackState='playing';}catch(e){}}});}catch(e){}
+ try{navigator.mediaSession.setActionHandler('nexttrack',function(){if(window.deNext)window.deNext();});}catch(e){}}
 /* native <audio controls> on the page (quiz/all-in-one): only one sound at a time + same bar */
 document.querySelectorAll('audio[controls]').forEach(function(x){x.addEventListener('play',function(){if(ST)stopAll();
  document.querySelectorAll('audio[controls]').forEach(function(y){if(y!==x)y.pause();});
@@ -35,9 +39,9 @@ function show(){var m=MODES[ST.mode]||MODES.single;bar.style.setProperty('--m',m
  if(ST.btn){ST.btn.classList.add('act');ST.btn.style.setProperty('--m',m[0]);}
  if('mediaSession' in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:ST.label||m[1],artist:'매일 영어 100일'});navigator.mediaSession.playbackState='playing';}catch(e){}}}
 /* play(src, opts): MUST be called inside the tap handler */
-function play(src,o){stopAll();o=o||{};ST={mode:o.mode||'single',label:o.label,starts:o.starts||[],total:o.total||0,btn:o.btn,cards:o.cards||[],chunks:o.chunks||[],unit:o.unit||''};
- A.src=src;A.currentTime=0;var p=A.play();window.__plays=(window.__plays||0)+1;
- if(p&&p.catch)p.catch(function(err){window.__playErr=String(err);stopAll();});
+function play(src,o){stopAll();o=o||{};ST={mode:o.mode||'single',label:o.label,starts:o.starts||[],total:o.total||0,btn:o.btn,cards:o.cards||[],chunks:o.chunks||[],unit:o.unit||'',onend:o.onend};
+ A.src=src;A.currentTime=0;A.defaultPlaybackRate=A.playbackRate=o.rate||1;var p=A.play();window.__plays=(window.__plays||0)+1;
+ var mine=ST;if(p&&p.catch)p.catch(function(err){window.__playErr=String(err);if(ST===mine)stopAll();});
  show();tick();}
 window.dePlay=play;
 function idx(){if(!ST||!ST.starts.length)return -1;var t=A.currentTime,k=0;for(var i=0;i<ST.starts.length;i++){if(t+0.05>=ST.starts[i])k=i;}return k;}
@@ -50,7 +54,7 @@ function tick(){if(!ST)return;var k=idx();
   if(tg&&ST.cards.length>1){try{tg.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}}
   ST.chunks.forEach(function(c,i){c.classList.toggle('play',i===k);});}}
 A.addEventListener('timeupdate',tick);
-A.addEventListener('ended',function(){window.__ended=(window.__ended||0)+1;stopAll();});
+A.addEventListener('ended',function(){var cb=ST&&ST.onend;window.__ended=(window.__ended||0)+1;stopAll();if(cb){try{cb();}catch(e){}}});
 A.addEventListener('error',function(){if(ST){window.__playErr='media error';stopAll();}});
 /* ---- day page bindings ---- */
 var M=document.getElementById('meta');if(!M){window.__playerReady=1;return;}
