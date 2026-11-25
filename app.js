@@ -12,7 +12,9 @@ if(!document.body.dataset.home){var bk=document.createElement('a');bk.id='pback'
 var plab=document.getElementById('plab'),pprog=document.getElementById('pprog'),pgf=document.getElementById('pgf');
 function clearMarks(){document.querySelectorAll('.now,.play,.act').forEach(function(x){x.classList.remove('now','play','act');x.style.removeProperty('--m');});}
 function stopAll(){var was=!!ST;ST=null;try{A.pause();}catch(e){}try{A.removeAttribute('src');A.load();}catch(e){}
- document.querySelectorAll('audio').forEach(function(x){if(x!==A){try{x.pause();}catch(e){}}});
+ document.querySelectorAll('audio').forEach(function(x){if(x===A)return;try{x.pause();}catch(e){}
+  /* still loading (or a play() pending): drop the source so nothing starts late, keep it for the next tap */
+  if(x.readyState<3||!x.paused){var s=x.getAttribute('src')||x.dataset.src;if(s){x.dataset.src=s;try{x.removeAttribute('src');x.load();x.setAttribute('src',s);x.preload='none';}catch(e){}}}});
  clearMarks();document.body.classList.remove('playing');
  if('mediaSession' in navigator){try{navigator.mediaSession.playbackState='none';navigator.mediaSession.metadata=null;}catch(e){}}
  window.__stops=(window.__stops||0)+(was?1:0);}
