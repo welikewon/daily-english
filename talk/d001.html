@@ -43,11 +43,21 @@ button:disabled{opacity:.45}
 .nav{display:flex;justify-content:space-between;margin:16px 0 90px}
 details summary{font-weight:700;cursor:pointer;min-height:40px}
 .free{border-color:#1F8A45;background:#F2FAF4;font-size:16px}.free p{margin:6px 0}
+#stuck{position:fixed;inset:0;z-index:40;background:#F4F6FA;overflow:auto;padding:12px 12px 110px;font-size:18px}
+#stuck .shead{display:flex;justify-content:space-between;align-items:center;font-size:22px;position:sticky;top:-12px;background:#F4F6FA;padding:8px 0;z-index:1}
+#stuck h3{font-size:19px;margin:4px 0 8px;color:#1F3A5F}#stuck textarea{width:100%;font-size:18px;border:2px solid #1F3A5F;border-radius:10px;padding:8px}
+.srow{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.srow button,.sbtn{flex:1 1 140px;min-height:48px;font-size:17px}
+.sbtn{display:flex;align-items:center;justify-content:center;background:#1F3A5F;color:#fff;border-radius:12px;text-decoration:none;font-weight:700;padding:8px}
+.spol{margin:8px 0;font-size:19px}.ssteps{padding-left:0;list-style:none}.ssteps li{margin:6px 0;padding:8px;border-left:5px solid #1E63C6;background:#EEF4FD;border-radius:6px}
+.smi{border-top:1px solid #D5DBE3;padding:8px 0}.sclose{border-color:#C62F55;color:#8A0F2E}
+body.stuckopen #pback,body.stuckopen #tback{display:none}
+.stuckbtn{border-color:#C25E0E;color:#7A3A00;font-weight:700}
 </style></head><body data-home="1">
 <a id="tback" href="../d001.html">← Day 1</a>
 <header class="top"><div class="k">DAY 1 · 대화 연습</div><h1>공항에서 처음 만나기</h1><div class="streak"></div></header>
 <main><div id="safari" class="warn" hidden>아이폰에서는 <b>Safari</b>로 열어 주세요. (다른 앱 안에서는 음성 인식이 되지 않아요.)</div>
 <div id="nosr" class="warn" hidden>이 브라우저는 음성 인식이 안 돼요. <b>소리 내어 말한 뒤</b> 영어로 써서 확인하거나 「말했어요」를 누르세요. 녹음 비교는 그대로 돼요.</div>
+<button class="stuckbtn" type="button" onclick="openStuck()">🙋 막혔을 때</button>
 <ol id="prog"><li>미션</li><li>블록 놀이</li><li>따라 말하기</li><li>역할 바꾸기</li><li>대화하기</li><li>정리</li><li>AI 대화</li></ol>
 <label class="slow"><input type="checkbox" id="slow"> 🐢 천천히 듣기 (0.8×)</label>
 <section class="tstep" data-k="mission"><div class="card mission"><div class="k">오늘의 미션</div><div class="big">공항에서 Jake를 맞이하고, 이름을 묻고, 차로 안내하세요.</div><p>인천공항 도착장. 텍사스에서 온 단기선교팀 청년 Jake가 막 나왔어요. 목사님(나)이 마중을 나왔어요.</p><p class="n2">상대: <b>Jake</b> · 텍사스 오스틴에서 온 20대 청년, 단기선교팀</p></div>
@@ -79,14 +89,12 @@ Start now with your first question.</textarea><button id="copy" class="big2">�
 <ol class="how"><li><span class="ic">📋</span><b>붙여넣기</b><br>입력 칸을 길게 눌러 「붙여넣기」</li><li><span class="ic">➤</span><b>보내기</b><br>보내기 화살표를 눌러요</li><li><span class="ic">🎤</span><b>음성 버튼</b><br>마이크(음성 대화) 버튼을 누르고 말해요</li></ol>
 <p class="warn">🚗 운전 중에는 쓰지 마세요.</p><div class="card free"><b>무료·유료 안내</b><p>AI 대화 연습은 무료예요.<br>하루에 쓸 수 있는 무료 양이 정해져 있어요. 다 쓰면 준비된 대화 연습으로 이어지고, 다음 날 다시 AI와 대화할 수 있어요.<br>더 많이 대화하고 싶으면, 휴대폰의 AI 앱(ChatGPT · Gemini · Claude)과 바로 대화할 수 있어요. 무료 계정으로 시작하고, 원하시면 각 앱의 유료 요금제로 더 길게 쓸 수 있어요.</p></div><p class="n2">AI 앱에는 주소·건강 같은 개인 정보를 말하지 마세요. AI도 틀릴 수 있어요.</p></div><div class="nav"><button data-prev>◀ 이전</button></div></section>
 </main><script src="../app.js"></script><script>window.TALK={"day": 1, "partner": {"name": "Jake", "voice": "am_fenrir", "about_ko": "텍사스 오스틴에서 온 20대 청년, 단기선교팀"}, "game": [{"en": "I'm a little tired today.", "ko": "오늘은 좀 피곤해요.", "audio": "../audio/d001/s01.mp3", "blocks": [{"en": "I'm", "ko": "나는", "slot": "WHO"}, {"en": "a little tired", "ko": "조금 피곤하다", "slot": "DO"}, {"en": "today.", "ko": "오늘", "slot": "WHEN"}]}, {"en": "I'm the pastor here. Welcome!", "ko": "제가 이 교회 목사예요. 환영합니다!", "audio": "../audio/d001/s09.mp3", "blocks": [{"en": "I'm", "ko": "나는", "slot": "WHO"}, {"en": "the pastor", "ko": "목사이다", "slot": "DO"}, {"en": "here.", "ko": "여기", "slot": "WHERE"}, {"en": "Welcome!", "ko": "환영해요", "slot": "OTHER"}]}], "warmup": [{"en": "I'm a little tired today.", "ko": "오늘은 좀 피곤해요.", "audio": "../audio/d001/s01.mp3", "tip_ko": "little은 「리틀」보다 「리를」에 가깝게. tired 끝 d에 「드」를 붙여 늘이지 말고, 혀만 살짝 대고 끝내세요."}, {"en": "My wife is a nurse.", "ko": "제 아내는 간호사예요.", "audio": "../audio/d001/s03.mp3", "tip_ko": "wife의 f는 윗니로 아랫입술을 살짝 물고 바람만 내보내요(p처럼 터뜨리지 않기). nurse는 혀끝을 들어 「너-ㄹ스」."}, {"en": "I'm the pastor here. Welcome!", "ko": "제가 이 교회 목사예요. 환영합니다!", "audio": "../audio/d001/s09.mp3", "tip_ko": "Welcome의 l은 혀끝을 윗니 뒤 잇몸에 붙였다 떼요. here는 「히어」보다 「히얼」, 끝에 「어」를 따로 붙이지 않아요."}, {"en": "Our church isn't big, but it's warm.", "ko": "우리 교회는 크지 않지만 따뜻해요.", "audio": "../audio/d001/s12.mp3", "tip_ko": "big의 b는 두 입술을 붙였다 터뜨려요(v처럼 입술을 물지 않기). 끝 g는 「비그」가 아니라 짧게 멈추세요."}], "dialogue": {"learner_speaker": "Pastor Kim", "lines": [{"speaker": "Pastor Kim", "en": "Hello! I'm Pastor Kim. Welcome to Korea!", "ko": "안녕하세요! 김 목사입니다. 한국에 오신 걸 환영해요!", "audio": "../audio/d001/dlg_01.mp3", "keys": [["hello", "pastor", "kim"], ["welcome", "korea"]]}, {"speaker": "Jake", "en": "Hi, Pastor Kim! I'm Jake. Nice to meet you.", "ko": "안녕하세요, 목사님! 저는 제이크예요. 만나서 반가워요.", "audio": "../audio/d001/dlg_02.mp3", "keys": [["jake", "nice", "meet"], ["hi", "jake"]]}, {"speaker": "Pastor Kim", "en": "Nice to meet you too, Jake. You're from Texas, right?", "ko": "저도 반가워요, 제이크. 텍사스에서 왔죠?", "audio": "../audio/d001/dlg_03.mp3", "keys": [["nice", "meet", "too"], ["texas", "right"]]}, {"speaker": "Jake", "en": "Yes, I'm from Austin. I'm so excited to be here.", "ko": "네, 오스틴에서 왔어요. 여기 오게 돼서 정말 신나요.", "audio": "../audio/d001/dlg_04.mp3", "keys": [["austin"], ["excited"]]}, {"speaker": "Pastor Kim", "en": "I'm glad. You're probably tired after the long flight.", "ko": "기쁘네요. 긴 비행 후라 피곤하겠어요.", "audio": "../audio/d001/dlg_05.mp3", "keys": [["glad"], ["tired", "flight"]]}, {"speaker": "Jake", "en": "I'm a little tired, but I'm okay.", "ko": "조금 피곤하지만 괜찮아요.", "audio": "../audio/d001/dlg_06.mp3", "keys": [["little", "tired"], ["okay"]]}, {"speaker": "Pastor Kim", "en": "Good. The van is right outside.", "ko": "좋아요. 승합차가 바로 밖에 있어요.", "audio": "../audio/d001/dlg_07.mp3", "keys": [["van", "outside"], ["right", "outside"]]}]}, "roleplay": {"turns": [{"id": "t1", "partner_en": "Excuse me, are you Pastor Kim?", "partner_ko": "실례지만, 김 목사님이세요?", "task_ko": "「네, 맞아요」 하고 환영해 주세요.", "accept": ["Yes, I am. Welcome to Korea!", "Yes, I'm Pastor Kim.", "Yes, I am.", "Yes. Welcome!"], "keys": [["yes"], ["welcome"], ["i", "am"]], "suggest": [0, 2], "reply_en": "Thank you! It's so nice to meet you.", "reply_ko": "감사해요! 만나서 정말 반가워요.", "partner_audio": "../audio/talk/d001/t1_p.mp3", "reply_audio": "../audio/talk/d001/t1_r.mp3", "suggest_audio": ["../audio/talk/d001/t1_s0.mp3", "../audio/talk/d001/t1_s1.mp3"]}, {"id": "t2", "partner_en": null, "partner_ko": null, "task_ko": "이번엔 내가 먼저! 이름을 물어보세요.", "accept": ["What's your name?", "Are you Jake?", "And your name is?", "What is your name?"], "keys": [["name"], ["are", "you", "jake"]], "suggest": [0, 1], "reply_en": "I'm Jake. I'm from Austin, Texas.", "reply_ko": "저는 제이크예요. 텍사스 오스틴에서 왔어요.", "partner_audio": null, "reply_audio": "../audio/talk/d001/t2_r.mp3", "suggest_audio": ["../audio/talk/d001/t2_s0.mp3", "../audio/talk/d001/t2_s1.mp3"]}, {"id": "t3", "partner_en": "Is the airport always this busy?", "partner_ko": "공항이 늘 이렇게 붐벼요?", "task_ko": "「네, 늘 바빠요」라고 대답해 보세요.", "accept": ["Yes, it is.", "Yes, it's always busy.", "Yes, very busy.", "Yes, it's busy."], "keys": [["yes"], ["busy"], ["it", "is"]], "suggest": [1, 0], "reply_en": "Wow. It's a big airport!", "reply_ko": "와, 큰 공항이네요!", "partner_audio": "../audio/talk/d001/t3_p.mp3", "reply_audio": "../audio/talk/d001/t3_r.mp3", "suggest_audio": ["../audio/talk/d001/t3_s0.mp3", "../audio/talk/d001/t3_s1.mp3"]}, {"id": "t4", "partner_en": null, "partner_ko": null, "task_ko": "피곤한지 물어보세요.", "accept": ["Are you tired?", "You're tired, right?", "Are you okay?", "Are you tired after the long flight?"], "keys": [["tired"], ["are", "you", "okay"]], "suggest": [0, 2], "reply_en": "I'm a little tired, but I'm okay.", "reply_ko": "조금 피곤하지만 괜찮아요.", "partner_audio": null, "reply_audio": "../audio/talk/d001/t4_r.mp3", "suggest_audio": ["../audio/talk/d001/t4_s0.mp3", "../audio/talk/d001/t4_s1.mp3"]}, {"id": "t5", "partner_en": "Pastor Kim, I'm really hungry.", "partner_ko": "목사님, 저 정말 배고파요.", "task_ko": "「나도 배고파요」라고 말해 보세요.", "accept": ["Me too. I'm hungry too.", "I'm hungry too.", "Me too!", "Yes, I'm hungry too."], "keys": [["me", "too"], ["hungry", "too"], ["hungry"]], "suggest": [1, 2], "reply_en": "Great! Let's eat together.", "reply_ko": "좋아요! 같이 먹어요.", "partner_audio": "../audio/talk/d001/t5_p.mp3", "reply_audio": "../audio/talk/d001/t5_r.mp3", "suggest_audio": ["../audio/talk/d001/t5_s0.mp3", "../audio/talk/d001/t5_s1.mp3"]}, {"id": "t6", "partner_en": "Where is the car?", "partner_ko": "차는 어디 있어요?", "task_ko": "「승합차가 바로 밖에 있어요」라고 안내하세요.", "accept": ["The van is right outside.", "It's right outside.", "The car is outside.", "It's outside."], "keys": [["outside"], ["right", "outside"]], "suggest": [0, 1], "reply_en": "Perfect. Let's go!", "reply_ko": "좋아요. 가요!", "partner_audio": "../audio/talk/d001/t6_p.mp3", "reply_audio": "../audio/talk/d001/t6_r.mp3", "suggest_audio": ["../audio/talk/d001/t6_s0.mp3", "../audio/talk/d001/t6_s1.mp3"]}], "fallback_en": "Sorry, could you say that again?", "fallback_ko": "미안해요, 다시 말해 줄래요?", "fallback_audio": "../audio/talk/d001/fallback.mp3", "end_en": "Thanks, Pastor Kim. See you at church!", "end_ko": "고마워요, 목사님. 교회에서 봬요!", "end_audio": "../audio/talk/d001/end.mp3"}};</script><script>/* Talk practice page (one scene per day). Needs app.js (window.dePlay / stopAll) loaded first and window.TALK = scene data. */
-window.initTalk=function(){
-var T=window.TALK,AU=T.audio_base,TA=T.talk_base;
+/* shared kit (talk page + stuck-helper panel): matching, word colours, push-to-talk box, record & compare */
+window.TK=(function(){
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 var $=function(s,r){return (r||document).querySelector(s);},$$=function(s,r){return [].slice.call((r||document).querySelectorAll(s));};
 function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-var LOG=[]; /* {en, heard, score, step} */
-window.__talk={log:LOG};
 /* ---------- text matching ---------- */
 var CONTR={"i'm":"i am","you're":"you are","it's":"it is","we're":"we are","they're":"they are","he's":"he is","she's":"she is","isn't":"is not","aren't":"are not","what's":"what is","let's":"let us","that's":"that is","don't":"do not","can't":"can not","i'll":"i will"};
 function norm(s){s=String(s||'').toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9' ]+/g,' ');
@@ -128,7 +136,7 @@ function talkBox(opts){ /* opts: {target, onDone(text)} -> element with big butt
  said.onclick=function(){if(REC){var r=REC;REC=null;try{r.abort();}catch(e){}barOff();}opts.onDone(null,[]);};
  function best(t,a){if(!opts.target||!a.length)return t;var bs=t,bv=sim(opts.target,t);a.forEach(function(x){var v=sim(opts.target,x);if(v>bv){bv=v;bs=x;}});return bs;}
  return box;}
-function abortAll(){if(REC){var r=REC;REC=null;try{r.abort();}catch(e){}}if(MR&&MR.state==='recording'){try{MR.stop();}catch(e){}}document.body.classList.remove('playing');
+function abortAll(){var any=false;if(REC){var r=REC;REC=null;any=true;try{r.abort();}catch(e){}}if(MR&&MR.state==='recording'){any=true;try{MR.stop();}catch(e){}}if(any)document.body.classList.remove('playing');
  if(SR)$$('.talkbox .done').forEach(function(d){d.style.display='none';d.classList.remove('on');});$$('.talkbox .mic').forEach(function(m){if(SR)m.style.display='';});}
 window.__talkAbort=abortAll;
 if(!window.__talkG){window.__talkG=1;document.addEventListener('click',function(e){if(e.target.closest('#pstop')&&window.__talkAbort)window.__talkAbort();},true);
@@ -144,6 +152,14 @@ function recBox(native){var w=el('div','recbox'),b=el('button','rec','🎙 내 �
    MR.start();barOn('🎙 녹음 중');b.textContent='■ 녹음 끝';b.classList.add('on');n.textContent='말해 보세요…';}).catch(function(){n.textContent='마이크를 쓸 수 없어요.';});};
  p.onclick=function(){if(!url)return;dePlay(native,{label:'👂 원어민',onend:function(){dePlay(url,{label:'🗣 내 목소리'});}});};
  w.appendChild(b);w.appendChild(p);w.appendChild(n);return w;}
+
+return {SR:SR,$:$,$$:$$,el:el,esc:esc,norm:norm,lev:lev,sim:sim,colour:colour,accepted:accepted,talkBox:talkBox,recBox:recBox,abortAll:abortAll};
+})();
+window.initTalk=function(){
+var T=window.TALK,AU=T.audio_base,TA=T.talk_base;
+var LOG=[]; /* {en, heard, score, step} */
+window.__talk={log:LOG};
+var K=window.TK,SR=K.SR,$=K.$,$$=K.$$,el=K.el,esc=K.esc,norm=K.norm,lev=K.lev,sim=K.sim,colour=K.colour,accepted=K.accepted,talkBox=K.talkBox,recBox=K.recBox,abortAll=K.abortAll;
 /* ---------- steps ---------- */
 var STEPS=$$('.tstep'),cur=0;
 function go(i){cur=Math.max(0,Math.min(STEPS.length-1,i));STEPS.forEach(function(s,k){s.hidden=k!==cur;});
@@ -245,4 +261,52 @@ $('#rpstart').onclick=function(){roleplay();$('#rpstart').remove();};
 streak();go(0);window.__talkReady=1;
 };
 if(window.TALK&&!window.TALK_DEFER)window.initTalk();
+</script><script>window.STUCK={"title_ko": "말이 막힐 때: 번역기 대화 모드로 이어 가기", "lead_ko": "미국 선교팀과 이야기하다 말이 막히면, 대화를 멈추지 말고 휴대폰 번역기의 대화 모드로 이어 가세요. 다시 통하면 그 문장을 내 입으로 말해 보면 돼요.", "apps": [{"order": 1, "name": "Google 번역 (Google Translate)", "steps": [{"no": 1, "text_ko": "앱을 열고 아래쪽의 「live translate(실시간 번역)」 버튼을 눌러요.", "picture": {"phone": true, "highlight": "bottom button 'live translate' (icon: two speech bubbles)"}}, {"no": 2, "text_ko": "「Conversation(대화)」 모드를 고르고, 두 언어를 한국어 ⇄ 영어로 맞춰요.", "picture": {"phone": true, "highlight": "mode list: Listening / Conversation / Text only — Conversation marked; language bar 한국어 ⇄ English"}}, {"no": 3, "text_ko": "「Face to face(마주 보기)」를 누르면 화면이 둘로 나뉘어 서로 자기 말로 읽어요. 한 사람씩 짧게 말하고, 번역 소리가 끝나면 상대 차례예요.", "picture": {"phone": true, "highlight": "split screen: top half upside down (English), bottom half (한국어); mic in the middle; arrows 말하기 → 기다리기 → 상대 차례"}}], "notes_ko": ["한국어 화면에서는 버튼 이름이 조금 다를 수 있어요. 말풍선 두 개 모양을 찾으세요.", "한국에서 산 휴대폰은 화면이 다르게 보일 수 있어요. 처음에는 집에서 한 번 미리 해 보세요.", "인터넷(와이파이나 데이터)이 있어야 해요."]}, {"order": 2, "name": "파파고 (Papago)", "steps": [{"no": 1, "text_ko": "앱을 열고 아래쪽의 「대화」 탭을 눌러요.", "picture": {"phone": true, "highlight": "bottom tab '대화'"}}, {"no": 2, "text_ko": "휴대폰을 두 사람 사이에 놓고, 각자 자기 말로 한 번씩 말해요. 번역은 화면에 보이고 소리로도 들을 수 있어요.", "picture": {"phone": true, "highlight": "phone on a table between two people; speech bubbles ko / en"}}], "notes_ko": ["인터넷이 있어야 해요."]}], "also_ko": ["갤럭시(S24 이후) 휴대폰: 화면 위에서 내려 「통역」을 눌러도 돼요.", "아이폰을 쓰는 손님: 기본 「번역」 앱의 대화에서 「Face to Face」를 쓸 수 있어요. 한국어를 미리 내려받아 두면 인터넷 없이도 돼요."], "polite_lines": [{"en": "Could you speak into my phone, please?", "ko": "제 휴대폰에 대고 말씀해 주시겠어요?"}, {"en": "One more time, please.", "ko": "한 번 더 말씀해 주세요."}, {"en": "Thank you for your patience.", "ko": "기다려 주셔서 고마워요."}], "tips_ko": ["짧은 문장으로, 한 사람씩 말해요.", "조용한 곳에서, 휴대폰은 두 사람 가운데에.", "소리가 잘 안 들리면 화면을 보여 주세요.", "앱은 켠 채로 두세요. 다른 앱으로 넘어가면 멈출 수 있어요."], "bottom_box_ko": "통한 문장은 책 뒤 「내 입으로 말해 보기」 목록에 적어 두세요. 다음에는 번역기 없이 내 입으로 말해 봐요.", "polite_audio": ["../audio/stuck/pol_1.mp3", "../audio/stuck/pol_2.mp3", "../audio/stuck/pol_3.mp3"]};</script><script>/* "막혔을 때" panel (app day/talk screens + standalone talk page). Needs window.STUCK (content) and window.TK (talk kit) + dePlay. Free only: links to the official translator web pages, phone speech synthesis. */
+(function(){
+function S(){return window.STUCK;}var K=function(){return window.TK;};
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+var KEY='de100mouth';function list(){return JSON.parse(localStorage.getItem(KEY)||'[]');}function save(l){localStorage.setItem(KEY,JSON.stringify(l.slice(0,50)));}
+function hasKo(t){return /[가-힣]/.test(t);}
+function gUrl(t){var ko=hasKo(t);return 'https://translate.google.com/?sl='+(ko?'ko':'en')+'&tl='+(ko?'en':'ko')+'&text='+encodeURIComponent(t)+'&op=translate';}
+function pUrl(t){var ko=hasKo(t);return 'https://papago.naver.com/?sk='+(ko?'ko':'en')+'&tk='+(ko?'en':'ko')+'&st='+encodeURIComponent(t);}
+function speak(t,rate){if(!window.speechSynthesis){return false;}try{stopAll();}catch(e){}speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang=hasKo(t)?'ko-KR':'en-US';u.rate=rate||1;speechSynthesis.speak(u);window.__spoke=(window.__spoke||0)+1;return true;}
+function steps(a){return '<div class="sapp"><h3>'+a.order+'. '+esc(a.name)+'</h3><ol class="ssteps">'+a.steps.map(function(s){return '<li><b>'+s.no+'</b> '+esc(s.text_ko)+'</li>';}).join('')+'</ol>'+(a.notes_ko||[]).map(function(n){return '<p class="n2">· '+esc(n)+'</p>';}).join('')+'</div>';}
+function render(p){var st=S(),l=list();
+ p.innerHTML='<div class="shead"><b>🙋 막혔을 때</b><button class="sclose" aria-label="닫기">✕ 닫기</button></div>'+
+ '<p>'+esc(st.lead_ko)+'</p>'+
+ '<div class="card"><h3>✍ 번역기로 바로 보내기</h3><textarea id="stx" rows="3" placeholder="하고 싶은 말을 한국어로 (또는 들은 영어를) 쓰거나 🎤로 말하세요"></textarea>'+
+  '<div class="srow"><button id="smic">🎤 한국어로 말하기</button><button id="smicen">🎤 영어로 말하기</button></div>'+
+  '<div class="srow"><a id="sg" class="sbtn" target="_blank" rel="noopener">Google 번역에서 열기</a><a id="sp" class="sbtn" target="_blank" rel="noopener">파파고에서 열기</a></div>'+
+  '<div class="srow"><button id="ssay">🔊 휴대폰 목소리로 듣기</button><button id="sslow">🐢 천천히 (0.7)</button><button id="sadd">➕ 내 입으로 말해 보기에 넣기</button></div>'+
+  '<p class="n2">앱이 빈 화면으로 열리면 브라우저에서 여세요. 번역 결과(영어)를 복사해 위 칸에 붙여 넣고 「➕」를 누르면 목록에 남아요.</p><div id="sst" class="n2"></div></div>'+
+ '<div class="card"><h3>💬 이렇게 부탁하세요</h3>'+st.polite_lines.map(function(x,i){return '<div class="spol"><button data-pol="'+i+'">🔊</button> <b>'+esc(x.en)+'</b><br><span class="n2">'+esc(x.ko)+'</span></div>';}).join('')+'</div>'+
+ '<div class="card"><h3>📱 번역기 대화 모드로 이어 가기</h3>'+st.apps.map(steps).join('')+(st.also_ko||[]).map(function(x){return '<p class="n2">· '+esc(x)+'</p>';}).join('')+
+  '<ul>'+st.tips_ko.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div>'+
+ '<div class="card"><h3>🗣 내 입으로 말해 보기 ('+l.length+')</h3><p class="n2">'+esc(st.bottom_box_ko.replace('책 뒤 ',''))+'</p><div id="smy"></div></div>';
+ p.querySelector('.sclose').onclick=close;
+ var tx=p.querySelector('#stx');function upd(){var t=tx.value.trim();p.querySelector('#sg').href=t?gUrl(t):'https://translate.google.com/?sl=ko&tl=en&op=translate';p.querySelector('#sp').href=t?pUrl(t):'https://papago.naver.com/?sk=ko&tk=en';}
+ tx.oninput=upd;upd();
+ function mic(lang){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){p.querySelector('#sst').textContent='이 브라우저는 음성 인식이 안 돼요. 글자로 써 주세요.';return;}
+  var r=new SR();r.lang=lang;r.interimResults=false;r.onresult=function(e){tx.value=e.results[0][0].transcript;upd();};r.onerror=function(){p.querySelector('#sst').textContent='잘 안 들렸어요. 다시 해 보세요.';};
+  try{r.start();p.querySelector('#sst').textContent='듣고 있어요… 말을 마치면 잠시 기다리세요.';r.onend=function(){p.querySelector('#sst').textContent='';};}catch(e){}}
+ p.querySelector('#smic').onclick=function(){mic('ko-KR');};p.querySelector('#smicen').onclick=function(){mic('en-US');};
+ p.querySelector('#ssay').onclick=function(){if(!speak(tx.value.trim(),1))p.querySelector('#sst').textContent='이 휴대폰은 읽어 주기를 지원하지 않아요.';};
+ p.querySelector('#sslow').onclick=function(){speak(tx.value.trim(),0.7);};
+ p.querySelector('#sadd').onclick=function(){var t=tx.value.trim();if(!t)return;if(hasKo(t)){p.querySelector('#sst').textContent='영어 문장을 넣어 주세요. (번역 결과를 복사해 붙여 넣기)';return;}
+  var L=list();if(!L.some(function(x){return x.en===t;}))L.unshift({en:t,added:new Date().toISOString().slice(0,10)});save(L);render(p);};
+ [].forEach.call(p.querySelectorAll('[data-pol]'),function(b){b.onclick=function(){dePlay(st.polite_audio[+b.dataset.pol],{label:'🔊 부탁하기',btn:b});};});
+ var my=p.querySelector('#smy');list().forEach(function(x,i){var c=document.createElement('div');c.className='smi';
+  c.innerHTML='<b>'+esc(x.en)+'</b> <span class="n2">'+esc(x.added||'')+'</span><div class="srow"><button data-s="1">🔊 듣기</button><button data-s="0.7">🐢 0.7</button><button class="sdel">지우기</button></div>';
+  [].forEach.call(c.querySelectorAll('[data-s]'),function(b){b.onclick=function(){speak(x.en,+b.dataset.s);};});
+  c.querySelector('.sdel').onclick=function(){var L=list();L.splice(i,1);save(L);render(p);};
+  var cw=document.createElement('div');cw.className='cmpw';
+  if(K())c.appendChild(K().talkBox({target:x.en,onDone:function(h){cw.innerHTML=h==null?'':K().colour(x.en,h).html;}}));c.appendChild(cw);my.appendChild(c);});
+ if(!list().length)my.innerHTML='<p class="n2">아직 없어요. 번역기로 통한 영어 문장을 「➕」로 넣어 두세요.</p>';}
+var P=null;
+function open(){try{stopAll();}catch(e){}if(!P){P=document.createElement('div');P.id='stuck';document.body.appendChild(P);}P.hidden=false;document.body.classList.add('stuckopen');render(P);P.scrollTop=0;window.__stuckOpen=1;}
+function close(){if(P){P.hidden=true;}document.body.classList.remove('stuckopen');try{if(window.TK)window.TK.abortAll();}catch(e){}if(window.speechSynthesis)speechSynthesis.cancel();window.__stuckOpen=0;}
+window.openStuck=open;window.closeStuck=close;
+window.addEventListener('hashchange',close);window.addEventListener('pagehide',function(){if(window.speechSynthesis)speechSynthesis.cancel();});
+document.addEventListener('click',function(e){if(e.target.closest('#pstop')&&window.speechSynthesis)speechSynthesis.cancel();},true);
+})();
 </script></body></html>

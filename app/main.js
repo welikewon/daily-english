@@ -58,7 +58,7 @@ function dayScreen(n){var d=day(n);if(!d){location.hash='#/';return;}
   '<label class="bg"><input type="checkbox" id="bg"'+(S.bg?' checked':'')+'> 화면이 꺼져도 계속 듣기</label>'+(isIOS&&standalone?'<p class="n2">아이폰 홈 화면 앱에서 화면이 꺼질 때 소리가 멈추면, Safari에서 열어 들으세요.</p>':'')+'</div>';
  h+='<div class="card dlc"><b>⬇ 이 날 내려받기</b> <span class="n2">약 '+d.mb+' MB</span><div><button id="dl" class="big2">내려받기</button> <button id="rm" hidden>지우기</button> <span id="dlst" class="n2"></span></div></div>';
  h+='<div class="card acts">'+(d.talk?'<a class="go" id="talkgo" href="#/talk/'+n+'">🗣 대화 연습 (말하고 대답 듣기)</a>':'<span class="n2">🗣 대화 연습은 곧 열려요.</span>')+
-  '<button id="stuck" class="help">🙋 막혔을 때</button><div id="stuckp" class="n2" hidden>막혔을 때 도움말(번역기 대화 모드 · 공손한 부탁 3문장)은 곧 이곳에 열려요.</div></div>';
+  '<button id="stuckgo" class="help">🙋 막혔을 때 (번역기 · 부탁하는 말)</button></div>';
  h+='<h2>오늘의 문장 '+d.sentences.length+'</h2>'+d.sentences.map(function(s,i){var k='s'+('0'+(i+1)).slice(-2);
   return '<div class="card sent" data-n="'+(i+1)+'"><div class="en big">'+(i+1)+'. '+esc(s.en)+'</div><div class="ko">'+esc(s.ko)+'</div>'+
    (s.blocks.length?'<div class="chips">'+s.blocks.map(function(b){return '<span class="ch"><b>'+esc(b.en)+'</b><i>'+esc(b.ko)+'</i></span>';}).join('')+'</div>':'')+
@@ -81,7 +81,7 @@ function dayScreen(n){var d=day(n);if(!d){location.hash='#/';return;}
  var isDl=false;function dlstate(){has(n).then(function(x){isDl=x;if(!$('#dl'))return;$('#dl').textContent=x?'다시 내려받기':'내려받기';$('#rm').hidden=!x;$('#dlst').textContent=x?'✓ 내려받았어요 (인터넷 없이 듣기 가능)':'';});}
  $('#dl').onclick=function(){var b=this;b.disabled=true;download(n,function(s){$('#dlst').textContent=s;}).then(function(){b.disabled=false;dlstate();});};
  $('#rm').onclick=function(){remove(n).then(dlstate);};dlstate();
- $('#stuck').onclick=function(){$('#stuckp').hidden=!$('#stuckp').hidden;};
+ $('#stuckgo').onclick=function(){window.openStuck();};
  var tg=$('#talkgo');if(tg&&!SR&&standalone&&isIOS){tg.href='../talk/'+did(n)+'.html';tg.target='_blank';tg.insertAdjacentHTML('afterend','<p class="n2" id="sfnote">아이폰 홈 화면 앱에서는 음성 인식이 안 돼서, 대화 연습은 Safari에서 열려요.</p>');}
  $('#fin').onclick=function(){var p=prog();p.done[n]=today();saveProg(p);markDay();this.textContent='✓ 잘했어요! 내일 또 만나요';};}
 function talkScreen(n){var t=window.TALKS[n];if(!t){location.hash='#/day/'+n;return;}

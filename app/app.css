@@ -25,6 +25,16 @@ body{font-size:18px;background:#F4F6FA}
 .phone .row{padding:6px 4px;border-bottom:1px solid #eee;min-height:18px}.phone .row.hi{background:#FFE58A;border:2px solid #C25E0E;border-radius:6px;font-weight:700}
 .talkwrap{margin-top:6px}
 
+#stuck{position:fixed;inset:0;z-index:40;background:#F4F6FA;overflow:auto;padding:12px 12px 110px;font-size:18px}
+#stuck .shead{display:flex;justify-content:space-between;align-items:center;font-size:22px;position:sticky;top:-12px;background:#F4F6FA;padding:8px 0;z-index:1}
+#stuck h3{font-size:19px;margin:4px 0 8px;color:#1F3A5F}#stuck textarea{width:100%;font-size:18px;border:2px solid #1F3A5F;border-radius:10px;padding:8px}
+.srow{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.srow button,.sbtn{flex:1 1 140px;min-height:48px;font-size:17px}
+.sbtn{display:flex;align-items:center;justify-content:center;background:#1F3A5F;color:#fff;border-radius:12px;text-decoration:none;font-weight:700;padding:8px}
+.spol{margin:8px 0;font-size:19px}.ssteps{padding-left:0;list-style:none}.ssteps li{margin:6px 0;padding:8px;border-left:5px solid #1E63C6;background:#EEF4FD;border-radius:6px}
+.smi{border-top:1px solid #D5DBE3;padding:8px 0}.sclose{border-color:#C62F55;color:#8A0F2E}
+body.stuckopen #pback,body.stuckopen #tback{display:none}
+.stuckbtn{border-color:#C25E0E;color:#7A3A00;font-weight:700}
+
 
 #tback{position:fixed;top:8px;left:8px;z-index:50;background:#fff;border:2px solid #1F3A5F;border-radius:10px;padding:8px 12px;font-weight:700;color:#1F3A5F;text-decoration:none}
 

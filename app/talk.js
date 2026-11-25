@@ -1,13 +1,11 @@
 window.TALK_DEFER=1;
 /* Talk practice page (one scene per day). Needs app.js (window.dePlay / stopAll) loaded first and window.TALK = scene data. */
-window.initTalk=function(){
-var T=window.TALK,AU=T.audio_base,TA=T.talk_base;
+/* shared kit (talk page + stuck-helper panel): matching, word colours, push-to-talk box, record & compare */
+window.TK=(function(){
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 var $=function(s,r){return (r||document).querySelector(s);},$$=function(s,r){return [].slice.call((r||document).querySelectorAll(s));};
 function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-var LOG=[]; /* {en, heard, score, step} */
-window.__talk={log:LOG};
 /* ---------- text matching ---------- */
 var CONTR={"i'm":"i am","you're":"you are","it's":"it is","we're":"we are","they're":"they are","he's":"he is","she's":"she is","isn't":"is not","aren't":"are not","what's":"what is","let's":"let us","that's":"that is","don't":"do not","can't":"can not","i'll":"i will"};
 function norm(s){s=String(s||'').toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9' ]+/g,' ');
@@ -49,7 +47,7 @@ function talkBox(opts){ /* opts: {target, onDone(text)} -> element with big butt
  said.onclick=function(){if(REC){var r=REC;REC=null;try{r.abort();}catch(e){}barOff();}opts.onDone(null,[]);};
  function best(t,a){if(!opts.target||!a.length)return t;var bs=t,bv=sim(opts.target,t);a.forEach(function(x){var v=sim(opts.target,x);if(v>bv){bv=v;bs=x;}});return bs;}
  return box;}
-function abortAll(){if(REC){var r=REC;REC=null;try{r.abort();}catch(e){}}if(MR&&MR.state==='recording'){try{MR.stop();}catch(e){}}document.body.classList.remove('playing');
+function abortAll(){var any=false;if(REC){var r=REC;REC=null;any=true;try{r.abort();}catch(e){}}if(MR&&MR.state==='recording'){any=true;try{MR.stop();}catch(e){}}if(any)document.body.classList.remove('playing');
  if(SR)$$('.talkbox .done').forEach(function(d){d.style.display='none';d.classList.remove('on');});$$('.talkbox .mic').forEach(function(m){if(SR)m.style.display='';});}
 window.__talkAbort=abortAll;
 if(!window.__talkG){window.__talkG=1;document.addEventListener('click',function(e){if(e.target.closest('#pstop')&&window.__talkAbort)window.__talkAbort();},true);
@@ -65,6 +63,14 @@ function recBox(native){var w=el('div','recbox'),b=el('button','rec','🎙 내 �
    MR.start();barOn('🎙 녹음 중');b.textContent='■ 녹음 끝';b.classList.add('on');n.textContent='말해 보세요…';}).catch(function(){n.textContent='마이크를 쓸 수 없어요.';});};
  p.onclick=function(){if(!url)return;dePlay(native,{label:'👂 원어민',onend:function(){dePlay(url,{label:'🗣 내 목소리'});}});};
  w.appendChild(b);w.appendChild(p);w.appendChild(n);return w;}
+
+return {SR:SR,$:$,$$:$$,el:el,esc:esc,norm:norm,lev:lev,sim:sim,colour:colour,accepted:accepted,talkBox:talkBox,recBox:recBox,abortAll:abortAll};
+})();
+window.initTalk=function(){
+var T=window.TALK,AU=T.audio_base,TA=T.talk_base;
+var LOG=[]; /* {en, heard, score, step} */
+window.__talk={log:LOG};
+var K=window.TK,SR=K.SR,$=K.$,$$=K.$$,el=K.el,esc=K.esc,norm=K.norm,lev=K.lev,sim=K.sim,colour=K.colour,accepted=K.accepted,talkBox=K.talkBox,recBox=K.recBox,abortAll=K.abortAll;
 /* ---------- steps ---------- */
 var STEPS=$$('.tstep'),cur=0;
 function go(i){cur=Math.max(0,Math.min(STEPS.length-1,i));STEPS.forEach(function(s,k){s.hidden=k!==cur;});
