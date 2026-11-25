@@ -43,8 +43,9 @@ function tick(){if(!ST)return;var k=idx();
  if(A.duration)pgf.style.width=(100*A.currentTime/A.duration)+'%';
  if(k>=0&&ST.total){pprog.textContent=' · '+Math.min(k+1,ST.total)+' / '+ST.total+(ST.unit||'');if(ST.k!==k){window.__maxIdx=Math.max(window.__maxIdx||0,k+1);}}
  if(k>=0&&ST.k!==k){ST.k=k;
-  ST.cards.forEach(function(c,i){c.classList.toggle('now',i===k);c.style.setProperty('--m',(MODES[ST.mode]||MODES.single)[0]);});
-  if(ST.cards[k]&&ST.mode!=='x3'){try{ST.cards[k].scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}}
+  var tg=ST.cards[Math.min(k,ST.cards.length-1)];
+  ST.cards.forEach(function(c){if(c){c.classList.toggle('now',c===tg);c.style.setProperty('--m',(MODES[ST.mode]||MODES.single)[0]);}});
+  if(tg&&ST.cards.length>1){try{tg.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}}
   ST.chunks.forEach(function(c,i){c.classList.toggle('play',i===k);});}}
 A.addEventListener('timeupdate',tick);
 A.addEventListener('ended',function(){window.__ended=(window.__ended||0)+1;stopAll();});
@@ -58,7 +59,7 @@ document.addEventListener('click',function(e){
  if(b){var n=b.dataset.p,kind=b.dataset.kind||'single',card=b.closest('.sent,.snd-i,.try,.step,.vb,.flip')||null;
   if(b.classList.contains('act')){stopAll();return;}
   if(kind==='shadow'){var cs=[].slice.call(document.querySelectorAll('.sent[data-n]'));play(S('shadow'),{mode:'shadow',starts:(a.shadow||{}).starts,total:cs.length,btn:b,cards:cs});return;}
-  if(kind==='x3'){play(S(n+'_x3'),{mode:'x3',starts:(a[n+'_x3']||{}).starts,total:3,unit:'번',btn:b,cards:[card,card,card]});return;}
+  if(kind==='x3'){play(S(n+'_x3'),{mode:'x3',starts:(a[n+'_x3']||{}).starts,total:3,unit:'번',btn:b,cards:card?[card]:[]});return;}
   if(kind==='chunk'){var ch=card?[].slice.call(card.querySelectorAll('.ch')):[];var st=(a[n+'_chunks']||{}).starts||[];
    play(S(n+'_chunks'),{mode:'chunk',starts:st,total:st.length,btn:b,cards:[],chunks:ch});return;}
   if(kind==='dlg'){var ls=[].slice.call(document.querySelectorAll('.dlg .ln'));play(S('dlg'),{mode:'dlg',starts:(a.dlg||{}).starts,total:ls.length,btn:b,cards:ls});return;}

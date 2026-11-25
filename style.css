@@ -55,6 +55,7 @@ body.playing #pbar{display:flex}
 body.playing main{padding-bottom:150px}
 #pbar .pl{flex:1;min-width:0;font-size:17px;color:var(--m,#1F8A45)}
 #pbar .pl b{font-size:18px}
+#pprog{white-space:nowrap;font-weight:700}
 #pbar .pd{display:inline-block;width:11px;height:11px;border-radius:50%;background:var(--m,#1F8A45);margin-right:6px;animation:pulse 1s infinite}
 #pbar .pg{height:6px;background:#eceff5;border-radius:3px;margin-top:6px;overflow:hidden}#pbar .pg i{display:block;height:100%;width:0;background:var(--m,#1F8A45)}
 #pstop{flex:0 0 auto;min-height:56px;min-width:44%;border:0;border-radius:12px;background:#C62828;color:#fff;font-size:20px;font-weight:800;padding:0 14px;cursor:pointer}
