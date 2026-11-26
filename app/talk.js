@@ -257,24 +257,65 @@ window.__aiLive=function(){return !!(window.TALK_AI_URL!=null?window.TALK_AI_URL
    S.localN++;var l=S.localN<=2?local():null;if(!l)return fallback('준비된 대화 연습으로 이어 갈게요.');   /* then a prepared line keeps the call going */
    window.__aiLocal=(window.__aiLocal||0)+1;H.push({role:'partner',text:l.reply});if(!l.hints.length)l.hints=[{en:'Yes.',ko:'네.'},{en:'Sorry, one more time, please.',ko:'죄송해요, 한 번 더요.'}];
    l.hints=l.hints.map(function(h){return typeof h==='string'?{en:h,ko:''}:{en:h.en||h.text||'',ko:h.ko||''};});show(l);});}
- function end(msg){S.on=false;stopListen();if(window.speechSynthesis)speechSynthesis.cancel();S.speaking=false;$('#aictl').hidden=true;
+ function end(msg){S.on=false;liveStop();stopListen();if(window.speechSynthesis)speechSynthesis.cancel();S.speaking=false;$('#aictl').hidden=true;
   var s=$('#aisum');s.hidden=false;s.innerHTML='<h3>📞 통화 끝 · Call ended</h3><p class="big">오늘 AI와 <b>'+S.turns+'번</b> 주고받았어요.</p>'+
    (S.nat.length?'<p>💡 이렇게 말하면 더 자연스러워요 · More natural</p><ul>'+S.nat.slice(0,3).map(function(x){return '<li><b>'+esc(x)+'</b></li>';}).join('')+'</ul>':'')+'<button id="aitmrw" class="big2">👍 내일 또 해요 · See you tomorrow</button>';
   if(msg)$('#ainote').textContent=msg;window.__aiSummary=S.turns;$('#aistart').hidden=false;
   $('#aitmrw').onclick=function(){s.hidden=true;if(location.hash.indexOf('#/')===0)location.hash='#/';else window.scrollTo(0,0);};}
+ /* ---------- real-time voice (Gemini Live) path; any failure -> the text path below ---------- */
+ var LV=null;window.__liveLats=[];window.__aiLiveStop=function(){liveStop();};
+ function liveOK(){return !!(TU.live&&window.deLive&&deLive.supported());}
+ function liveStop(){if(!LV)return;var l=LV;LV=null;try{l.mic&&l.mic.stop();}catch(e){}try{l.pl&&l.pl.stop();}catch(e){}try{l.sess&&l.sess.close();}catch(e){}}
+ function liveFail(e){var had=LV&&LV.started;liveStop();window.__aiLiveFail=(e&&e.error)||String(e||'x');S.mode='text';
+  if(e&&e.status===429&&!had)$('#ainote').textContent='오늘의 실시간 대화를 다 썼어요. 보통 대화로 이어 갈게요. · Real-time talk is used up today; switching to normal mode.';
+  if(S.on&&!had)startText();else if(S.on)end('연결이 끊겼어요. 다시 「대화 시작」을 눌러 주세요. · The connection dropped. Tap Start talking again.');}
+ function closeMe(){if(LV&&LV.me){H.push({role:'learner',text:LV.meTxt});LV.lastLearner=LV.meTxt;LV.me=null;}}
+ function finishTurn(){if(!LV||!LV.cur)return;var txt=LV.curTxt.trim(),c=LV.cur,ch=LV.chunks.slice(),learner=LV.lastLearner||'';LV.cur=null;if(!txt)return;H.push({role:'partner',text:txt});
+  var ag=el('button','again','🔁 다시 듣기 · Play again');c.appendChild(ag);ag.onclick=function(e){e.stopPropagation();if(!LV)return;var p=new deLive.Player();p.rate=$('#aislow').checked?0.8:1;ch.forEach(function(d){p.play(d);});};
+  setTimeout(function(){if(LV&&!LV.pl.busy()){S.speaking=false;box.classList.remove('aispk');}},Math.max(200,(LV?LV.pl.endsIn():0)*1000+200));
+  fetch(U.replace(/\/$/,'')+'/hints',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({day:T.day,partner:txt,learner:learner,sid:sid})})
+   .then(function(r){return r.json();}).then(function(j){if(j.reply_ko)c.querySelector('.ko').textContent=j.reply_ko;
+    if(j.natural){var tp=el('div','tip','💡 이렇게 말하면 더 자연스러워요 · More natural: <b>'+esc(j.natural)+'</b>');c.insertBefore(tp,c.querySelector('.hints'));if(S.nat.indexOf(j.natural)<0)S.nat.push(j.natural);}
+    (j.hints||[]).forEach(function(h){var b=el('button','sug big2','🗣 '+esc(h.en)+'<br><span class="n2">'+esc(h.ko)+'</span>');
+     b.onclick=function(e){e.stopPropagation();if(!LV||!LV.sess)return;closeMe();bubble(true,'<div class="who">나 · Me</div><div class="en">'+esc(h.en)+'</div>');H.push({role:'learner',text:h.en});LV.lastLearner=h.en;S.turns++;LV.pl.stop();LV.sess.sendText(h.en);};
+     c.querySelector('.hints').appendChild(b);});}).catch(function(){});}
+ function startLive(){S.mode='live';window.__aiMode='live';deLive.audio();var t0=Date.now(),wait=bubble(false,'<div class="n2 think">📞 연결 중… · Connecting…</div>');
+  deLive.tokens(U,{kind:'call',day:T.day,sid:sid}).then(function(j){if(!S.on){return;}var s=j.sessions.call;
+   LV={pl:new deLive.Player(),cur:null,me:null,curTxt:'',meTxt:'',chunks:[],lastIn:0,started:false,firstAudio:false};
+   LV.mic=new deLive.Mic(function(d,rms){if(LV&&!S.paused&&LV.sess){LV.sess.sendAudio(d);if(rms>0.01&&!S.speaking)LV.lastVoice=Date.now();}});
+   LV.sess=new deLive.Session(j.ws,s,{
+    ready:function(){if(!LV)return;if(wait.parentNode)wait.remove();LV.started=true;window.__liveReadyMs=Date.now()-t0;LV.sess.sendText('(The talk starts. Greet the learner.)');
+     LV.mic.start().catch(function(){$('#ainote').textContent='마이크 사용이 막혀 있어요. 주소창 옆 🔒 → 마이크 허용을 눌러 주세요. · The microphone is blocked: tap 🔒 and allow the microphone.';});},
+    outTx:function(t){if(!LV)return;if(!LV.cur){closeMe();LV.cur=bubble(false,'<div class="who">'+esc(T.partner.name)+'</div><div class="en"></div><div class="ko n2"></div><div class="hints"></div>');LV.curTxt='';LV.chunks=[];}
+     LV.curTxt+=t;LV.cur.querySelector('.en').textContent=LV.curTxt;},
+    inTx:function(t){if(!LV)return;if(!LV.me){LV.me=bubble(true,'<div class="who">나 · Me</div><div class="en"></div>');LV.meTxt='';S.turns++;}
+     LV.meTxt+=t;LV.me.querySelector('.en').textContent=LV.meTxt;LV.lastIn=Date.now();LV.waitLat=true;},
+    audio:function(d){if(!LV||S.paused)return;if(LV.waitLat&&LV.lastVoice){window.__liveLats.push(Date.now()-LV.lastVoice);LV.waitLat=false;}
+     if(!LV.firstAudio){LV.firstAudio=true;window.__liveFirstAudioMs=Date.now()-t0;}LV.pl.play(d);LV.chunks.push(d);S.speaking=true;box.classList.add('aispk');window.__aiSpoke=(window.__aiSpoke||0)+1;},
+    interrupted:function(){if(!LV)return;LV.pl.stop();finishTurn();},
+    turnDone:function(){finishTurn();},
+    closed:function(code,wasReady){window.__liveClose=code;if(!LV)return;if(!wasReady)return liveFail({error:'ws'+code});if(S.on)liveFail({error:'closed'+code});}});
+   LV.sess.open();
+   setTimeout(function(){if(LV&&!LV.started)liveFail({error:'timeout'});},8000);
+  }).catch(function(e){if(wait.parentNode)wait.remove();liveFail(e);});}
  $('#aistart').onclick=function(){$('#aistart').hidden=true;$('#aictl').hidden=false;$('#aisum').hidden=true;S.on=true;S.paused=false;S.turns=0;S.nat=[];S.localN=0;
+  if(liveOK())return startLive();
+  startText();};
+ function startText(){S.mode='text';window.__aiMode='text';
   if(window.speechSynthesis){try{var w=new SpeechSynthesisUtterance(' ');w.volume=0;speechSynthesis.speak(w);}catch(e){}}   /* warm-up inside the tap (first-turn silence on some phones) */
   voices(function(){var o=T.roleplay.turns.filter(function(t){return t.partner_en;})[0];S.rpI=1;
    if(o){bubble(false,'<div class="who">'+esc(T.partner.name)+'</div><div class="en">'+esc(o.partner_en)+'</div><div class="ko n2">'+esc(o.partner_ko||'')+'</div>');H.push({role:'partner',text:o.partner_en});speak(o.partner_en,listen);}
-   else talk('');});};
+   else talk('');});}
  $('#aipause').onclick=function(){if(!S.on)return;S.paused=!S.paused;this.textContent=S.paused?'▶ 이어서 · Resume':'⏸ 잠깐 멈춤 · Pause';
+  if(S.mode==='live'&&LV){if(S.paused){LV.mic.pause(true);LV.pl.stop();S.speaking=false;box.classList.remove('aispk');}else LV.mic.pause(false);return;}
   if(S.paused){stopListen();if(window.speechSynthesis)speechSynthesis.cancel();S.speaking=false;box.classList.remove('aispk');}else{S.t0=0;listen();}};
  $('#aiend').onclick=function(){end();};
  $('#aiko').onchange=function(){log.classList.toggle('noko',!this.checked);};
  /* barge-in: tap anywhere on the call card while the AI speaks -> stop the voice and listen now */
- box.addEventListener('click',function(e){if(!S.on||!S.speaking||!S.bargeFin)return;if(e.target.closest('button,input,label,a,summary'))return;window.__aiBarge=(window.__aiBarge||0)+1;S.bargeFin();},true);
+ box.addEventListener('click',function(e){if(S.on&&S.mode==='live'&&LV&&S.speaking&&!e.target.closest('button,input,label,a,summary')){LV.pl.stop();S.speaking=false;box.classList.remove('aispk');window.__aiBarge=(window.__aiBarge||0)+1;return;}
+  if(!S.on||!S.speaking||!S.bargeFin)return;if(e.target.closest('button,input,label,a,summary'))return;window.__aiBarge=(window.__aiBarge||0)+1;S.bargeFin();},true);
  if(!window.__aiG){window.__aiG=1;document.addEventListener('click',function(e){if(e.target.closest('#pstop')&&window.speechSynthesis)speechSynthesis.cancel();},true);
-  window.addEventListener('hashchange',function(){if(window.speechSynthesis)speechSynthesis.cancel();var L=window.__aiLoop;if(L&&L.on){L.on=false;L.speaking=false;var r=L.rec;L.rec=null;if(r){r.onend=null;try{r.abort();}catch(e){}}}});}
+  window.addEventListener('hashchange',function(){if(window.speechSynthesis)speechSynthesis.cancel();if(window.__aiLiveStop)window.__aiLiveStop();var L=window.__aiLoop;if(L&&L.on){L.on=false;L.speaking=false;var r=L.rec;L.rec=null;if(r){r.onend=null;try{r.abort();}catch(e){}}}});}
 })();
 streak();go(0);window.__talkReady=1;
 };
