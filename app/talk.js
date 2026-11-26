@@ -177,6 +177,7 @@ window.__aiLive=function(){return !!(window.TALK_AI_URL!=null?window.TALK_AI_URL
 /* ---------- 자유 대화 (AI): hands-free call loop. proxy address from config; any failure -> the prepared role-play continues ---------- */
 (function(){var TU=T.tutor||{},U=window.TALK_AI_URL!=null?window.TALK_AI_URL:(TU.url||''),box=$('#aichat');if(!box)return;
  if(!U){box.hidden=true;return;}box.hidden=false;if($('#ainone'))$('#ainone').hidden=true;
+ if($('#aitr')&&/\/app\//.test(location.pathname))$('#aitr').setAttribute('href','#/tr');
  if(TU.provider&&TU.provider!=='GEMINI')$('#aipriv').textContent='AI와 대화할 때 이름·연락처 같은 개인 정보는 말하지 마세요.';
  var H=[],busy=false,n=0,MAX=30,log=$('#ailog'),sid=null,S={on:false,paused:false,rec:null,speaking:false,t0:0,turns:0,nat:[],wd:null,bargeFin:null,localN:0,rpI:0};window.__aiLoop=S;
  var END_MS=window.__aiEndMs||1500,TURN_MS=15000,NOSPEECH_MS=8000,TIMEOUT=window.__aiTimeout||10000;

@@ -49,12 +49,16 @@ function reviewItems(){var p=prog(),out=[],seen={};
   Object.keys(p.done).forEach(function(id){if(p.done[id]!==key)return;var d=day(+id);if(!d)return;
    (d.must&&d.must.length?d.must:[1,2]).forEach(function(n){var s=d.sentences[n-1];if(!s||seen[id+'_'+n])return;seen[id+'_'+n]=1;
     out.push({day:+id,en:s.en,ko:s.ko,src:'../audio/'+did(+id)+'/s'+('0'+n).slice(-2)+'.mp3'});});});});
- var pick=[],i=0;while(pick.length<5&&out.length){pick.push(out.splice(i%out.length,1)[0]);i++;}return pick;}
+ var st=(window.deStars?window.deStars():[]).filter(function(x){return [1,3,7].some(function(k){var dt=new Date();dt.setDate(dt.getDate()-k);return x.saved===dstr(dt);});}).slice(0,2);
+ var pick=[],i=0;while(pick.length<5-st.length&&out.length){pick.push(out.splice(i%out.length,1)[0]);i++;}
+ st.forEach(function(x){pick.push({day:0,en:x.en,ko:x.ko,src:null,star:1});});return pick;}
 var REVT=0;document.addEventListener('click',function(e){if(e.target.closest('#pstop'))REVT++;},true);window.addEventListener('hashchange',function(){REVT++;});
 function playReview(items,btn){var tok=++REVT,i=0,rep=0;
  function next(){if(tok!==REVT)return;if(i>=items.length){$$('.rv').forEach(function(r){r.classList.remove('now');});window.__revDone=1;return;}
   $$('.rv').forEach(function(r,k){r.classList.toggle('now',k===i);});var it=items[i];
-  dePlay(it.src,{label:'🔁 오늘 복습 '+(i+1)+' / '+items.length,btn:btn,onend:function(){if(tok!==REVT)return;rep++;if(rep>=2){rep=0;i++;}window.__revPlays=(window.__revPlays||0)+1;setTimeout(next,rep?800:1500);}});}
+  var after=function(){if(tok!==REVT)return;rep++;if(rep>=2){rep=0;i++;}window.__revPlays=(window.__revPlays||0)+1;setTimeout(next,rep?800:1500);};
+  if(!it.src&&window.deTR){window.deTR.say(it.en,'en',0.9,after);return;}   /* saved sentence (no recording): phone voice */
+  dePlay(it.src,{label:'🔁 오늘 복습 '+(i+1)+' / '+items.length,btn:btn,onend:after});}
  next();}
 /* ---------- daily reminder: calendar event (no server); Android app bonus: notification ---------- */
 function icsFor(h){var now=new Date(),st=new Date();st.setHours(h,0,0,0);if(st<now)st.setDate(st.getDate()+1);
@@ -68,9 +72,10 @@ function remind(h){var ics=icsFor(h);window.__ics=ics;var a=document.createEleme
 function home(){var p=prog(),t=todayDay(),td=day(t);
  var h=top('오늘의 영어','<div class="streak">'+streak()+'</div>');
  var rv=localStorage.getItem('de100revskip')===today()?[]:reviewItems();window.__revN=rv.length;
- if(rv.length)h+='<div class="card revcard"><b class="inst">🔁 오늘 복습 '+rv.length+'개</b>'+rv.map(function(x){return '<div class="rv"><div class="en">'+esc(x.en)+'</div><div class="n2">'+esc(x.ko)+' · Day '+x.day+'</div></div>';}).join('')+
+ if(rv.length)h+='<div class="card revcard"><b class="inst">🔁 오늘 복습 '+rv.length+'개</b>'+rv.map(function(x){return '<div class="rv"><div class="en">'+esc(x.en)+'</div><div class="n2">'+esc(x.ko)+' · '+(x.star?'⭐ 내가 저장한 문장 · Saved':'Day '+x.day)+'</div></div>';}).join('')+
   '<button id="revgo" class="go">▶ 복습 듣기 (2번씩)</button><button id="revskip" class="nolink">건너뛰기</button></div>';
- h+='<div class="card todaycard"><div class="k">오늘 · DAY '+t+'</div><div class="big">'+esc(td.title_ko)+'</div><div class="n2">'+esc(td.title_en)+'</div><a class="go" href="#/day/'+t+'">시작하기 ▶</a></div>';
+ h+='<div class="card todaycard"><div class="k">오늘 · DAY '+t+'</div><div class="big">'+esc(td.title_ko)+'</div><div class="n2">'+esc(td.title_en)+'</div><a class="go" href="#/day/'+t+'">시작하기 ▶ · Start</a></div>';
+ if(window.deTR&&window.deTR.url())h+='<a class="go trgo" href="#/tr">🗣 바로 통역 · Live interpreter<br><span class="n2">한국어 ↔ English</span></a>';
  h+='<div class="card"><button id="remgo" class="big2">⏰ 매일 알림 받기</button><div id="rempick" hidden><p class="inst">언제 알려 드릴까요?</p><button class="big2 remh" data-h="7">아침 7시</button><button class="big2 remh" data-h="12">낮 12시</button><button class="big2 remh" data-h="21">저녁 9시</button></div><div id="remst" class="n2"></div>'+bigBtn()+'</div>';
  h+='<div class="card"><b>⬇ 지하철·차에서도 듣기</b><p class="n2">인터넷이 없어도 들을 수 있게 미리 내려받아요. (대화 연습·AI·음성 인식은 인터넷이 필요해요.)</p><button id="week" class="big2">이번 주 7일 내려받기</button> <span id="wkst" class="n2"></span><div id="use" class="n2"></div></div>';
  if(window.CKS&&window.CKS[0])h+='<div class="card"><b>🗣 말하기 점검</b><a class="go" href="#/ck/0">시작 점검 (Day 0)</a>'+(window.CKS[30]?'<a class="go" href="#/ck/30">30일 점검</a>':'')+'</div>';
@@ -92,7 +97,7 @@ function dayScreen(n){var d=day(n);if(!d){location.hash='#/';return;}
   bigBtn()+'<label class="bg"><input type="checkbox" id="bg"'+(S.bg?' checked':'')+'> 화면이 꺼져도 계속 듣기</label>'+(isIOS&&standalone?'<p class="n2">아이폰 홈 화면 앱에서 화면이 꺼질 때 소리가 멈추면, Safari에서 열어 들으세요.</p>':'')+'</div>';
  h+='<div class="card dlc"><b>⬇ 이 날 내려받기</b> <span class="n2">약 '+d.mb+' MB</span><div><button id="dl" class="big2">내려받기</button> <button id="rm" hidden>지우기</button> <span id="dlst" class="n2"></span></div></div>';
  if(d.check&&d.check.length)h=h.replace('<div class="card ten">','<a class="go ckgo" href="#/check/'+n+'">🗣 말하기 점검</a><div class="card ten">');
- h+='<div class="card acts"><a class="go aigo" href="#/ai/'+n+'">AI와 대화</a>'+(d.talk?'<a class="go" id="talkgo" href="#/talk/'+n+'">🗣 대화 연습 (말하고 대답 듣기)</a>':'<span class="n2">🗣 대화 연습은 곧 열려요.</span>')+
+ h+='<div class="card acts"><a class="go aigo" href="#/ai/'+n+'">AI와 대화 · Talk with AI</a>'+(window.deTR&&window.deTR.url()?'<a class="go trgo" href="#/tr/'+n+'">🗣 바로 통역 · Live interpreter</a>':'')+(d.talk?'<a class="go" id="talkgo" href="#/talk/'+n+'">🗣 대화 연습 (말하고 대답 듣기)</a>':'<span class="n2">🗣 대화 연습은 곧 열려요.</span>')+
   '<button id="stuckgo" class="help">🙋 막혔을 때 (번역기 · 부탁하는 말)</button></div>';
  h+='<h2>오늘의 문장 '+d.sentences.length+'</h2>'+d.sentences.map(function(s,i){var k='s'+('0'+(i+1)).slice(-2);
   return '<div class="card sent" data-n="'+(i+1)+'"><div class="en big">'+(i+1)+'. '+esc(s.en)+'</div><div class="ko">'+esc(s.ko)+'</div>'+
@@ -182,7 +187,7 @@ function install(){var ua=navigator.userAgent,inapp=/KAKAOTALK|NAVER\(|NAVER|Ins
  $$('.instbtn').forEach(function(b){b.onclick=function(){if(deferred){var dp=deferred;deferred=null;dp.prompt();(dp.userChoice||Promise.resolve({})).then(function(c){if(c&&c.outcome==='accepted'){installed();location.hash='#/';}});}};});}
 /* ---------- router ---------- */
 function route(){try{stopAll();}catch(e){}stopRec();window.deNext=null;var h=location.hash.replace(/^#\/?/,'').split('/');
- if(h[0]==='day'&&h[1])dayScreen(+h[1]);else if(h[0]==='talk'&&h[1])talkScreen(+h[1],h[2]);else if(h[0]==='ai'&&h[1])aiScreen(+h[1]);else if(h[0]==='check'&&h[1])checkScreen(+h[1]);else if(h[0]==='ck'&&h[1])ckScreen(+h[1]);else if(h[0]==='install')install();else home();
+ if(h[0]==='day'&&h[1])dayScreen(+h[1]);else if(h[0]==='talk'&&h[1])talkScreen(+h[1],h[2]);else if(h[0]==='ai'&&h[1])aiScreen(+h[1]);else if(h[0]==='check'&&h[1])checkScreen(+h[1]);else if(h[0]==='ck'&&h[1])ckScreen(+h[1]);else if(h[0]==='install')install();else if(h[0]==='tr'&&window.interpScreen)window.interpScreen(V,h[1]?'#/day/'+h[1]:'#/');else home();
  ibar();
  window.scrollTo(0,0);window.__route=location.hash||'#/';}
 window.addEventListener('hashchange',route);route();

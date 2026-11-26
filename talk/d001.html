@@ -58,6 +58,7 @@ details.other{margin:16px 0}details.other summary{min-height:56px;display:flex;a
 #aictl .tgl{display:inline-flex;align-items:center;gap:6px;min-height:56px;font-size:18px;padding:0 10px}#aictl .tgl input{width:26px;height:26px}
 details.nosnd{margin:10px 0;font-size:18px}details.nosnd summary{min-height:56px;display:flex;align-items:center;cursor:pointer}
 .think{font-size:20px}
+a.trlink{display:flex;align-items:center;justify-content:center;min-height:56px;font-size:18px;margin:8px 0;text-decoration:none}
 #stuck{position:fixed;inset:0;z-index:40;background:#F4F6FA;overflow:auto;padding:12px 12px 110px;font-size:18px}
 #stuck .shead{display:flex;justify-content:space-between;align-items:center;font-size:22px;position:sticky;top:-12px;background:#F4F6FA;padding:8px 0;z-index:1}
 #stuck h3{font-size:19px;margin:4px 0 8px;color:#1F3A5F}#stuck textarea{width:100%;font-size:18px;border:2px solid #1F3A5F;border-radius:10px;padding:8px}
@@ -68,6 +69,8 @@ details.nosnd{margin:10px 0;font-size:18px}details.nosnd summary{min-height:56px
 body.stuckopen #pback,body.stuckopen #tback{display:none}
 .stuckbtn{border-color:#C25E0E;color:#7A3A00;font-weight:700}
 #view button,main button,#stuck button{min-height:56px}
+#stuck .sbig{display:block;width:100%;min-height:64px;font-size:20px;font-weight:700;text-align:center;box-sizing:border-box;white-space:normal}
+#stuck .sbigt{font-size:26px;font-weight:700;margin:8px 0}#stuck .slinks{margin-top:10px}#stuck .srow button{min-height:56px;font-size:18px;white-space:normal}
 </style></head><body data-home="1">
 <a id="tback" href="../d001.html">← Day 1</a>
 <header class="top"><div class="k">DAY 1 · 대화 연습</div><h1>공항에서 처음 만나기</h1><div class="streak"></div></header>
@@ -95,6 +98,7 @@ body.stuckopen #pback,body.stuckopen #tback{display:none}
 <label class="tgl"><input type="checkbox" id="aislow"> 🐢 천천히 · Slower</label> <label class="tgl"><input type="checkbox" id="aiko" checked> 한국어 뜻 · Korean</label>
 <p class="n2">AI가 말할 때 화면을 누르면 바로 말할 수 있어요. · Tap the screen to interrupt.</p></div>
 <div id="ailog"></div><div id="ailive" hidden><span class="mic">🎤</span> <span class="lt"></span></div><div id="aibox"></div><div id="aisum" class="card" hidden></div>
+<a id="aitr" class="big2 trlink" href="../app/#/tr">🗣 바로 통역 · Live interpreter</a>
 <details class="nosnd"><summary>🔊 소리가 안 나오면 · No sound?</summary><ol><li>휴대폰 옆 소리 버튼(위)으로 <b>미디어 소리</b>를 키워요. · Turn up the media volume.</li><li>무음·진동 모드를 꺼요. · Turn off silent mode.</li><li>그래도 안 되면: 설정 → 일반 → 글자를 음성으로 변환(TTS) → <b>Google 음성 엔진</b>을 골라요. · Settings → Text-to-speech → choose the Google engine.</li></ol></details>
 <p id="aipriv" class="n2">무료 AI는 대화 내용이 구글 서비스 개선에 쓰일 수 있어요. 이름·연락처 같은 개인 정보는 말하지 마세요.</p><div id="ainote" class="warn"></div></div>
 <p id="ainone" class="inst">Jake와의 대화는 「대화하기」에서 할 수 있어요.</p>
@@ -292,6 +296,7 @@ window.__aiLive=function(){return !!(window.TALK_AI_URL!=null?window.TALK_AI_URL
 /* ---------- 자유 대화 (AI): hands-free call loop. proxy address from config; any failure -> the prepared role-play continues ---------- */
 (function(){var TU=T.tutor||{},U=window.TALK_AI_URL!=null?window.TALK_AI_URL:(TU.url||''),box=$('#aichat');if(!box)return;
  if(!U){box.hidden=true;return;}box.hidden=false;if($('#ainone'))$('#ainone').hidden=true;
+ if($('#aitr')&&/\/app\//.test(location.pathname))$('#aitr').setAttribute('href','#/tr');
  if(TU.provider&&TU.provider!=='GEMINI')$('#aipriv').textContent='AI와 대화할 때 이름·연락처 같은 개인 정보는 말하지 마세요.';
  var H=[],busy=false,n=0,MAX=30,log=$('#ailog'),sid=null,S={on:false,paused:false,rec:null,speaking:false,t0:0,turns:0,nat:[],wd:null,bargeFin:null,localN:0,rpI:0};window.__aiLoop=S;
  var END_MS=window.__aiEndMs||1500,TURN_MS=15000,NOSPEECH_MS=8000,TIMEOUT=window.__aiTimeout||10000;
@@ -393,7 +398,103 @@ window.__aiLive=function(){return !!(window.TALK_AI_URL!=null?window.TALK_AI_URL
 streak();go(0);window.__talkReady=1;
 };
 if(window.TALK&&!window.TALK_DEFER)window.initTalk();
-</script><script>window.STUCK={"title_ko": "말이 막힐 때: 번역기 대화 모드로 이어 가기", "lead_ko": "미국 선교팀과 이야기하다 말이 막히면, 대화를 멈추지 말고 휴대폰 번역기의 대화 모드로 이어 가세요. 다시 통하면 그 문장을 내 입으로 말해 보면 돼요.", "apps": [{"order": 1, "name": "Google 번역 (Google Translate)", "steps": [{"no": 1, "text_ko": "앱을 열고 아래쪽의 「live translate(실시간 번역)」 버튼을 눌러요.", "picture": {"phone": true, "highlight": "bottom button 'live translate' (icon: two speech bubbles)"}}, {"no": 2, "text_ko": "「Conversation(대화)」 모드를 고르고, 두 언어를 한국어 ⇄ 영어로 맞춰요.", "picture": {"phone": true, "highlight": "mode list: Listening / Conversation / Text only — Conversation marked; language bar 한국어 ⇄ English"}}, {"no": 3, "text_ko": "「Face to face(마주 보기)」를 누르면 화면이 둘로 나뉘어 서로 자기 말로 읽어요. 한 사람씩 짧게 말하고, 번역 소리가 끝나면 상대 차례예요.", "picture": {"phone": true, "highlight": "split screen: top half upside down (English), bottom half (한국어); mic in the middle; arrows 말하기 → 기다리기 → 상대 차례"}}], "notes_ko": ["한국어 화면에서는 버튼 이름이 조금 다를 수 있어요. 말풍선 두 개 모양을 찾으세요.", "한국에서 산 휴대폰은 화면이 다르게 보일 수 있어요. 처음에는 집에서 한 번 미리 해 보세요.", "인터넷(와이파이나 데이터)이 있어야 해요."]}, {"order": 2, "name": "파파고 (Papago)", "steps": [{"no": 1, "text_ko": "앱을 열고 아래쪽의 「대화」 탭을 눌러요.", "picture": {"phone": true, "highlight": "bottom tab '대화'"}}, {"no": 2, "text_ko": "휴대폰을 두 사람 사이에 놓고, 각자 자기 말로 한 번씩 말해요. 번역은 화면에 보이고 소리로도 들을 수 있어요.", "picture": {"phone": true, "highlight": "phone on a table between two people; speech bubbles ko / en"}}], "notes_ko": ["인터넷이 있어야 해요."]}], "also_ko": ["갤럭시(S24 이후) 휴대폰: 화면 위에서 내려 「통역」을 눌러도 돼요.", "아이폰을 쓰는 손님: 기본 「번역」 앱의 대화에서 「Face to Face」를 쓸 수 있어요. 한국어를 미리 내려받아 두면 인터넷 없이도 돼요."], "polite_lines": [{"en": "Could you speak into my phone, please?", "ko": "제 휴대폰에 대고 말씀해 주시겠어요?"}, {"en": "One more time, please.", "ko": "한 번 더 말씀해 주세요."}, {"en": "Thank you for your patience.", "ko": "기다려 주셔서 고마워요."}], "tips_ko": ["짧은 문장으로, 한 사람씩 말해요.", "조용한 곳에서, 휴대폰은 두 사람 가운데에.", "소리가 잘 안 들리면 화면을 보여 주세요.", "앱은 켠 채로 두세요. 다른 앱으로 넘어가면 멈출 수 있어요."], "bottom_box_ko": "통한 문장은 책 뒤 「내 입으로 말해 보기」 목록에 적어 두세요. 다음에는 번역기 없이 내 입으로 말해 봐요.", "polite_audio": ["../audio/stuck/pol_1.mp3", "../audio/stuck/pol_2.mp3", "../audio/stuck/pol_3.mp3"]};</script><script>/* "막혔을 때" panel (app day/talk screens + standalone talk page). Needs window.STUCK (content) and window.TK (talk kit) + dePlay. Free only: links to the official translator web pages, phone speech synthesis. */
+</script><script>window.STUCK={"title_ko": "말이 막힐 때: 번역기 대화 모드로 이어 가기", "lead_ko": "미국 선교팀과 이야기하다 말이 막히면, 대화를 멈추지 말고 휴대폰 번역기의 대화 모드로 이어 가세요. 다시 통하면 그 문장을 내 입으로 말해 보면 돼요.", "apps": [{"order": 1, "name": "Google 번역 (Google Translate)", "steps": [{"no": 1, "text_ko": "앱을 열고 아래쪽의 「live translate(실시간 번역)」 버튼을 눌러요.", "picture": {"phone": true, "highlight": "bottom button 'live translate' (icon: two speech bubbles)"}}, {"no": 2, "text_ko": "「Conversation(대화)」 모드를 고르고, 두 언어를 한국어 ⇄ 영어로 맞춰요.", "picture": {"phone": true, "highlight": "mode list: Listening / Conversation / Text only — Conversation marked; language bar 한국어 ⇄ English"}}, {"no": 3, "text_ko": "「Face to face(마주 보기)」를 누르면 화면이 둘로 나뉘어 서로 자기 말로 읽어요. 한 사람씩 짧게 말하고, 번역 소리가 끝나면 상대 차례예요.", "picture": {"phone": true, "highlight": "split screen: top half upside down (English), bottom half (한국어); mic in the middle; arrows 말하기 → 기다리기 → 상대 차례"}}], "notes_ko": ["한국어 화면에서는 버튼 이름이 조금 다를 수 있어요. 말풍선 두 개 모양을 찾으세요.", "한국에서 산 휴대폰은 화면이 다르게 보일 수 있어요. 처음에는 집에서 한 번 미리 해 보세요.", "인터넷(와이파이나 데이터)이 있어야 해요."]}, {"order": 2, "name": "파파고 (Papago)", "steps": [{"no": 1, "text_ko": "앱을 열고 아래쪽의 「대화」 탭을 눌러요.", "picture": {"phone": true, "highlight": "bottom tab '대화'"}}, {"no": 2, "text_ko": "휴대폰을 두 사람 사이에 놓고, 각자 자기 말로 한 번씩 말해요. 번역은 화면에 보이고 소리로도 들을 수 있어요.", "picture": {"phone": true, "highlight": "phone on a table between two people; speech bubbles ko / en"}}], "notes_ko": ["인터넷이 있어야 해요."]}], "also_ko": ["갤럭시(S24 이후) 휴대폰: 화면 위에서 내려 「통역」을 눌러도 돼요.", "아이폰을 쓰는 손님: 기본 「번역」 앱의 대화에서 「Face to Face」를 쓸 수 있어요. 한국어를 미리 내려받아 두면 인터넷 없이도 돼요."], "polite_lines": [{"en": "Could you speak into my phone, please?", "ko": "제 휴대폰에 대고 말씀해 주시겠어요?"}, {"en": "One more time, please.", "ko": "한 번 더 말씀해 주세요."}, {"en": "Thank you for your patience.", "ko": "기다려 주셔서 고마워요."}], "tips_ko": ["짧은 문장으로, 한 사람씩 말해요.", "조용한 곳에서, 휴대폰은 두 사람 가운데에.", "소리가 잘 안 들리면 화면을 보여 주세요.", "앱은 켠 채로 두세요. 다른 앱으로 넘어가면 멈출 수 있어요."], "bottom_box_ko": "통한 문장은 책 뒤 「내 입으로 말해 보기」 목록에 적어 두세요. 다음에는 번역기 없이 내 입으로 말해 봐요.", "polite_audio": ["../audio/stuck/pol_1.mp3", "../audio/stuck/pol_2.mp3", "../audio/stuck/pol_3.mp3"]};</script><script>/* 바로 통역 · Live interpreter (app screen #/tr) + window.deTR helper (stuck panel, AI call). our proxy /translate; phone speech in/out. */
+(function(){
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+function aiUrl(){if(window.TALK_AI_URL!=null)return window.TALK_AI_URL;var T=window.TALKS||{};for(var k in T){var t=T[k]&&(T[k].data||T[k]);if(t&&t.tutor&&t.tutor.url)return t.tutor.url;}
+ var one=window.TALK;return one&&one.tutor&&one.tutor.url||'';}
+function sid(){var s=null;try{s=sessionStorage.getItem('de100sid');}catch(e){}if(!s){s=Math.random().toString(36).slice(2,10)+Date.now().toString(36);try{sessionStorage.setItem('de100sid',s);}catch(e){}}return s;}
+function translate(text,from,to){var U=aiUrl();if(!U)return Promise.reject({error:'off'});
+ var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ctl)ctl.abort();},9000);
+ return fetch(U.replace(/\/$/,'')+'/translate',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl?ctl.signal:undefined,body:JSON.stringify({text:text,from:from,to:to,sid:sid()})})
+  .then(function(r){return r.json().catch(function(){return {};}).then(function(j){clearTimeout(tm);if(r.status===200&&j.translation)return j;throw {error:j.error||('http'+r.status),status:r.status};});},function(e){clearTimeout(tm);throw {error:'network'};});}
+function voice(lang){var v=(window.speechSynthesis&&speechSynthesis.getVoices())||[],re=(lang==='ko')?(/^ko/i):(/^en[-_]US/i);var c=v.filter(function(x){return re.test(x.lang);});
+ return c.filter(function(x){return /Google/i.test(x.name);})[0]||c[0]||null;}
+function say(t,lang,rate,cb){var ss=window.speechSynthesis;if(!ss||!t){cb&&cb();return;}try{window.stopAll&&stopAll();}catch(e){}ss.cancel();
+ var u=new SpeechSynthesisUtterance(t),v=voice(lang);u.lang=lang==='ko'?'ko-KR':'en-US';if(v)u.voice=v;u.rate=rate||0.9;var done=false,fin=function(){if(!done){done=true;cb&&cb();}};
+ u.onend=fin;u.onerror=fin;setTimeout(fin,2500+t.length*110/u.rate);ss.speak(u);window.__trSpoke=(window.__trSpoke||[]).concat([lang+':'+t]);}
+function errMsg(e){if(e&&e.status===429)return '오늘 쓸 수 있는 무료 통역을 다 썼어요. 내일 다시 쓸 수 있어요. · Today\'s free translations are used up. Try again tomorrow.';
+ if(e&&(e.error==='off'||e.status===503))return '지금은 통역을 쓸 수 없어요. 아래 번역기 링크를 써 주세요. · The interpreter is off right now. Please use a translator link below.';
+ return '연결이 느려요. 다시 눌러 주세요. · The connection is slow. Please try again.';}
+window.deTR={url:aiUrl,translate:translate,say:say,err:errMsg};
+/* ---------- saved sentences (⭐) feed the daily review ---------- */
+function stars(){try{return JSON.parse(localStorage.getItem('de100star')||'[]');}catch(e){return [];}}
+function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function star(en,ko){var L=stars();if(L.some(function(x){return x.en===en;}))return false;L.unshift({en:en,ko:ko,saved:today()});localStorage.setItem('de100star',JSON.stringify(L.slice(0,200)));return true;}
+window.deStars=stars;
+/* ---------- screen ---------- */
+window.interpScreen=function(V,back){var U=aiUrl();
+ var st={flip:false,conv:false,rec:null,last:null,hist:[]};try{st.hist=JSON.parse(sessionStorage.getItem('de100tr')||'[]');}catch(e){}
+ function L(ko,en){var m=String(ko).match(/^([^\w가-힣]+)\s*/),ic=m?m[1]:'';ko=String(ko).slice(m?m[0].length:0);return st.flip?ic+en+' · '+ko:ic+ko+' · '+en;}
+ V.innerHTML='<header class="atop"><a class="aback" href="'+(back||'#/')+'">← <span class="lb" data-ko="뒤로" data-en="Back"></span></a><div class="k">웰컴 잉글리시 100</div><h1 class="lb" data-ko="🗣 바로 통역" data-en="Live interpreter"></h1></header>'+
+  '<div id="trwrap">'+(U?'':'<div class="card warn">지금은 통역을 쓸 수 없어요. · The interpreter is not available.</div>')+
+  '<div id="trout" class="card trout"><p class="n2 lb" data-ko="아래 버튼을 누르고 말하세요." data-en="Tap a button below and speak."></p></div>'+
+  '<div id="trlive" class="trlive" hidden><span class="mic">🎤</span> <span class="lt"></span></div>'+
+  '<div class="trbtns"><button id="trko" class="trmic ko lb" data-ko="🇰🇷 한국어로 말하기" data-en="Speak Korean"></button><button id="tren" class="trmic en lb" data-ko="🇺🇸 영어로 말하기" data-en="Speak English"></button></div>'+
+  '<button id="trstop" class="big2 lb" hidden data-ko="■ 다 말했어요" data-en="Done"></button>'+
+  '<div class="trtog"><label class="tgl"><input type="checkbox" id="trconv"> <span class="lb" data-ko="대화 모드" data-en="Conversation mode"></span></label>'+
+  '<label class="tgl"><input type="checkbox" id="trkosnd"> <span class="lb" data-ko="한국어 소리로 듣기" data-en="Read Korean aloud"></span></label>'+
+  '<button id="trflip" class="big2 lb" data-ko="🔄 상대에게 보여주기" data-en="Show to partner"></button><button id="trpause" class="big2 lb" data-ko="⏸ 잠깐 멈춤" data-en="Pause"></button></div>'+
+  '<details class="trtype"><summary class="lb" data-ko="✍ 글로 쓰기" data-en="Type instead"></summary><textarea id="trtx" rows="3"></textarea><button id="trsend" class="big2 lb" data-ko="번역기로 바로 보내기" data-en="Send to translator"></button></details>'+
+  '<p class="n2 lb" data-ko="통역할 말은 번역을 위해 구글 AI로 보내져요. 이름·연락처 같은 개인 정보는 말하지 마세요." data-en="Your words go to Google AI for translation. Please do not say personal details."></p>'+
+  '<h3 class="lb" data-ko="이번 대화" data-en="This conversation"></h3><ol id="trhist" class="trhist"></ol>'+
+  '<p class="n2 center trlinks"><span class="lb" data-ko="다른 번역기" data-en="Other translators"></span>: <a href="https://translate.google.com/?sl=ko&tl=en&op=translate" target="_blank" rel="noopener">Google</a> · <a href="https://papago.naver.com/?sk=ko&tk=en" target="_blank" rel="noopener">Papago</a></p></div>';
+ var $=function(s){return V.querySelector(s);};
+ function labels(){[].forEach.call(V.querySelectorAll('.lb'),function(e){e.textContent=L(e.dataset.ko,e.dataset.en);});$('#trwrap').classList.toggle('flip',st.flip);}
+ function live(t,on){var b=$('#trlive');if(!b)return;b.hidden=!on;b.querySelector('.lt').textContent=t||L('듣고 있어요…','Listening…');}
+ function stopRec(){var r=st.rec;st.rec=null;clearTimeout(st.endT);clearTimeout(st.maxT);live('',false);if($('#trstop'))$('#trstop').hidden=true;
+  [].forEach.call(V.querySelectorAll('.trmic'),function(b){b.classList.remove('on');});if(r){r.onend=null;r.onresult=null;r.onerror=null;try{r.abort();}catch(e){}}}
+ function hist(){var o=$('#trhist');o.innerHTML=st.hist.slice(0,20).map(function(h,i){return '<li><div class="'+(h.from==='ko'?'hk':'he')+'">'+esc(h.src)+'</div><div class="ht">'+esc(h.out)+'</div><button class="trstar" data-i="'+i+'" aria-label="save">'+(h.star?'⭐':'☆')+' '+esc(L('복습에 넣기','Save'))+'</button></li>';}).join('');
+  [].forEach.call(o.querySelectorAll('.trstar'),function(b){b.onclick=function(){var h=st.hist[+b.dataset.i],en=h.from==='ko'?h.out:h.src,ko=h.from==='ko'?h.src:h.out;star(en,ko);h.star=1;save();hist();
+   toast(L('⭐ 복습 목록에 넣었어요. 내일 「오늘 복습」에 나와요.','Saved for review.'));};});}
+ function save(){try{sessionStorage.setItem('de100tr',JSON.stringify(st.hist.slice(0,20)));}catch(e){}}
+ function toast(t){var n=$('#trnote');if(!n){n=document.createElement('div');n.id='trnote';n.className='n2 trnote';$('#trout').after(n);}n.textContent=t;}
+ function next(from){if(!st.conv)return;var b=from==='ko'?$('#tren'):$('#trko'),o=from==='ko'?$('#trko'):$('#tren');o.classList.remove('next');b.classList.add('next');}
+ function show(src,from,j,re){var to=from==='ko'?'en':'ko',out=j.translation,simple=j.simple||'';st.last={src:src,out:out,from:from,simple:simple};
+  if(!re){st.hist.unshift({src:src,out:out,from:from});save();}hist();var o=$('#trout');
+  if(from==='ko'){o.innerHTML='<div class="trsrc">🇰🇷 '+esc(src)+'</div><div class="trbig en">'+esc(out)+'</div>'+(simple?'<div class="trsimple">'+esc(L('더 쉽게','Simpler'))+': <b>'+esc(simple)+'</b></div>':'')+
+    '<div class="trrow"><button id="tragain" class="big2">'+esc(L('🔁 다시 듣기','Play again'))+'</button><button id="trslow" class="big2">'+esc(L('🐢 천천히','Slower'))+'</button><button id="trrep" class="big2">'+esc(L('따라 말하기','Repeat after'))+'</button><button id="trsave" class="big2">'+esc(L('⭐ 복습에 넣기','Save'))+'</button></div><div id="trcmp"></div>';
+   if(!re)say(out,'en',0.9,function(){next('ko');});
+   $('#tragain').onclick=function(){say(out,'en',0.9);};$('#trslow').onclick=function(){say(out,'en',0.65);};
+   $('#trrep').onclick=function(){repeat(out);};}
+  else{o.innerHTML='<div class="trsrc">🇺🇸 '+esc(src)+'</div><div class="trbig ko">'+esc(out)+'</div><div class="trrow"><button id="tragain" class="big2">'+esc(L('🔁 다시 듣기','Play again'))+'</button><button id="trsave" class="big2">'+esc(L('⭐ 복습에 넣기','Save'))+'</button></div>';
+   if(!re){if($('#trkosnd').checked)say(out,'ko',1,function(){next('en');});else next('en');}
+   $('#tragain').onclick=function(){say(out,'ko',1);};}
+  $('#trsave').onclick=function(){star(from==='ko'?out:src,from==='ko'?src:out);if(st.hist[0])st.hist[0].star=1;save();hist();toast(L('⭐ 복습 목록에 넣었어요. 내일 「오늘 복습」에 나와요.','Saved for review.'));};
+  window.__trLast={src:src,out:out,from:from};}
+ function go(text,from){text=(text||'').trim();if(!text)return;var to=from==='ko'?'en':'ko';$('#trout').innerHTML='<div class="trsrc">'+(from==='ko'?'🇰🇷 ':'🇺🇸 ')+esc(text)+'</div><div class="think">💭 '+esc(L('번역 중…','Translating…'))+'</div>';
+  var t0=Date.now();translate(text,from,to).then(function(j){window.__trMs=Date.now()-t0;show(text,from,j);},function(e){$('#trout').innerHTML='<div class="trsrc">'+esc(text)+'</div><div class="warn">'+esc(errMsg(e))+'</div>';window.__trErr=(e&&e.error)||'x';});}
+ function listen(lang){if(!U)return;stopRec();if(window.speechSynthesis)speechSynthesis.cancel();
+  if(!SR){$('details.trtype').open=true;toast(L('이 휴대폰은 음성 인식이 안 돼요. 글로 써 주세요.','Speech input is not available here. Please type.'));return;}
+  var from=lang,r=new SR(),fins=[],interim='',btn=from==='ko'?$('#trko'):$('#tren');st.rec=r;r.lang=from==='ko'?'ko-KR':'en-US';r.interimResults=true;r.continuous=true;r.maxAlternatives=1;
+  btn.classList.add('on');btn.classList.remove('next');$('#trstop').hidden=false;live('',true);
+  function text(){return fins.join(' ').replace(/\s+/g,' ').trim();}
+  function done(){if(st.rec!==r)return;var t=(text()||interim).trim();stopRec();if(t)go(t,from);}
+  st.done=done;
+  r.onresult=function(ev){interim='';for(var i=ev.resultIndex;i<ev.results.length;i++){var x=ev.results[i][0].transcript.trim();if(ev.results[i].isFinal){var l=fins[fins.length-1];if(l&&x.toLowerCase().indexOf(l.toLowerCase())===0)fins[fins.length-1]=x;else if(x&&x!==l)fins.push(x);}else interim+=x+' ';}
+   live((text()+' '+interim).trim(),true);clearTimeout(st.endT);st.endT=setTimeout(done,window.__trEndMs||1000);};
+  r.onerror=function(ev){if(ev&&(ev.error==='not-allowed'||ev.error==='service-not-allowed')){stopRec();toast(L('마이크 사용이 막혀 있어요. 주소창 옆 🔒 → 마이크 허용을 눌러 주세요.','The microphone is blocked. Tap 🔒 next to the address and allow the microphone.'));}
+   else if(ev&&ev.error==='no-speech'){stopRec();toast(L('잘 안 들렸어요. 다시 눌러 주세요.','I could not hear you. Please tap again.'));}};
+  r.onend=function(){if(st.rec===r)done();};
+  st.maxT=setTimeout(done,20000);
+  try{r.start();window.__trListens=(window.__trListens||0)+1;window.__trLang=r.lang;}catch(e){stopRec();}}
+ function repeat(target){if(!SR||!window.TK)return;stopRec();var r=new SR(),heard='';st.rec=r;r.lang='en-US';r.interimResults=true;r.continuous=false;live('',true);
+  r.onresult=function(ev){heard='';for(var i=0;i<ev.results.length;i++)heard+=ev.results[i][0].transcript;live(heard,true);};
+  r.onend=function(){st.rec=null;live('',false);var c=window.TK.colour(target,heard),pc=Math.round(100*c.score);
+   $('#trcmp').innerHTML='<div class="cmp">'+c.html+'</div><p class="big">'+(pc>=80?'👍 ':'')+esc(L('맞힌 정도','Match'))+' '+pc+'%</p>';window.__trRepeat=pc;};
+  r.onerror=function(){};try{r.start();}catch(e){}}
+ $('#trko').onclick=function(){if(st.rec&&st.recFrom==='ko'){st.done&&st.done();return;}st.recFrom='ko';listen('ko');};
+ $('#tren').onclick=function(){if(st.rec&&st.recFrom==='en'){st.done&&st.done();return;}st.recFrom='en';listen('en');};
+ $('#trstop').onclick=function(){st.done&&st.done();};
+ $('#trpause').onclick=function(){stopRec();if(window.speechSynthesis)speechSynthesis.cancel();[].forEach.call(V.querySelectorAll('.trmic'),function(b){b.classList.remove('next');});};
+ $('#trconv').onchange=function(){st.conv=this.checked;if(!st.conv)[].forEach.call(V.querySelectorAll('.trmic'),function(b){b.classList.remove('next');});};
+ $('#trflip').onclick=function(){st.flip=!st.flip;labels();hist();if(st.last){var l=st.last;show(l.src,l.from,{translation:l.out,simple:l.simple},true);}window.__trFlip=st.flip;};
+ $('#trsend').onclick=function(){var t=$('#trtx').value.trim();if(!t)return;go(t,/[가-힣]/.test(t)?'ko':'en');};
+ labels();hist();window.__trReady=1;
+ window.addEventListener('hashchange',function h(){stopRec();if(window.speechSynthesis)speechSynthesis.cancel();window.removeEventListener('hashchange',h);});};
+})();
+</script><script>/* "막혔을 때" panel (app day/talk screens + standalone talk page). Needs window.STUCK (content) and window.TK (talk kit) + dePlay. Free only: links to the official translator web pages, phone speech synthesis. */
 (function(){
 function S(){return window.STUCK;}var K=function(){return window.TK;};
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -406,11 +507,12 @@ function steps(a){return '<div class="sapp"><h3>'+a.order+'. '+esc(a.name)+'</h3
 function render(p){var st=S(),l=list();
  p.innerHTML='<div class="shead"><b>🙋 막혔을 때</b><button class="sclose" aria-label="닫기">✕ 닫기</button></div>'+
  '<p>'+esc(st.lead_ko)+'</p>'+
- '<div class="card"><h3>✍ 번역기로 바로 보내기</h3><textarea id="stx" rows="3" placeholder="하고 싶은 말을 한국어로 (또는 들은 영어를) 쓰거나 🎤로 말하세요"></textarea>'+
-  '<div class="srow"><button id="smic">🎤 한국어로 말하기</button><button id="smicen">🎤 영어로 말하기</button></div>'+
-  '<div class="srow"><a id="sg" class="sbtn" target="_blank" rel="noopener">Google 번역에서 열기</a><a id="sp" class="sbtn" target="_blank" rel="noopener">파파고에서 열기</a></div>'+
-  '<div class="srow"><button id="ssay">🔊 휴대폰 목소리로 듣기</button><button id="sslow">🐢 천천히 (0.7)</button><button id="sadd">➕ 내 입으로 말해 보기에 넣기</button></div>'+
-  '<p class="n2">앱이 빈 화면으로 열리면 브라우저에서 여세요. 번역 결과(영어)를 복사해 위 칸에 붙여 넣고 「➕」를 누르면 목록에 남아요.</p><div id="sst" class="n2"></div></div>'+
+ '<div class="card"><h3>✍ 바로 통역 · Translate now</h3>'+(window.deTR&&window.deTR.url()?'<a class="sbtn sbig" href="'+(/\/app\//.test(location.pathname)?'#/tr':'../app/#/tr')+'">🗣 바로 통역 화면 열기 · Open live interpreter</a>':'')+
+  '<textarea id="stx" rows="3" placeholder="하고 싶은 말을 한국어로 (또는 들은 영어를) 쓰거나 🎤로 말하세요 · Type or speak"></textarea>'+
+  '<div class="srow"><button id="smic">🇰🇷 한국어로 말하기 · Speak Korean</button><button id="smicen">🇺🇸 영어로 말하기 · Speak English</button></div>'+
+  '<div class="srow"><button id="strn" class="sbig">번역기로 바로 보내기 · Send to translator</button></div><div id="sres"></div>'+
+  '<div class="srow"><button id="ssay">📱 휴대폰 목소리로 듣기 · Listen (phone voice)</button><button id="sslow">🐢 천천히 · Slower</button><button id="sadd">✍ 내 입에서 말해 보기에 넣기 · Add to my practice list</button></div>'+
+  '<div id="sst" class="n2"></div><p class="n2 slinks">다른 번역기 · Other translators: <a id="sg" target="_blank" rel="noopener">Google</a> · <a id="sp" target="_blank" rel="noopener">Papago</a></p></div>'+
  '<div class="card"><h3>💬 이렇게 부탁하세요</h3>'+st.polite_lines.map(function(x,i){return '<div class="spol"><button data-pol="'+i+'">🔊</button> <b>'+esc(x.en)+'</b><br><span class="n2">'+esc(x.ko)+'</span></div>';}).join('')+'</div>'+
  '<div class="card"><h3>📱 번역기 대화 모드로 이어 가기</h3>'+st.apps.map(steps).join('')+(st.also_ko||[]).map(function(x){return '<p class="n2">· '+esc(x)+'</p>';}).join('')+
   '<ul>'+st.tips_ko.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div>'+
@@ -419,8 +521,12 @@ function render(p){var st=S(),l=list();
  var tx=p.querySelector('#stx');function upd(){var t=tx.value.trim();p.querySelector('#sg').href=t?gUrl(t):'https://translate.google.com/?sl=ko&tl=en&op=translate';p.querySelector('#sp').href=t?pUrl(t):'https://papago.naver.com/?sk=ko&tk=en';}
  tx.oninput=upd;upd();
  function mic(lang){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){p.querySelector('#sst').textContent='이 브라우저는 음성 인식이 안 돼요. 글자로 써 주세요.';return;}
-  var r=new SR();r.lang=lang;r.interimResults=false;r.onresult=function(e){tx.value=e.results[0][0].transcript;upd();};r.onerror=function(){p.querySelector('#sst').textContent='잘 안 들렸어요. 다시 해 보세요.';};
+  var r=new SR();r.lang=lang;r.interimResults=false;r.onresult=function(e){tx.value=e.results[0][0].transcript;upd();trn();};r.onerror=function(){p.querySelector('#sst').textContent='잘 안 들렸어요. 다시 해 보세요.';};
   try{r.start();p.querySelector('#sst').textContent='듣고 있어요… 말을 마치면 잠시 기다리세요.';r.onend=function(){p.querySelector('#sst').textContent='';};}catch(e){}}
+ function trn(){var t=tx.value.trim(),out=p.querySelector('#sres');if(!t||!window.deTR||!window.deTR.url())return;var ko=hasKo(t);out.innerHTML='<p class="n2">💭 번역 중… · Translating…</p>';
+  window.deTR.translate(t,ko?'ko':'en',ko?'en':'ko').then(function(j){out.innerHTML='<div class="sbigt">'+esc(j.translation)+'</div>';window.__stuckTr=j.translation;if(ko){tx.value=j.translation;upd();window.deTR.say(j.translation,'en',0.9);}},
+   function(e){out.innerHTML='<p class="warn">'+esc(window.deTR.err(e))+'</p>';});}
+ p.querySelector('#strn').onclick=trn;
  p.querySelector('#smic').onclick=function(){mic('ko-KR');};p.querySelector('#smicen').onclick=function(){mic('en-US');};
  p.querySelector('#ssay').onclick=function(){if(!speak(tx.value.trim(),1))p.querySelector('#sst').textContent='이 휴대폰은 읽어 주기를 지원하지 않아요.';};
  p.querySelector('#sslow').onclick=function(){speak(tx.value.trim(),0.7);};
@@ -428,7 +534,7 @@ function render(p){var st=S(),l=list();
   var L=list();if(!L.some(function(x){return x.en===t;}))L.unshift({en:t,added:new Date().toISOString().slice(0,10)});save(L);render(p);};
  [].forEach.call(p.querySelectorAll('[data-pol]'),function(b){b.onclick=function(){dePlay(st.polite_audio[+b.dataset.pol],{label:'🔊 부탁하기',btn:b});};});
  var my=p.querySelector('#smy');list().forEach(function(x,i){var c=document.createElement('div');c.className='smi';
-  c.innerHTML='<b>'+esc(x.en)+'</b> <span class="n2">'+esc(x.added||'')+'</span><div class="srow"><button data-s="1">🔊 듣기</button><button data-s="0.7">🐢 0.7</button><button class="sdel">지우기</button></div>';
+  c.innerHTML='<b>'+esc(x.en)+'</b> <span class="n2">'+esc(x.added||'')+'</span><div class="srow"><button data-s="1">🔊 듣기 · Listen</button><button data-s="0.7">🐢 천천히 · Slower</button><button class="sdel">지우기 · Delete</button></div>';
   [].forEach.call(c.querySelectorAll('[data-s]'),function(b){b.onclick=function(){speak(x.en,+b.dataset.s);};});
   c.querySelector('.sdel').onclick=function(){var L=list();L.splice(i,1);save(L);render(p);};
   var cw=document.createElement('div');cw.className='cmpw';
