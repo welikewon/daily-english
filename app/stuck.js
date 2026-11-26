@@ -9,7 +9,7 @@ function pUrl(t){var ko=hasKo(t);return 'https://papago.naver.com/?sk='+(ko?'ko'
 function speak(t,rate){if(!window.speechSynthesis){return false;}try{stopAll();}catch(e){}speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang=hasKo(t)?'ko-KR':'en-US';u.rate=rate||1;speechSynthesis.speak(u);window.__spoke=(window.__spoke||0)+1;return true;}
 function steps(a){return '<div class="sapp"><h3>'+a.order+'. '+esc(a.name)+'</h3><ol class="ssteps">'+a.steps.map(function(s){return '<li><b>'+s.no+'</b> '+esc(s.text_ko)+'</li>';}).join('')+'</ol>'+(a.notes_ko||[]).map(function(n){return '<p class="n2">· '+esc(n)+'</p>';}).join('')+'</div>';}
 function render(p){var st=S(),l=list();
- p.innerHTML='<div class="shead"><b>🙋 막혔을 때</b><button class="sclose" aria-label="닫기">✕ 닫기</button></div>'+
+ p.innerHTML='<div class="shead"><b>🙋 막혔을 때 · When stuck</b><button class="sclose" aria-label="닫기">✕ 닫기 · Close</button></div>'+
  '<p>'+esc(st.lead_ko)+'</p>'+
  '<div class="card"><h3>✍ 바로 통역 · Translate now</h3>'+(window.deTR&&window.deTR.url()?'<a class="sbtn sbig" href="'+(/\/app\//.test(location.pathname)?'#/tr':'../app/#/tr')+'">🗣 바로 통역 화면 열기 · Open live interpreter</a>':'')+
   '<textarea id="stx" rows="3" placeholder="하고 싶은 말을 한국어로 (또는 들은 영어를) 쓰거나 🎤로 말하세요 · Type or speak"></textarea>'+
@@ -26,7 +26,7 @@ function render(p){var st=S(),l=list();
  tx.oninput=upd;upd();
  function mic(lang){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){p.querySelector('#sst').textContent='이 브라우저는 음성 인식이 안 돼요. 글자로 써 주세요.';return;}
   var r=new SR();r.lang=lang;r.interimResults=false;r.onresult=function(e){tx.value=e.results[0][0].transcript;upd();trn();};r.onerror=function(){p.querySelector('#sst').textContent='잘 안 들렸어요. 다시 해 보세요.';};
-  try{r.start();p.querySelector('#sst').textContent='듣고 있어요… 말을 마치면 잠시 기다리세요.';r.onend=function(){p.querySelector('#sst').textContent='';};}catch(e){}}
+  try{r.start();p.querySelector('#sst').textContent='듣고 있어요… 말을 마치면 잠시 기다리세요. · Listening…';r.onend=function(){p.querySelector('#sst').textContent='';};}catch(e){}}
  function trn(){var t=tx.value.trim(),out=p.querySelector('#sres');if(!t||!window.deTR||!window.deTR.url())return;var ko=hasKo(t);out.innerHTML='<p class="n2">💭 번역 중… · Translating…</p>';
   window.deTR.translate(t,ko?'ko':'en',ko?'en':'ko').then(function(j){out.innerHTML='<div class="sbigt">'+esc(j.translation)+'</div>';window.__stuckTr=j.translation;if(ko){tx.value=j.translation;upd();window.deTR.say(j.translation,'en',0.9);}},
    function(e){out.innerHTML='<p class="warn">'+esc(window.deTR.err(e))+'</p>';});}
