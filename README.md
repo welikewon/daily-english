@@ -1,5 +1,5 @@
-# Daily English 100 · 매일 영어 100일
+# Welcome English 100 · 웰컴 잉글리시 100
 
-Listening website for the book *Daily English 100 · 듣고 말하는 영어 비법책* (test: Day 1–2).
+Listening website for the book *웰컴 잉글리시 100 · 목회자를 위한 하루 10분 영어 대화* (Day 1–30).
 
 ⓒ 2026 김용원 목사 · 세움교회 (Seum Church). All rights reserved.

@@ -38,7 +38,7 @@ document.querySelectorAll('audio[controls]').forEach(function(x){x.addEventListe
 function show(){var m=MODES[ST.mode]||MODES.single;bar.style.setProperty('--m',m[0]);plab.textContent=ST.label||m[1];pprog.textContent='';pgf.style.width='0';
  document.body.classList.add('playing');
  if(ST.btn){ST.btn.classList.add('act');ST.btn.style.setProperty('--m',m[0]);}
- if('mediaSession' in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:ST.label||m[1],artist:'매일 영어 100일'});navigator.mediaSession.playbackState='playing';}catch(e){}}}
+ if('mediaSession' in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:ST.label||m[1],artist:'웰컴 잉글리시 100'});navigator.mediaSession.playbackState='playing';}catch(e){}}}
 /* play(src, opts): MUST be called inside the tap handler */
 function play(src,o){stopAll();o=o||{};ST={mode:o.mode||'single',label:o.label,starts:o.starts||[],total:o.total||0,btn:o.btn,cards:o.cards||[],chunks:o.chunks||[],unit:o.unit||'',onend:o.onend,keep:!!o.keep};
  if(o.nextSeek){var prevNext=window.deNext,me=ST;ST.restoreNext=prevNext;window.deNext=function(){if(ST!==me)return;var k=idx();if(ST.starts[k+1]!=null){A.currentTime=ST.starts[k+1];tick();}};}

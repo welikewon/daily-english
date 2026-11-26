@@ -1,4 +1,4 @@
-/* 매일 영어 100일 app (PWA): hash routes  #/  #/day/N  #/talk/N  #/install  — needs ../app.js (dePlay/stopAll), content.js, talk.js */
+/* 웰컴 잉글리시 100 app (PWA): hash routes  #/  #/day/N  #/talk/N  #/install  — needs ../app.js (dePlay/stopAll), content.js, talk.js */
 (function(){
 var D=window.DAYS,V=document.getElementById('view'),AU='../audio/';
 function $(s,r){return (r||document).querySelector(s);}function $$(s,r){return [].slice.call((r||document).querySelectorAll(s));}
@@ -36,7 +36,7 @@ function download(n,cb){var d=day(n),u=urls(d),i=0,fail=0;if(!window.caches){cb&
 function remove(n){return window.caches?caches.delete(cname(n)):Promise.resolve(false);}
 function usage(el){if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){el.textContent='이 휴대폰에 저장한 양: 약 '+(e.usage/1e6).toFixed(1)+' MB';});}
 /* ---------- screens ---------- */
-function top(title,sub,back){return '<header class="atop">'+(back?'<a class="aback" href="'+back[0]+'">← '+esc(back[1])+'</a>':'')+'<div class="k">매일 영어 100일</div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</header>';}
+function top(title,sub,back){return '<header class="atop">'+(back?'<a class="aback" href="'+back[0]+'">← '+esc(back[1])+'</a>':'')+'<div class="k">웰컴 잉글리시 100</div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</header>';}
 /* ---------- big text (persists) ---------- */
 function bigOn(){return localStorage.getItem('de100big')==='1';}
 document.documentElement.classList.toggle('bigtext',bigOn());
@@ -61,8 +61,8 @@ function icsFor(h){var now=new Date(),st=new Date();st.setHours(h,0,0,0);if(st<n
  var z=function(n){return ('0'+n).slice(-2);},loc=st.getFullYear()+z(st.getMonth()+1)+z(st.getDate())+'T'+z(h)+'0000',
   stamp=now.toISOString().replace(/[-:]/g,'').replace(/.d+/,''),url=new URL('./',location.href).href;
  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//daily-english//app//KO','CALSCALE:GREGORIAN','BEGIN:VEVENT','UID:de100-daily-'+h+'@daily-english','DTSTAMP:'+stamp,'DTSTART:'+loc,'DURATION:PT10M','RRULE:FREQ=DAILY',
-  'SUMMARY:매일 영어 10분','DESCRIPTION:오늘의 영어 10분: '+url,'URL:'+url,'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:매일 영어 10분','TRIGGER:PT0M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n')+'\r\n';}
-function remind(h){var ics=icsFor(h);window.__ics=ics;var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar;charset=utf-8'}));a.download='매일영어_알림.ics';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();},1000);
+  'SUMMARY:웰컴영어 10분','DESCRIPTION:오늘의 영어 10분: '+url,'URL:'+url,'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:웰컴영어 10분','TRIGGER:PT0M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n')+'\r\n';}
+function remind(h){var ics=icsFor(h);window.__ics=ics;var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar;charset=utf-8'}));a.download='웰컴영어_알림.ics';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();},1000);
  localStorage.setItem('de100remind',String(h));$('#remst').textContent='달력 앱이 열리면 「추가」 또는 「저장」을 누르세요. 매일 '+(h===7?'아침 7시':h===12?'낮 12시':'저녁 9시')+'에 알려 줘요.';
  if(standalone&&'Notification' in window&&navigator.serviceWorker){Notification.requestPermission().then(function(pm){if(pm!=='granted')return;navigator.serviceWorker.ready.then(function(reg){if(reg.periodicSync)reg.periodicSync.register('de100-daily',{minInterval:12*3600*1000}).then(function(){window.__psync=1;}).catch(function(){});});});}}
 function home(){var p=prog(),t=todayDay(),td=day(t);
@@ -165,7 +165,7 @@ function ibar(){var b=document.getElementById('ibar');var dis=+localStorage.getI
  $('#ibtn').onclick=function(){if(deferred){var dp=deferred;deferred=null;dp.prompt();(dp.userChoice||Promise.resolve({})).then(function(c){window.__instChoice=c&&c.outcome;if(c&&c.outcome==='accepted')installed();});}else location.hash='#/install';};
  $('#ix').onclick=function(){localStorage.setItem('de100ibarx',String(Date.now()));b.remove();};}
 function installed(){localStorage.setItem('de100inst','1');var b=document.getElementById('ibar');if(b)b.remove();if(document.getElementById('idone'))return;
- var m=document.createElement('div');m.id='idone';m.textContent='설치됐어요! 바탕화면의 「매일영어」를 누르세요';document.body.insertBefore(m,document.body.firstChild);setTimeout(function(){m.remove();},10000);}
+ var m=document.createElement('div');m.id='idone';m.textContent='설치됐어요! 바탕화면의 「웰컴영어」를 누르세요';document.body.insertBefore(m,document.body.firstChild);setTimeout(function(){m.remove();},10000);}
 window.addEventListener('appinstalled',installed);
 function install(){var ua=navigator.userAgent,inapp=/KAKAOTALK|NAVER\(|NAVER|Instagram|FBAN|FBAV|Line\/|DaumApps|; wv\)/i.test(ua),android=/Android/i.test(ua),samsung=/SamsungBrowser/i.test(ua),iosOther=isIOS&&/CriOS|FxiOS|EdgiOS/.test(ua);
  var ph=function(lines,hi,arrow){return '<div class="phone"><div class="scr">'+lines.map(function(l,i){return '<div class="row'+(i===hi?' hi':'')+'">'+l+'</div>';}).join('')+'</div>'+(arrow?'<div class="arw">'+arrow+'</div>':'')+'</div>';};
@@ -174,8 +174,8 @@ function install(){var ua=navigator.userAgent,inapp=/KAKAOTALK|NAVER\(|NAVER|Ins
  else if(deferred){g='<button class="go instbtn">📲 바탕화면에 두기</button>';kind='prompt';}
  else if(android&&inapp){kind='android_inapp';g='<div class="card">'+ph(['카카오톡 안에서 열린 화면','',''],0)+'<p class="inst">아래 버튼을 눌러 크롬으로 여세요.</p><a class="go" id="chromego" href="intent://'+location.host+location.pathname+'#Intent;scheme=https;package=com.android.chrome;end">크롬으로 열기</a></div>';}
  else if(isIOS&&(inapp||iosOther)){kind='ios_inapp';g='<div class="card">'+ph(['','','⋯  (메뉴)'],2,'⬇')+'<p class="inst">아래 메뉴(⋯)에서 「Safari로 열기」를 누르세요.</p></div>';}
- else if(isIOS){kind='ios_safari';g='<div class="card">'+ph(['매일 영어 100일','','◁   ▷   [⬆]   📖   ⧉'],2,'⬇ 공유 버튼')+'<p class="inst">① 아래 가운데 공유 버튼 [⬆]을 누르세요.<br>② 「홈 화면에 추가」를 누르세요.</p></div>';}
- else if(samsung){kind='samsung';g='<div class="card">'+ph(['매일 영어 100일','','◁   ▷   ⌂   ☆   ≡'],2,'⬇ 메뉴 ≡')+'<p class="inst">① 아래 오른쪽 메뉴 ≡ 를 누르세요.<br>② 「현재 페이지 추가」 → 「홈 화면」을 누르세요.</p></div>';}
+ else if(isIOS){kind='ios_safari';g='<div class="card">'+ph(['웰컴 잉글리시 100','','◁   ▷   [⬆]   📖   ⧉'],2,'⬇ 공유 버튼')+'<p class="inst">① 아래 가운데 공유 버튼 [⬆]을 누르세요.<br>② 「홈 화면에 추가」를 누르세요.</p></div>';}
+ else if(samsung){kind='samsung';g='<div class="card">'+ph(['웰컴 잉글리시 100','','◁   ▷   ⌂   ☆   ≡'],2,'⬇ 메뉴 ≡')+'<p class="inst">① 아래 오른쪽 메뉴 ≡ 를 누르세요.<br>② 「현재 페이지 추가」 → 「홈 화면」을 누르세요.</p></div>';}
  else if(android){kind='chrome';g='<div class="card">'+ph(['주소창                ⋮','',''],0,'⬆ 메뉴 ⋮')+'<p class="inst">① 오른쪽 위 메뉴 ⋮ 를 누르세요.<br>② 「홈 화면에 추가」 또는 「앱 설치」를 누르세요.</p></div>';}
  else{kind='other';g='<div class="card"><p class="inst">휴대폰 카메라로 책의 QR을 찍어 여세요.</p></div>';}
  V.innerHTML=h+g+'<a class="nolink" href="#/">설치 없이 바로 쓰기</a>';window.__instKind=kind;
