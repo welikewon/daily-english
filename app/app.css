@@ -113,3 +113,7 @@ details.other{margin:16px 0}details.other summary{min-height:56px;display:flex;a
 #ailive .mic{display:inline-block;animation:aipulse 1s ease-in-out infinite}@keyframes aipulse{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
 #ailog.noko .ko{display:none}#ailog .sug.big2{display:block;width:100%;text-align:left;margin:6px 0}#ailog .again{min-height:56px;margin-top:6px}
 #aisum .big{font-size:22px}
+#aichat.aispk #ailog .ln:last-child{outline:3px solid #2f7d32;outline-offset:2px}
+#aictl .tgl{display:inline-flex;align-items:center;gap:6px;min-height:56px;font-size:18px;padding:0 10px}#aictl .tgl input{width:26px;height:26px}
+details.nosnd{margin:10px 0;font-size:18px}details.nosnd summary{min-height:56px;display:flex;align-items:center;cursor:pointer}
+.think{font-size:20px}
