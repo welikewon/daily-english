@@ -2,7 +2,7 @@
 (function(){
 var A=document.createElement('audio');A.preload='none';A.setAttribute('playsinline','');document.body.appendChild(A);
 var ST=null; /* {mode,label,starts,total,btn,cards,chunks} */
-var MODES={single:['#1F8A45','▶ 듣기 중'],slow:['#1F8A45','🐢 천천히 듣기 중'],shadow:['#1E63C6','🎧 쉐도잉 중'],x3:['#C25E0E','🔁 3번 반복 중'],
+var MODES={single:['#1F8A45','▶ 듣기 중'],slow:['#1F8A45','🐢 천천히 듣기 중'],shadow:['#1E63C6','🎧 쉐도잉 중'],x3:['#C25E0E','🔁 3번 반복 중'],x3all:['#C25E0E','🔁 3번씩 듣기 중'],
  chunk:['#7B4FC4','✂ 끊어 듣기 중'],dlg:['#1F3A5F','💬 대화 듣기 중'],seq:['#1E63C6','🎧 이어 듣기 중'],quiz:['#C62F55','🗣 말해 보기 중']};
 /* ---- UI: stop bar + back button ---- */
 var bar=document.createElement('div');bar.id='pbar';
@@ -11,7 +11,7 @@ document.body.appendChild(bar);
 if(!document.body.dataset.home){var bk=document.createElement('a');bk.id='pback';bk.href='index.html';bk.textContent='← 목록';document.body.appendChild(bk);}
 var plab=document.getElementById('plab'),pprog=document.getElementById('pprog'),pgf=document.getElementById('pgf');
 function clearMarks(){document.querySelectorAll('.now,.play,.act').forEach(function(x){x.classList.remove('now','play','act');x.style.removeProperty('--m');});}
-function stopAll(){var was=!!ST;ST=null;try{A.pause();}catch(e){}try{A.removeAttribute('src');A.load();}catch(e){}
+function stopAll(){var was=!!ST;if(ST&&('restoreNext' in ST))window.deNext=ST.restoreNext;ST=null;try{A.pause();}catch(e){}try{A.removeAttribute('src');A.load();}catch(e){}
  document.querySelectorAll('audio').forEach(function(x){if(x===A)return;try{x.pause();}catch(e){}
   /* still loading (or a play() pending): drop the source so nothing starts late, keep it for the next tap */
   if(x.readyState<3||!x.paused){var s=x.getAttribute('src')||x.dataset.src;if(s){x.dataset.src=s;try{x.removeAttribute('src');x.load();x.setAttribute('src',s);x.preload='none';}catch(e){}}}});
@@ -21,11 +21,12 @@ function stopAll(){var was=!!ST;ST=null;try{A.pause();}catch(e){}try{A.removeAtt
 window.stopAll=stopAll;
 document.getElementById('pstop').addEventListener('click',stopAll);
 /* window.deKeepPlaying (app setting "화면 꺼도 계속 듣기"): screen-off / app-switch do not stop; back/leave still do */
-document.addEventListener('visibilitychange',function(){if(document.hidden&&!window.deKeepPlaying)stopAll();});
-window.addEventListener('pagehide',stopAll);window.addEventListener('blur',function(){if(!window.deKeepPlaying)stopAll();});window.addEventListener('popstate',stopAll);
-document.addEventListener('freeze',function(){if(!window.deKeepPlaying)stopAll();});
+function keep(){return window.deKeepPlaying||(ST&&ST.keep);}  /* ST.keep: tracks meant for screen-off listening (「3번씩 듣기」) */
+document.addEventListener('visibilitychange',function(){if(document.hidden&&!keep())stopAll();});
+window.addEventListener('pagehide',stopAll);window.addEventListener('blur',function(){if(!keep())stopAll();});window.addEventListener('popstate',stopAll);
+document.addEventListener('freeze',function(){if(!keep())stopAll();});
 if('mediaSession' in navigator){try{navigator.mediaSession.setActionHandler('stop',stopAll);}catch(e){}
- try{navigator.mediaSession.setActionHandler('pause',function(){if(window.deKeepPlaying&&ST){A.pause();try{navigator.mediaSession.playbackState='paused';}catch(e){}}else stopAll();});}catch(e){}
+ try{navigator.mediaSession.setActionHandler('pause',function(){if(keep()&&ST){A.pause();try{navigator.mediaSession.playbackState='paused';}catch(e){}}else stopAll();});}catch(e){}
  try{navigator.mediaSession.setActionHandler('play',function(){if(ST&&A.getAttribute('src')){A.play();try{navigator.mediaSession.playbackState='playing';}catch(e){}}});}catch(e){}
  try{navigator.mediaSession.setActionHandler('nexttrack',function(){if(window.deNext)window.deNext();});}catch(e){}}
 /* native <audio controls> on the page (quiz/all-in-one): only one sound at a time + same bar */
@@ -39,7 +40,8 @@ function show(){var m=MODES[ST.mode]||MODES.single;bar.style.setProperty('--m',m
  if(ST.btn){ST.btn.classList.add('act');ST.btn.style.setProperty('--m',m[0]);}
  if('mediaSession' in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:ST.label||m[1],artist:'매일 영어 100일'});navigator.mediaSession.playbackState='playing';}catch(e){}}}
 /* play(src, opts): MUST be called inside the tap handler */
-function play(src,o){stopAll();o=o||{};ST={mode:o.mode||'single',label:o.label,starts:o.starts||[],total:o.total||0,btn:o.btn,cards:o.cards||[],chunks:o.chunks||[],unit:o.unit||'',onend:o.onend};
+function play(src,o){stopAll();o=o||{};ST={mode:o.mode||'single',label:o.label,starts:o.starts||[],total:o.total||0,btn:o.btn,cards:o.cards||[],chunks:o.chunks||[],unit:o.unit||'',onend:o.onend,keep:!!o.keep};
+ if(o.nextSeek){var prevNext=window.deNext,me=ST;ST.restoreNext=prevNext;window.deNext=function(){if(ST!==me)return;var k=idx();if(ST.starts[k+1]!=null){A.currentTime=ST.starts[k+1];tick();}};}
  A.src=src;A.currentTime=0;A.defaultPlaybackRate=A.playbackRate=o.rate||1;var p=A.play();window.__plays=(window.__plays||0)+1;
  var mine=ST;if(p&&p.catch)p.catch(function(err){window.__playErr=String(err);if(ST===mine)stopAll();});
  show();tick();}
@@ -65,6 +67,7 @@ document.addEventListener('click',function(e){
  if(b){var n=b.dataset.p,kind=b.dataset.kind||'single',card=b.closest('.sent,.snd-i,.try,.step,.vb,.flip')||null;
   if(b.classList.contains('act')){stopAll();return;}
   if(kind==='shadow'){var cs=[].slice.call(document.querySelectorAll('.sent[data-n]'));play(S('shadow'),{mode:'shadow',starts:(a.shadow||{}).starts,total:cs.length,btn:b,cards:cs});return;}
+  if(kind==='x3all'){var cs3=[].slice.call(document.querySelectorAll('.sent[data-n]'));play(S('x3all'),{mode:'x3all',label:'🔁 3번씩 듣기',starts:(a.x3all||{}).starts,total:cs3.length,btn:b,cards:cs3,keep:true,nextSeek:true});return;}
   if(kind==='x3'){play(S(n+'_x3'),{mode:'x3',starts:(a[n+'_x3']||{}).starts,total:3,unit:'번',btn:b,cards:card?[card]:[]});return;}
   if(kind==='chunk'){var ch=card?[].slice.call(card.querySelectorAll('.ch')):[];var st=(a[n+'_chunks']||{}).starts||[];
    play(S(n+'_chunks'),{mode:'chunk',starts:st,total:st.length,btn:b,cards:[],chunks:ch});return;}

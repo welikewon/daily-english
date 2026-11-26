@@ -39,9 +39,9 @@ function usage(el){if(navigator.storage&&navigator.storage.estimate)navigator.st
 function top(title,sub,back){return '<header class="atop">'+(back?'<a class="aback" href="'+back[0]+'">← '+esc(back[1])+'</a>':'')+'<div class="k">매일 영어 100일</div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</header>';}
 function home(){var p=prog(),t=todayDay(),td=day(t);
  var h=top('오늘의 영어','<div class="streak">'+streak()+'</div>');
- if(!standalone)h+='<a class="card instcard" href="#/install">📲 <b>휴대폰에 앱으로 설치하기</b><br><span class="n2">책 없이도 홈 화면에서 바로 열 수 있어요.</span></a>';
  h+='<div class="card todaycard"><div class="k">오늘 · DAY '+t+'</div><div class="big">'+esc(td.title_ko)+'</div><div class="n2">'+esc(td.title_en)+'</div><a class="go" href="#/day/'+t+'">시작하기 ▶</a></div>';
  h+='<div class="card"><b>⬇ 지하철·차에서도 듣기</b><p class="n2">인터넷이 없어도 들을 수 있게 미리 내려받아요. (대화 연습·AI·음성 인식은 인터넷이 필요해요.)</p><button id="week" class="big2">이번 주 7일 내려받기</button> <span id="wkst" class="n2"></span><div id="use" class="n2"></div></div>';
+ if(window.CKS&&window.CKS[0])h+='<div class="card"><b>🗣 말하기 점검</b><a class="go" href="#/ck/0">시작 점검 (Day 0)</a>'+(window.CKS[30]?'<a class="go" href="#/ck/30">30일 점검</a>':'')+'</div>';
  h+='<h2>Day 1–'+D.length+'</h2><ol class="days">'+D.map(function(d){return '<li><a href="#/day/'+d.id+'" class="'+(p.done[d.id]?'done':'')+(d.id===t?' now':'')+'"><span class="dn">'+d.id+'</span><span class="dt">'+esc(d.title_ko)+'</span><span class="mk" data-dl="'+d.id+'"></span>'+(p.done[d.id]?'<span class="ck">✓</span>':'')+'</a></li>';}).join('')+'</ol>';
  h+='<p class="n2 center"><a href="#/install">설치 안내</a> · <a href="../index.html">웹 목록</a></p>';
  V.innerHTML=h;usage($('#use'));
@@ -52,12 +52,13 @@ function home(){var p=prog(),t=todayDay(),td=day(t);
 function dayScreen(n){var d=day(n);if(!d){location.hash='#/';return;}
  var h=top('DAY '+n+' · '+d.title_ko,esc(d.title_en),['#/','오늘']);
  h+='<div class="card ten"><b>🎧 오늘의 10분</b><div class="tenb">'+
-  '<button class="big2" data-trk="shadow">🎧 쉐도잉 (12문장)</button><button class="big2" data-trk="dlg">💬 대화 듣기</button><button class="big2" data-trk="quiz">🗣 말해 보기 퀴즈</button><button class="big2" data-trk="all">🔁 전체 듣기</button>'+
-  '<button class="big2 soon" disabled>👂 귀로만 말하기 (준비 중)</button></div>'+
+  '<button class="big2 top2" data-trk="shadow">▶ 쉐도잉</button><button class="big2 top2" data-trk="x3all">🔁 3번씩 듣기</button><button class="big2" data-trk="dlg">💬 대화 듣기</button><button class="big2" data-trk="quiz">🗣 말해 보기 퀴즈</button><button class="big2" data-trk="all">🔁 전체 듣기</button>'+
+  '</div>'+
   '<p class="drive">🚗 운전 중에는 <b>듣기·따라 말하기만</b> 하세요. 화면은 보지 마세요.</p>'+
   '<label class="bg"><input type="checkbox" id="bg"'+(S.bg?' checked':'')+'> 화면이 꺼져도 계속 듣기</label>'+(isIOS&&standalone?'<p class="n2">아이폰 홈 화면 앱에서 화면이 꺼질 때 소리가 멈추면, Safari에서 열어 들으세요.</p>':'')+'</div>';
  h+='<div class="card dlc"><b>⬇ 이 날 내려받기</b> <span class="n2">약 '+d.mb+' MB</span><div><button id="dl" class="big2">내려받기</button> <button id="rm" hidden>지우기</button> <span id="dlst" class="n2"></span></div></div>';
- h+='<div class="card acts">'+(d.talk?'<a class="go" id="talkgo" href="#/talk/'+n+'">🗣 대화 연습 (말하고 대답 듣기)</a>':'<span class="n2">🗣 대화 연습은 곧 열려요.</span>')+
+ if(d.check&&d.check.length)h=h.replace('<div class="card ten">','<a class="go ckgo" href="#/check/'+n+'">🗣 말하기 점검</a><div class="card ten">');
+ h+='<div class="card acts"><a class="go aigo" href="#/ai/'+n+'">AI와 대화</a>'+(d.talk?'<a class="go" id="talkgo" href="#/talk/'+n+'">🗣 대화 연습 (말하고 대답 듣기)</a>':'<span class="n2">🗣 대화 연습은 곧 열려요.</span>')+
   '<button id="stuckgo" class="help">🙋 막혔을 때 (번역기 · 부탁하는 말)</button></div>';
  h+='<h2>오늘의 문장 '+d.sentences.length+'</h2>'+d.sentences.map(function(s,i){var k='s'+('0'+(i+1)).slice(-2);
   return '<div class="card sent" data-n="'+(i+1)+'"><div class="en big">'+(i+1)+'. '+esc(s.en)+'</div><div class="ko">'+esc(s.ko)+'</div>'+
@@ -67,8 +68,8 @@ function dayScreen(n){var d=day(n);if(!d){location.hash='#/';return;}
  h+='<button id="fin" class="big2 fin">✓ 오늘 공부 끝!</button>';
  V.innerHTML=h;var dir=AU+did(n)+'/';
  var Q=['shadow','dlg','quiz'];
- function trk(k,btn){var cards=k==='shadow'?$$('.sent'):k==='dlg'?$$('.ln'):[];window.deNext=function(){var i=Q.indexOf(k);if(i>=0&&i<Q.length-1)trk(Q[i+1]);};
-  dePlay(dir+k+'.mp3',{mode:k==='shadow'?'shadow':k==='dlg'?'dlg':k==='quiz'?'quiz':'seq',label:{shadow:'🎧 쉐도잉',dlg:'💬 대화 듣기',quiz:'🗣 말해 보기',all:'🔁 전체 듣기'}[k],starts:d.a[k]||[],total:cards.length,btn:btn,cards:cards});markDay();}
+ function trk(k,btn){var cards=(k==='shadow'||k==='x3all')?$$('.sent'):k==='dlg'?$$('.ln'):[];window.deNext=function(){var i=Q.indexOf(k);if(i>=0&&i<Q.length-1)trk(Q[i+1]);};
+  dePlay(dir+k+'.mp3',{nextSeek:k==='x3all',keep:k==='x3all',mode:k==='x3all'?'x3all':k==='shadow'?'shadow':k==='dlg'?'dlg':k==='quiz'?'quiz':'seq',label:{shadow:'🎧 쉐도잉',dlg:'💬 대화 듣기',quiz:'🗣 말해 보기',all:'🔁 전체 듣기',x3all:'🔁 3번씩 듣기'}[k],starts:d.a[k]||[],total:cards.length,btn:btn,cards:cards});markDay();}
  $$('[data-trk]').forEach(function(b){b.onclick=function(){if(b.classList.contains('act')){stopAll();return;}trk(b.dataset.trk,b);};});
  $$('[data-one]').forEach(function(b){b.onclick=function(){if(b.classList.contains('act')){stopAll();return;}dePlay(dir+b.dataset.one+'.mp3',{mode:b.dataset.slow?'slow':'single',btn:b,cards:[b.closest('.sent')],starts:[0]});markDay();};});
  $$('[data-x3]').forEach(function(b){b.onclick=function(){if(b.classList.contains('act')){stopAll();return;}var k=b.dataset.x3;dePlay(dir+k+'_x3.mp3',{mode:'x3',starts:d.a[k+'_x3'],total:3,unit:'번',btn:b,cards:[b.closest('.sent')]});markDay();};});
@@ -84,24 +85,71 @@ function dayScreen(n){var d=day(n);if(!d){location.hash='#/';return;}
  $('#stuckgo').onclick=function(){window.openStuck();};
  var tg=$('#talkgo');if(tg&&!SR&&standalone&&isIOS){tg.href='../talk/'+did(n)+'.html';tg.target='_blank';tg.insertAdjacentHTML('afterend','<p class="n2" id="sfnote">아이폰 홈 화면 앱에서는 음성 인식이 안 돼서, 대화 연습은 Safari에서 열려요.</p>');}
  $('#fin').onclick=function(){var p=prog();p.done[n]=today();saveProg(p);markDay();this.textContent='✓ 잘했어요! 내일 또 만나요';};}
-function talkScreen(n){var t=window.TALKS[n];if(!t){location.hash='#/day/'+n;return;}
+function talkScreen(n,step){var t=window.TALKS[n];if(!t){location.hash='#/day/'+n;return;}
  if(!SR&&standalone&&isIOS){V.innerHTML=top('대화 연습','',['#/day/'+n,'Day '+n])+'<div class="card warn">아이폰 홈 화면 앱에서는 음성 인식이 안 돼요. <a href="../talk/'+did(n)+'.html" target="_blank">Safari에서 대화 연습 열기 ▶</a></div>';return;}
- V.innerHTML=top('대화 연습 · DAY '+n,'',['#/day/'+n,'Day '+n])+'<div class="talkwrap">'+t.html+'</div>';window.TALK=t.data;window.initTalk();}
-function install(){var h=top('앱으로 설치하기','',['#/','오늘']);
- if(standalone)h+='<div class="card okc">✓ 이미 앱으로 설치되어 있어요.</div>';
- h+='<button class="big2 instbtn"'+(deferred?'':' hidden')+'>📲 지금 설치하기</button>';
- var ph=function(lines,hi){return '<div class="phone"><div class="scr">'+lines.map(function(l,i){return '<div class="row'+(i===hi?' hi':'')+'">'+l+'</div>';}).join('')+'</div></div>';};
- var gal='<div class="card"><h2>갤럭시 (삼성 인터넷 · 크롬)</h2><ol class="steps"><li>'+ph(['주소창 · 매일 영어 100일','','≡ / ⋮ 메뉴'],2)+'<b>1</b> 화면 아래(삼성 인터넷 ≡) 또는 위(크롬 ⋮)의 <b>메뉴</b>를 눌러요.</li>'+
-  '<li>'+ph(['새 탭','북마크','＋ 현재 페이지 추가 / 홈 화면에 추가','앱 설치'],2)+'<b>2</b> 「<b>현재 페이지 추가</b> → 홈 화면」(삼성 인터넷) 또는 「<b>홈 화면에 추가</b>」·「<b>앱 설치</b>」(크롬)를 눌러요.</li>'+
-  '<li>'+ph(['매일 영어 100일을 설치할까요?','','[ 설치 ] / [ 추가 ]'],2)+'<b>3</b> 「<b>설치</b>」 또는 「<b>추가</b>」를 누르면 홈 화면에 <b>매일영어</b> 아이콘이 생겨요.</li></ol></div>';
- var ios='<div class="card"><h2>아이폰 (Safari)</h2><ol class="steps"><li>'+ph(['매일 영어 100일','','◁  ▷  [⬆]  📖  ⧉'],2)+'<b>1</b> <b>Safari</b>로 열고, 아래의 <b>공유 버튼</b>(네모에서 위로 향한 화살표)을 눌러요.</li>'+
-  '<li>'+ph(['복사','읽기 목록에 추가','＋ 홈 화면에 추가','책갈피 추가'],2)+'<b>2</b> 목록을 위로 밀어 「<b>홈 화면에 추가</b>」를 눌러요.</li>'+
-  '<li>'+ph(['홈 화면에 추가','매일영어','            [ 추가 ]'],2)+'<b>3</b> 오른쪽 위 「<b>추가</b>」를 누르면 끝!</li></ol><p class="n2">카카오톡 등 다른 앱 안에서 열었다면, 먼저 「Safari로 열기」를 하세요. 아이폰 홈 화면 앱에서는 대화 연습(음성 인식)이 Safari에서 열려요.</p></div>';
- h+=isIOS?ios+gal:gal+ios;V.innerHTML=h;
- $$('.instbtn').forEach(function(b){b.onclick=function(){if(deferred){deferred.prompt();deferred.userChoice.then(function(){deferred=null;b.hidden=true;});}};});}
+ V.innerHTML=top('대화 연습 · DAY '+n,'',['#/day/'+n,'Day '+n])+'<div class="talkwrap">'+t.html+'</div>';window.TALK=t.data;window.initTalk();
+ var steps=[].slice.call(document.querySelectorAll('.tstep')).map(function(s){return s.dataset.k;}),li=document.querySelectorAll('#prog li');
+ if(step==='ai'&&li.length)li[li.length-1].click();
+ if(step==='go'&&li.length){if(window.__aiLive&&window.__aiLive()){li[steps.indexOf('ai')].click();}else{li[steps.indexOf('rp')].click();}}}
+function aiScreen(n){var ks=Object.keys(window.TALKS).map(Number).sort(function(a,b){return a-b;});if(!ks.length){location.hash='#/day/'+n;return;}
+ var k=window.TALKS[n]?n:(ks.filter(function(x){return x<=n;}).pop()||ks[0]);location.replace('#/talk/'+k+'/go');}
+/* ---------- recording (speaking check, check-ups) ---------- */
+var RC={mr:null,t:0};
+function startRec(cb,max){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){cb(null,'norec');return;}
+ navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){var ch=[],mr=new MediaRecorder(st);RC.mr=mr;
+  mr.ondataavailable=function(e){if(e.data&&e.data.size)ch.push(e.data);};
+  mr.onstop=function(){st.getTracks().forEach(function(t){t.stop();});clearTimeout(RC.t);RC.mr=null;cb(new Blob(ch,{type:mr.mimeType||'audio/mp4'}));};
+  mr.start();RC.t=setTimeout(function(){if(mr.state==='recording')mr.stop();},max||20000);},function(){cb(null,'denied');});}
+function stopRec(){if(RC.mr&&RC.mr.state==='recording')RC.mr.stop();}
+function recBtn(b,max,done){var on=false;b.onclick=function(){if(on){stopRec();return;}try{stopAll();}catch(e){}on=true;b.dataset.l=b.dataset.l||b.textContent;b.textContent='■ 녹음 끝';b.classList.add('on');
+ startRec(function(blob,err){on=false;b.classList.remove('on');b.textContent=err?b.dataset.l:'🎤 다시 녹음하기';done(blob,err);},max);};}
+function idb(){return new Promise(function(res,rej){var r=indexedDB.open('de100rec',1);r.onupgradeneeded=function(){r.result.createObjectStore('r');};r.onsuccess=function(){res(r.result);};r.onerror=function(){rej(r.error);};});}
+function idbPut(k,v){return idb().then(function(db){return new Promise(function(res){var t=db.transaction('r','readwrite');t.objectStore('r').put(v,k);t.oncomplete=function(){res(true);};t.onerror=function(){res(false);};});}).catch(function(){return false;});}
+function idbGet(k){return idb().then(function(db){return new Promise(function(res){var q=db.transaction('r').objectStore('r').get(k);q.onsuccess=function(){res(q.result||null);};q.onerror=function(){res(null);};});}).catch(function(){return null;});}
+var NOREC='녹음이 안 되면, 소리 내어 말한 뒤 「👀 영어 보기」를 누르세요.';
+function checkScreen(n,i){var d=day(n);if(!d||!d.check||!d.check.length){location.hash='#/day/'+n;return;}i=i||0;var it=d.check[i],mine=null,last=i>=d.check.length-1;
+ V.innerHTML=top('말하기 점검 · DAY '+n,'',['#/day/'+n,'Day '+n])+'<div class="card ckc"><div class="k">'+(i+1)+' / '+d.check.length+'</div><p class="inst">한국어를 보고 영어로 말해 보세요.</p><div class="ko1">'+esc(it.ko)+'</div>'+
+  '<button id="rec" class="big2 recb">🎤 녹음하기</button><button id="cmp" class="big2" hidden>▶ 내 목소리 → 원어민 소리</button><button id="see" class="big2">👀 영어 보기</button><div id="ans" class="en1" hidden>'+esc(it.en)+'</div><div id="rst" class="n2"></div>'+
+  '<button id="nx" class="go">'+(last?'점검 끝 ✓':'다음 문장 ▶')+'</button></div>';
+ recBtn($('#rec'),20000,function(b,err){if(err||!b||!b.size){$('#rst').textContent=NOREC;return;}if(mine)URL.revokeObjectURL(mine);mine=URL.createObjectURL(b);$('#cmp').hidden=false;window.__ckRec=(window.__ckRec||0)+1;});
+ $('#cmp').onclick=function(){$('#ans').hidden=false;dePlay(mine,{label:'🎙 내 목소리',btn:$('#cmp'),onend:function(){dePlay(it.audio,{label:'🔊 원어민',btn:$('#cmp')});}});};
+ $('#see').onclick=function(){$('#ans').hidden=false;};
+ $('#nx').onclick=function(){if(last){var p=prog();p.done[n]=today();saveProg(p);location.hash='#/day/'+n;}else{checkScreen(n,i+1);window.scrollTo(0,0);}};}
+function ckScreen(k,i){var C=(window.CKS||{})[k];if(!C||!C.topics.length){location.hash='#/';return;}i=i||0;var it=C.topics[i],last=i>=C.topics.length-1,mine=null;
+ V.innerHTML=top(C.title_ko||'말하기 점검','',['#/','오늘'])+'<div class="card ckc"><div class="k">'+(i+1)+' / '+C.topics.length+'</div><p class="inst">주제를 보고 1분 동안 영어로 말해 보세요.</p><div class="ko1">'+esc(it.ko)+'</div><div class="n2">'+esc(it.en_hint||'')+'</div>'+
+  '<button id="rec" class="big2 recb">🎤 1분 말하기</button><button id="mine" class="big2" hidden>▶ 내 목소리 듣기</button><button id="old" class="big2" hidden>▶ Day 0 때 내 목소리</button><div id="rst" class="n2"></div>'+
+  '<button id="nx" class="go">'+(last?'점검 끝 ✓':'다음 주제 ▶')+'</button></div>';
+ var key='ck'+k+'_'+i;
+ recBtn($('#rec'),60000,function(b,err){if(err||!b||!b.size){$('#rst').textContent='녹음이 안 되면, 소리 내어 1분 말해 보세요.';return;}mine=URL.createObjectURL(b);$('#mine').hidden=false;idbPut(key,b).then(function(ok){window.__ckSaved=ok;});});
+ $('#mine').onclick=function(){if(mine)dePlay(mine,{label:'🎙 내 목소리',btn:$('#mine')});};
+ if(k>0)idbGet('ck0_'+i).then(function(b){if(b&&$('#old')){$('#old').hidden=false;$('#old').onclick=function(){dePlay(URL.createObjectURL(b),{label:'🎙 Day 0 내 목소리',btn:$('#old')});};}});
+ $('#nx').onclick=function(){if(last)location.hash='#/';else{ckScreen(k,i+1);window.scrollTo(0,0);}};}
+/* ---------- optional install bar (never a gate) ---------- */
+function ibar(){var b=document.getElementById('ibar');var dis=+localStorage.getItem('de100ibarx')||0;
+ if(standalone||localStorage.getItem('de100inst')||(dis&&Date.now()-dis<2*864e5)||location.hash.indexOf('#/install')===0){if(b)b.remove();return;}
+ if(b)return;b=document.createElement('div');b.id='ibar';b.innerHTML='<button id="ibtn">📲 바탕화면에 두기 (한 번만 누르세요)</button><button id="ix" aria-label="닫기">✕</button>';document.body.insertBefore(b,document.body.firstChild);
+ $('#ibtn').onclick=function(){if(deferred){var dp=deferred;deferred=null;dp.prompt();(dp.userChoice||Promise.resolve({})).then(function(c){window.__instChoice=c&&c.outcome;if(c&&c.outcome==='accepted')installed();});}else location.hash='#/install';};
+ $('#ix').onclick=function(){localStorage.setItem('de100ibarx',String(Date.now()));b.remove();};}
+function installed(){localStorage.setItem('de100inst','1');var b=document.getElementById('ibar');if(b)b.remove();if(document.getElementById('idone'))return;
+ var m=document.createElement('div');m.id='idone';m.textContent='설치됐어요! 바탕화면의 「매일영어」를 누르세요';document.body.insertBefore(m,document.body.firstChild);setTimeout(function(){m.remove();},10000);}
+window.addEventListener('appinstalled',installed);
+function install(){var ua=navigator.userAgent,inapp=/KAKAOTALK|NAVER\(|NAVER|Instagram|FBAN|FBAV|Line\/|DaumApps|; wv\)/i.test(ua),android=/Android/i.test(ua),samsung=/SamsungBrowser/i.test(ua),iosOther=isIOS&&/CriOS|FxiOS|EdgiOS/.test(ua);
+ var ph=function(lines,hi,arrow){return '<div class="phone"><div class="scr">'+lines.map(function(l,i){return '<div class="row'+(i===hi?' hi':'')+'">'+l+'</div>';}).join('')+'</div>'+(arrow?'<div class="arw">'+arrow+'</div>':'')+'</div>';};
+ var h=top('바탕화면에 두기','',['#/','오늘']),g,kind;
+ if(standalone){g='<div class="card okc">✓ 이미 바탕화면에 있어요.</div>';kind='done';}
+ else if(deferred){g='<button class="go instbtn">📲 바탕화면에 두기</button>';kind='prompt';}
+ else if(android&&inapp){kind='android_inapp';g='<div class="card">'+ph(['카카오톡 안에서 열린 화면','',''],0)+'<p class="inst">아래 버튼을 눌러 크롬으로 여세요.</p><a class="go" id="chromego" href="intent://'+location.host+location.pathname+'#Intent;scheme=https;package=com.android.chrome;end">크롬으로 열기</a></div>';}
+ else if(isIOS&&(inapp||iosOther)){kind='ios_inapp';g='<div class="card">'+ph(['','','⋯  (메뉴)'],2,'⬇')+'<p class="inst">아래 메뉴(⋯)에서 「Safari로 열기」를 누르세요.</p></div>';}
+ else if(isIOS){kind='ios_safari';g='<div class="card">'+ph(['매일 영어 100일','','◁   ▷   [⬆]   📖   ⧉'],2,'⬇ 공유 버튼')+'<p class="inst">① 아래 가운데 공유 버튼 [⬆]을 누르세요.<br>② 「홈 화면에 추가」를 누르세요.</p></div>';}
+ else if(samsung){kind='samsung';g='<div class="card">'+ph(['매일 영어 100일','','◁   ▷   ⌂   ☆   ≡'],2,'⬇ 메뉴 ≡')+'<p class="inst">① 아래 오른쪽 메뉴 ≡ 를 누르세요.<br>② 「현재 페이지 추가」 → 「홈 화면」을 누르세요.</p></div>';}
+ else if(android){kind='chrome';g='<div class="card">'+ph(['주소창                ⋮','',''],0,'⬆ 메뉴 ⋮')+'<p class="inst">① 오른쪽 위 메뉴 ⋮ 를 누르세요.<br>② 「홈 화면에 추가」 또는 「앱 설치」를 누르세요.</p></div>';}
+ else{kind='other';g='<div class="card"><p class="inst">휴대폰 카메라로 책의 QR을 찍어 여세요.</p></div>';}
+ V.innerHTML=h+g+'<a class="nolink" href="#/">설치 없이 바로 쓰기</a>';window.__instKind=kind;
+ $$('.instbtn').forEach(function(b){b.onclick=function(){if(deferred){var dp=deferred;deferred=null;dp.prompt();(dp.userChoice||Promise.resolve({})).then(function(c){if(c&&c.outcome==='accepted'){installed();location.hash='#/';}});}};});}
 /* ---------- router ---------- */
-function route(){try{stopAll();}catch(e){}window.deNext=null;var h=location.hash.replace(/^#\/?/,'').split('/');
- if(h[0]==='day'&&h[1])dayScreen(+h[1]);else if(h[0]==='talk'&&h[1])talkScreen(+h[1]);else if(h[0]==='install')install();else home();
+function route(){try{stopAll();}catch(e){}stopRec();window.deNext=null;var h=location.hash.replace(/^#\/?/,'').split('/');
+ if(h[0]==='day'&&h[1])dayScreen(+h[1]);else if(h[0]==='talk'&&h[1])talkScreen(+h[1],h[2]);else if(h[0]==='ai'&&h[1])aiScreen(+h[1]);else if(h[0]==='check'&&h[1])checkScreen(+h[1]);else if(h[0]==='ck'&&h[1])ckScreen(+h[1]);else if(h[0]==='install')install();else home();
+ ibar();
  window.scrollTo(0,0);window.__route=location.hash||'#/';}
 window.addEventListener('hashchange',route);route();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').then(function(r){window.__swReg=1;}).catch(function(e){window.__swErr=String(e);});

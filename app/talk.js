@@ -169,6 +169,41 @@ $('#slow').onchange=function(){};
 T.dialogue.other=T.dialogue.lines.filter(function(l){return l.speaker!==T.dialogue.learner_speaker;})[0].speaker;
 $('#dlgstart').onclick=function(){dialogue(T.dialogue.learner_speaker);$('#dlgstart').remove();};
 $('#rpstart').onclick=function(){roleplay();$('#rpstart').remove();};
+window.__aiLive=function(){return !!(window.TALK_AI_URL!=null?window.TALK_AI_URL:((T.tutor||{}).url));};
+/* ---------- 자유 대화 (AI): proxy address from config; any failure -> the prepared role-play continues ---------- */
+(function(){var TU=T.tutor||{},U=window.TALK_AI_URL!=null?window.TALK_AI_URL:(TU.url||''),box=$('#aichat');if(!box)return;
+ if(!U){box.hidden=true;return;}box.hidden=false;if($('#ainone'))$('#ainone').hidden=true;
+ if(TU.provider&&TU.provider!=='GEMINI')$('#aipriv').textContent='AI와 대화할 때 이름·주소·건강 같은 개인 정보는 말하지 마세요.';
+ var H=[],busy=false,n=0,MAX=20,log=$('#ailog'),sid=null;
+ try{sid=sessionStorage.getItem('de100sid');}catch(e){}if(!sid){sid=Math.random().toString(36).slice(2,10)+Date.now().toString(36);try{sessionStorage.setItem('de100sid',sid);}catch(e){}}
+ function voice(){var v=(window.speechSynthesis&&speechSynthesis.getVoices())||[],en=v.filter(function(x){return /^en[-_]US/i.test(x.lang);}),pref=/Natural|Neural|Samantha|Google US English|Aria|Jenny|Ava|Allison/i;
+  return en.filter(function(x){return pref.test(x.name);})[0]||en[0]||v.filter(function(x){return /^en/i.test(x.lang);})[0]||null;}
+ function speak(t){if(!window.speechSynthesis||!t)return;try{stopAll();}catch(e){}speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t),vv=voice();u.lang='en-US';if(vv)u.voice=vv;u.rate=$('#aislow').checked?0.7:0.9;speechSynthesis.speak(u);window.__aiSpoke=(window.__aiSpoke||0)+1;}
+ function bubble(me,html){var c=el('div','card ln'+(me?' mine':''),html);log.appendChild(c);try{c.scrollIntoView({block:'nearest'});}catch(e){}return c;}
+ function fallback(msg){$('#ainote').textContent=msg;window.__aiFallback=(window.__aiFallback||0)+1;
+  setTimeout(function(){var k=STEPS.map(function(s){return s.dataset.k;}).indexOf('rp');go(k);if($('#rpstart'))$('#rpstart').click();},1500);}
+ function show(j){var c=bubble(false,'<div class="who">'+esc(T.partner.name)+'</div><div class="en">'+esc(j.reply)+'</div><div class="ko n2">'+esc(j.reply_ko||'')+'</div>'+
+   (j.natural?'<div class="tip">💡 이렇게 말하면 더 자연스러워요: <b>'+esc(j.natural)+'</b></div>':'')+(j.tip_ko?'<div class="tip">'+esc(j.tip_ko)+'</div>':'')+'<div class="hints"></div>');
+  j.hints.forEach(function(h){var b=el('button','sug','🔊 '+esc(h.en)+'<br><span class="n2">'+esc(h.ko)+'</span>');b.onclick=function(){speak(h.en);};c.querySelector('.hints').appendChild(b);});speak(j.reply);}
+ function send(text){if(busy)return;if(n>=MAX){$('#ainote').textContent='오늘 대화는 여기까지! 아주 잘했어요.';return;}busy=true;n++;
+  if(text)bubble(true,'<div class="who">나</div><div class="en">'+esc(text)+'</div>');var wait=bubble(false,'<div class="n2">'+esc(T.partner.name)+'가 생각하고 있어요…</div>');
+  var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ctl)ctl.abort();},15000);
+  fetch(U.replace(/\/$/,'')+'/talk',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl?ctl.signal:undefined,
+   body:JSON.stringify({day:T.day,scene_id:'d'+('00'+T.day).slice(-3),level:'A1',sid:sid,history:H.slice(-12),text:text})})
+  .then(function(r){return r.json().catch(function(){return {};}).then(function(j){return {s:r.status,j:j};});})
+  .then(function(x){clearTimeout(tm);busy=false;wait.remove();
+   if(x.s===200&&x.j.reply&&x.j.hints){if(text)H.push({role:'learner',text:text});H.push({role:'partner',text:x.j.reply});show(x.j);return;}
+   if(x.s===429&&x.j.error==='session')return fallback('이번 AI 대화는 여기까지예요. 준비된 대화 연습으로 이어 갈게요.');
+   if(x.s===429)return fallback('오늘 쓸 수 있는 무료 AI 대화를 다 썼어요. 준비된 대화 연습으로 이어 갈게요. 내일 다시 AI와 대화할 수 있어요.');
+   fallback('준비된 대화 연습으로 이어 갈게요.');})
+  .catch(function(){clearTimeout(tm);busy=false;wait.remove();fallback('준비된 대화 연습으로 이어 갈게요.');});}
+ $('#aistart').onclick=function(){$('#aistart').remove();var o=T.roleplay.turns.filter(function(t){return t.partner_en;})[0];
+  if(o){bubble(false,'<div class="who">'+esc(T.partner.name)+'</div><div class="en">'+esc(o.partner_en)+'</div><div class="ko n2">'+esc(o.partner_ko||'')+'</div>');H.push({role:'partner',text:o.partner_en});dePlay(o.partner_audio,{label:'💬 '+T.partner.name});}
+  var tb=talkBox({target:'',onDone:function(h){send(h==null?'':h);}});$('#aibox').appendChild(tb);
+  var hp=el('button','help','🆘 도와줘요 (help)');hp.onclick=function(){send('help');};$('#aibox').appendChild(hp);};
+ if(!window.__aiG){window.__aiG=1;document.addEventListener('click',function(e){if(e.target.closest('#pstop')&&window.speechSynthesis)speechSynthesis.cancel();},true);
+  window.addEventListener('hashchange',function(){if(window.speechSynthesis)speechSynthesis.cancel();});}
+})();
 streak();go(0);window.__talkReady=1;
 };
 if(window.TALK&&!window.TALK_DEFER)window.initTalk();
