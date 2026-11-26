@@ -37,14 +37,48 @@ function remove(n){return window.caches?caches.delete(cname(n)):Promise.resolve(
 function usage(el){if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){el.textContent='이 휴대폰에 저장한 양: 약 '+(e.usage/1e6).toFixed(1)+' MB';});}
 /* ---------- screens ---------- */
 function top(title,sub,back){return '<header class="atop">'+(back?'<a class="aback" href="'+back[0]+'">← '+esc(back[1])+'</a>':'')+'<div class="k">매일 영어 100일</div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</header>';}
+/* ---------- big text (persists) ---------- */
+function bigOn(){return localStorage.getItem('de100big')==='1';}
+document.documentElement.classList.toggle('bigtext',bigOn());
+function bigBtn(){return '<button class="bigt" aria-pressed="'+bigOn()+'">'+(bigOn()?'가 큰 글씨 켜짐 ✓':'가 큰 글씨')+'</button>';}
+function bindBig(){$$('.bigt').forEach(function(b){b.onclick=function(){localStorage.setItem('de100big',bigOn()?'0':'1');document.documentElement.classList.toggle('bigtext',bigOn());route();};});}
+/* ---------- auto review: must-say sentences from days done 1, 3, 7 days ago ---------- */
+function dstr(dt){return dt.getFullYear()+'-'+('0'+(dt.getMonth()+1)).slice(-2)+'-'+('0'+dt.getDate()).slice(-2);}
+function reviewItems(){var p=prog(),out=[],seen={};
+ [1,3,7].forEach(function(k){var dt=new Date();dt.setDate(dt.getDate()-k);var key=dstr(dt);
+  Object.keys(p.done).forEach(function(id){if(p.done[id]!==key)return;var d=day(+id);if(!d)return;
+   (d.must&&d.must.length?d.must:[1,2]).forEach(function(n){var s=d.sentences[n-1];if(!s||seen[id+'_'+n])return;seen[id+'_'+n]=1;
+    out.push({day:+id,en:s.en,ko:s.ko,src:'../audio/'+did(+id)+'/s'+('0'+n).slice(-2)+'.mp3'});});});});
+ var pick=[],i=0;while(pick.length<5&&out.length){pick.push(out.splice(i%out.length,1)[0]);i++;}return pick;}
+var REVT=0;document.addEventListener('click',function(e){if(e.target.closest('#pstop'))REVT++;},true);window.addEventListener('hashchange',function(){REVT++;});
+function playReview(items,btn){var tok=++REVT,i=0,rep=0;
+ function next(){if(tok!==REVT)return;if(i>=items.length){$$('.rv').forEach(function(r){r.classList.remove('now');});window.__revDone=1;return;}
+  $$('.rv').forEach(function(r,k){r.classList.toggle('now',k===i);});var it=items[i];
+  dePlay(it.src,{label:'🔁 오늘 복습 '+(i+1)+' / '+items.length,btn:btn,onend:function(){if(tok!==REVT)return;rep++;if(rep>=2){rep=0;i++;}window.__revPlays=(window.__revPlays||0)+1;setTimeout(next,rep?800:1500);}});}
+ next();}
+/* ---------- daily reminder: calendar event (no server); Android app bonus: notification ---------- */
+function icsFor(h){var now=new Date(),st=new Date();st.setHours(h,0,0,0);if(st<now)st.setDate(st.getDate()+1);
+ var z=function(n){return ('0'+n).slice(-2);},loc=st.getFullYear()+z(st.getMonth()+1)+z(st.getDate())+'T'+z(h)+'0000',
+  stamp=now.toISOString().replace(/[-:]/g,'').replace(/.d+/,''),url=new URL('./',location.href).href;
+ return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//daily-english//app//KO','CALSCALE:GREGORIAN','BEGIN:VEVENT','UID:de100-daily-'+h+'@daily-english','DTSTAMP:'+stamp,'DTSTART:'+loc,'DURATION:PT10M','RRULE:FREQ=DAILY',
+  'SUMMARY:매일 영어 10분','DESCRIPTION:오늘의 영어 10분: '+url,'URL:'+url,'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:매일 영어 10분','TRIGGER:PT0M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n')+'\r\n';}
+function remind(h){var ics=icsFor(h);window.__ics=ics;var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar;charset=utf-8'}));a.download='매일영어_알림.ics';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();},1000);
+ localStorage.setItem('de100remind',String(h));$('#remst').textContent='달력 앱이 열리면 「추가」 또는 「저장」을 누르세요. 매일 '+(h===7?'아침 7시':h===12?'낮 12시':'저녁 9시')+'에 알려 줘요.';
+ if(standalone&&'Notification' in window&&navigator.serviceWorker){Notification.requestPermission().then(function(pm){if(pm!=='granted')return;navigator.serviceWorker.ready.then(function(reg){if(reg.periodicSync)reg.periodicSync.register('de100-daily',{minInterval:12*3600*1000}).then(function(){window.__psync=1;}).catch(function(){});});});}}
 function home(){var p=prog(),t=todayDay(),td=day(t);
  var h=top('오늘의 영어','<div class="streak">'+streak()+'</div>');
+ var rv=localStorage.getItem('de100revskip')===today()?[]:reviewItems();window.__revN=rv.length;
+ if(rv.length)h+='<div class="card revcard"><b class="inst">🔁 오늘 복습 '+rv.length+'개</b>'+rv.map(function(x){return '<div class="rv"><div class="en">'+esc(x.en)+'</div><div class="n2">'+esc(x.ko)+' · Day '+x.day+'</div></div>';}).join('')+
+  '<button id="revgo" class="go">▶ 복습 듣기 (2번씩)</button><button id="revskip" class="nolink">건너뛰기</button></div>';
  h+='<div class="card todaycard"><div class="k">오늘 · DAY '+t+'</div><div class="big">'+esc(td.title_ko)+'</div><div class="n2">'+esc(td.title_en)+'</div><a class="go" href="#/day/'+t+'">시작하기 ▶</a></div>';
+ h+='<div class="card"><button id="remgo" class="big2">⏰ 매일 알림 받기</button><div id="rempick" hidden><p class="inst">언제 알려 드릴까요?</p><button class="big2 remh" data-h="7">아침 7시</button><button class="big2 remh" data-h="12">낮 12시</button><button class="big2 remh" data-h="21">저녁 9시</button></div><div id="remst" class="n2"></div>'+bigBtn()+'</div>';
  h+='<div class="card"><b>⬇ 지하철·차에서도 듣기</b><p class="n2">인터넷이 없어도 들을 수 있게 미리 내려받아요. (대화 연습·AI·음성 인식은 인터넷이 필요해요.)</p><button id="week" class="big2">이번 주 7일 내려받기</button> <span id="wkst" class="n2"></span><div id="use" class="n2"></div></div>';
  if(window.CKS&&window.CKS[0])h+='<div class="card"><b>🗣 말하기 점검</b><a class="go" href="#/ck/0">시작 점검 (Day 0)</a>'+(window.CKS[30]?'<a class="go" href="#/ck/30">30일 점검</a>':'')+'</div>';
  h+='<h2>Day 1–'+D.length+'</h2><ol class="days">'+D.map(function(d){return '<li><a href="#/day/'+d.id+'" class="'+(p.done[d.id]?'done':'')+(d.id===t?' now':'')+'"><span class="dn">'+d.id+'</span><span class="dt">'+esc(d.title_ko)+'</span><span class="mk" data-dl="'+d.id+'"></span>'+(p.done[d.id]?'<span class="ck">✓</span>':'')+'</a></li>';}).join('')+'</ol>';
  h+='<p class="n2 center"><a href="#/install">설치 안내</a> · <a href="../index.html">웹 목록</a></p>';
- V.innerHTML=h;usage($('#use'));
+ V.innerHTML=h;
+ bindBig();if($('#revgo')){$('#revgo').onclick=function(){playReview(rv,$('#revgo'));};$('#revskip').onclick=function(){localStorage.setItem('de100revskip',today());route();};}
+ $('#remgo').onclick=function(){$('#rempick').hidden=false;$('#remgo').hidden=true;};$$('.remh').forEach(function(b){b.onclick=function(){remind(+b.dataset.h);};});usage($('#use'));
  D.forEach(function(d){has(d.id).then(function(x){if(x){var m=$('[data-dl="'+d.id+'"]');if(m)m.textContent='⬇';}});});
  $('#week').onclick=function(){var b=this,ids=[];for(var k=0;k<7;k++)if(day(t+k))ids.push(t+k);b.disabled=true;var i=0;
   (function nx(){if(i>=ids.length){$('#wkst').textContent='완료! '+ids.length+'일치를 받았어요.';b.disabled=false;usage($('#use'));home.refresh&&home.refresh();return;}
@@ -55,7 +89,7 @@ function dayScreen(n){var d=day(n);if(!d){location.hash='#/';return;}
   '<button class="big2 top2" data-trk="shadow">▶ 쉐도잉</button><button class="big2 top2" data-trk="x3all">🔁 3번씩 듣기</button><button class="big2" data-trk="dlg">💬 대화 듣기</button><button class="big2" data-trk="quiz">🗣 말해 보기 퀴즈</button><button class="big2" data-trk="all">🔁 전체 듣기</button>'+
   '</div>'+
   '<p class="drive">🚗 운전 중에는 <b>듣기·따라 말하기만</b> 하세요. 화면은 보지 마세요.</p>'+
-  '<label class="bg"><input type="checkbox" id="bg"'+(S.bg?' checked':'')+'> 화면이 꺼져도 계속 듣기</label>'+(isIOS&&standalone?'<p class="n2">아이폰 홈 화면 앱에서 화면이 꺼질 때 소리가 멈추면, Safari에서 열어 들으세요.</p>':'')+'</div>';
+  bigBtn()+'<label class="bg"><input type="checkbox" id="bg"'+(S.bg?' checked':'')+'> 화면이 꺼져도 계속 듣기</label>'+(isIOS&&standalone?'<p class="n2">아이폰 홈 화면 앱에서 화면이 꺼질 때 소리가 멈추면, Safari에서 열어 들으세요.</p>':'')+'</div>';
  h+='<div class="card dlc"><b>⬇ 이 날 내려받기</b> <span class="n2">약 '+d.mb+' MB</span><div><button id="dl" class="big2">내려받기</button> <button id="rm" hidden>지우기</button> <span id="dlst" class="n2"></span></div></div>';
  if(d.check&&d.check.length)h=h.replace('<div class="card ten">','<a class="go ckgo" href="#/check/'+n+'">🗣 말하기 점검</a><div class="card ten">');
  h+='<div class="card acts"><a class="go aigo" href="#/ai/'+n+'">AI와 대화</a>'+(d.talk?'<a class="go" id="talkgo" href="#/talk/'+n+'">🗣 대화 연습 (말하고 대답 듣기)</a>':'<span class="n2">🗣 대화 연습은 곧 열려요.</span>')+
@@ -66,7 +100,7 @@ function dayScreen(n){var d=day(n);if(!d){location.hash='#/';return;}
    '<div class="sb"><button data-one="'+k+'">▶ 듣기</button><button data-one="'+k+'_slow" data-slow="1">🐢 천천히</button>'+(d.a[k+'_x3']?'<button data-x3="'+k+'">🔁 3번</button>':'')+(d.a[k+'_chunks']?'<button data-ck="'+k+'">✂ 끊어</button>':'')+'</div></div>';}).join('');
  if(d.dialogue.lines.length)h+='<h2>대화 · '+esc(d.dialogue.setting_ko)+'</h2><button class="big2" data-trk="dlg">💬 대화 전체 듣기</button>'+d.dialogue.lines.map(function(l,i){return '<div class="card ln" data-k="dlg_'+('0'+(i+1)).slice(-2)+'"><div class="who">'+esc(l.speaker)+'</div><div class="en">'+esc(l.en)+'</div><div class="ko n2">'+esc(l.ko)+'</div></div>';}).join('');
  h+='<button id="fin" class="big2 fin">✓ 오늘 공부 끝!</button>';
- V.innerHTML=h;var dir=AU+did(n)+'/';
+ V.innerHTML=h;bindBig();var dir=AU+did(n)+'/';
  var Q=['shadow','dlg','quiz'];
  function trk(k,btn){var cards=(k==='shadow'||k==='x3all')?$$('.sent'):k==='dlg'?$$('.ln'):[];window.deNext=function(){var i=Q.indexOf(k);if(i>=0&&i<Q.length-1)trk(Q[i+1]);};
   dePlay(dir+k+'.mp3',{nextSeek:k==='x3all',keep:k==='x3all',mode:k==='x3all'?'x3all':k==='shadow'?'shadow':k==='dlg'?'dlg':k==='quiz'?'quiz':'seq',label:{shadow:'🎧 쉐도잉',dlg:'💬 대화 듣기',quiz:'🗣 말해 보기',all:'🔁 전체 듣기',x3all:'🔁 3번씩 듣기'}[k],starts:d.a[k]||[],total:cards.length,btn:btn,cards:cards});markDay();}

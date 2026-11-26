@@ -13,13 +13,17 @@ function norm(s){s=String(s||'').toLowerCase().replace(/[’‘]/g,"'").replace(
 function lev(a,b){var d=[],i,j;for(j=0;j<=b.length;j++)d[j]=j;for(i=1;i<=a.length;i++){var p=d[0];d[0]=i;for(j=1;j<=b.length;j++){var t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]!==b[j-1]?1:0));p=t;}}return d[b.length];}
 function sim(a,b){var x=norm(a).sort().join(' '),y=norm(b).sort().join(' ');if(!x&&!y)return 1;return 1-lev(x,y)/Math.max(x.length,y.length,1);}
 /* word colours: green exact (in order), yellow close, red missing */
-function colour(target,heard){var tw=String(target).split(/\s+/),h=norm(heard),used={},out=[],g=0,y=0;
+function pronTip(w){var P=window.PRON;if(!P||!P.rules)return null;var x=String(w).toLowerCase().replace(/[^a-z]/g,'');if(!x)return null;
+ for(var i=0;i<P.order.length;i++){var r=P.rules[P.order[i]];if(r&&new RegExp(r.match).test(x))return {key:P.order[i],ko:r.ko};}return null;}
+function colour(target,heard){var tw=String(target).split(/\s+/),h=norm(heard),used={},out=[],g=0,y=0,fr=null,fy=null;
  tw.forEach(function(w){var n=norm(w),cls='r';
   if(n.length){var ok=n.every(function(p){var k=h.indexOf(p);while(k>=0&&used[k])k=h.indexOf(p,k+1);if(k>=0){used[k]=1;return true;}return false;});
    if(ok){cls='g';g++;}else{var best=9;n.forEach(function(p){h.forEach(function(q,k){if(!used[k])best=Math.min(best,lev(p,q)/Math.max(p.length,1));});});if(best<=0.34){cls='y';y++;}}}
   else{cls='g';g++;}
+  if(cls==='r'&&!fr)fr=w;if(cls==='y'&&!fy)fy=w;
   out.push('<span class="w '+cls+'">'+esc(w)+'</span>');});
- return {html:out.join(' '),score:(g+0.5*y)/Math.max(tw.length,1)};}
+ var tw0=fr||fy,tp=tw0?pronTip(tw0):null;window.__pronTip=tp&&tp.key;
+ return {html:out.join(' ')+(tp?'<div class="ptip">💡 <b>'+esc(tw0.replace(/[^A-Za-z']/g,''))+'</b> — '+esc(tp.ko)+'</div>':''),score:(g+0.5*y)/Math.max(tw.length,1),tip:tp};}
 function accepted(turn,heard){var s=0;(turn.accept||[]).forEach(function(a){s=Math.max(s,sim(a,heard));});
  var h=' '+norm(heard).join(' ')+' ';var key=(turn.keys||[]).some(function(k){return k.every(function(w){return h.indexOf(' '+norm(w).join(' ')+' ')>=0;});});
  return {ok:s>=0.6||key,score:s,key:key};}
@@ -64,7 +68,7 @@ function recBox(native){var w=el('div','recbox'),b=el('button','rec','🎙 내 �
  p.onclick=function(){if(!url)return;dePlay(native,{label:'👂 원어민',onend:function(){dePlay(url,{label:'🗣 내 목소리'});}});};
  w.appendChild(b);w.appendChild(p);w.appendChild(n);return w;}
 
-return {SR:SR,$:$,$$:$$,el:el,esc:esc,norm:norm,lev:lev,sim:sim,colour:colour,accepted:accepted,talkBox:talkBox,recBox:recBox,abortAll:abortAll};
+return {pronTip:pronTip,SR:SR,$:$,$$:$$,el:el,esc:esc,norm:norm,lev:lev,sim:sim,colour:colour,accepted:accepted,talkBox:talkBox,recBox:recBox,abortAll:abortAll};
 })();
 window.initTalk=function(){
 var T=window.TALK,AU=T.audio_base,TA=T.talk_base;
