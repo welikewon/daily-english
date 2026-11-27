@@ -273,7 +273,7 @@ window.__aiLive=function(){return !!(window.TALK_AI_URL!=null?window.TALK_AI_URL
  function finishTurn(){if(!LV||!LV.cur)return;var txt=LV.curTxt.trim(),c=LV.cur,ch=LV.chunks.slice(),learner=LV.lastLearner||'';LV.cur=null;if(!txt)return;H.push({role:'partner',text:txt});
   var ag=el('button','again','🔁 다시 듣기 · Play again');c.appendChild(ag);ag.onclick=function(e){e.stopPropagation();if(!LV)return;var p=new deLive.Player();p.rate=$('#aislow').checked?0.8:1;ch.forEach(function(d){p.play(d);});};
   setTimeout(function(){if(LV&&!LV.pl.busy()){S.speaking=false;box.classList.remove('aispk');}},Math.max(200,(LV?LV.pl.endsIn():0)*1000+200));
-  fetch(U.replace(/\/$/,'')+'/hints',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({day:T.day,partner:txt,learner:learner,sid:sid})})
+  fetch(U.replace(/\/$/,'')+'/hints',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({day:T.day,partner:txt,learner:learner,sid:sid,dev:window.deLive&&deLive.dev?deLive.dev():undefined})})
    .then(function(r){return r.json();}).then(function(j){if(j.reply_ko)c.querySelector('.ko').textContent=j.reply_ko;
     if(j.natural){var tp=el('div','tip','💡 이렇게 말하면 더 자연스러워요 · More natural: <b>'+esc(j.natural)+'</b>');c.insertBefore(tp,c.querySelector('.hints'));if(S.nat.indexOf(j.natural)<0)S.nat.push(j.natural);}
     (j.hints||[]).forEach(function(h){var b=el('button','sug big2','🗣 '+esc(h.en)+'<br><span class="n2">'+esc(h.ko)+'</span>');

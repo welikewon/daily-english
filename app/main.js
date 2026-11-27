@@ -36,12 +36,16 @@ function download(n,cb,fresh){var d=day(n),u=urls(d),i=0,fail=0;if(!window.cache
 function remove(n){return window.caches?caches.delete(cname(n)):Promise.resolve(false);}
 function usage(el){if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){el.textContent='이 휴대폰에 저장한 양: 약 '+(e.usage/1e6).toFixed(1)+' MB';});}
 /* ---------- screens ---------- */
-function top(title,sub,back){return '<header class="atop">'+(back?'<a class="aback" href="'+back[0]+'">← '+esc(back[1])+'</a>':'')+'<div class="hbtn"><button data-go="#/update">🔄 업데이트<small>Update</small></button><button data-go="#/settings">⚙ 설정<small>Settings</small></button></div><div class="k">웰컴 잉글리시 100</div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</header>';}
+function top(title,sub,back){return '<button class="fsback" data-big="0">가 보통 글씨로 · Normal text</button><header class="atop">'+(back?'<a class="aback" href="'+back[0]+'">← '+esc(back[1])+'</a>':'')+'<div class="hbtn"><button data-go="#/update">🔄 업데이트<small>Update</small></button><button data-go="#/settings">⚙ 설정<small>Settings</small></button></div><div class="k">웰컴 잉글리시 100</div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</header>';}
 /* ---------- big text (persists) ---------- */
 function bigOn(){return localStorage.getItem('de100big')==='1';}
 document.documentElement.classList.toggle('bigtext',bigOn());
-function bigBtn(){return '<button class="bigt" aria-pressed="'+bigOn()+'">'+(bigOn()?'가 큰 글씨 켜짐 ✓ · Big text on':'가 큰 글씨 · Big text')+'</button>';}
-function bindBig(){$$('.bigt').forEach(function(b){b.onclick=function(){localStorage.setItem('de100big',bigOn()?'0':'1');document.documentElement.classList.toggle('bigtext',bigOn());route();};});}
+function bigBtn(){return '<div class="fsz" role="group"><span>글자 크기 · Text size</span><button class="fszb" data-big="0">가 보통 · Normal</button><button class="fszb" data-big="1">가 크게 · Big</button></div>';}
+window.deBigBtn=bigBtn;
+function bindBig(){}
+/* one handler for every 「글자 크기」 picker and the 「가 보통 글씨로」 button (state is shown by CSS from html.bigtext) */
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-big]');if(!b)return;var v=b.dataset.big==='1';if(v===bigOn())return;
+ localStorage.setItem('de100big',v?'1':'0');document.documentElement.classList.toggle('bigtext',v);try{window.dispatchEvent(new Event('resize'));}catch(x){}});
 /* ---------- auto review: must-say sentences from days done 1, 3, 7 days ago ---------- */
 function dstr(dt){return dt.getFullYear()+'-'+('0'+(dt.getMonth()+1)).slice(-2)+'-'+('0'+dt.getDate()).slice(-2);}
 function reviewItems(){var p=prog(),out=[],seen={};
@@ -70,7 +74,7 @@ function remind(h){var ics=icsFor(h);window.__ics=ics;var a=document.createEleme
  localStorage.setItem('de100remind',String(h));$('#remst').textContent='달력 앱이 열리면 「추가」 또는 「저장」을 누르세요. 매일 '+(h===7?'아침 7시 · 7 AM':h===12?'낮 12시 · 12 PM':'저녁 9시 · 9 PM')+'에 알려 줘요.';
  if(standalone&&'Notification' in window&&navigator.serviceWorker){Notification.requestPermission().then(function(pm){if(pm!=='granted')return;navigator.serviceWorker.ready.then(function(reg){if(reg.periodicSync)reg.periodicSync.register('de100-daily',{minInterval:12*3600*1000}).then(function(){window.__psync=1;}).catch(function(){});});});}}
 /* ---------- 🔄 새 내용 받기 · Get updates (version.json on the site; one tap = new files + reload) ---------- */
-var APPV='2026.11.27-7';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
+var APPV='2026.11.27-8';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
 function vfetch(){return fetch('../version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();});}
 function vnotes(j){return '<div class="updn"><b>이번에 달라진 점 · What is new</b><ul>'+(j.notes_ko||[]).map(function(k,i){return '<li>'+esc(k)+'<br><span class="n2">'+esc((j.notes_en||[])[i]||'')+'</span></li>';}).join('')+'</ul></div>';}
 function doUpdate(st){st.innerHTML='<p>⏳ 새 내용을 받는 중… · Downloading…</p>';localStorage.setItem('de100redl','1');
@@ -88,7 +92,7 @@ function pdfInfo(st){st.innerHTML='<p>⏳ …</p>';vfetch().then(function(j){var
   if(p.status!=='ready'||!p.url){st.innerHTML='<p>📕 곧 나와요 · Coming soon</p>';return;}
   st.innerHTML='<p><b>'+esc(p.title||'웰컴 잉글리시 100')+'</b><br><span class="n2">'+esc(p.version||'')+' · '+esc(p.date||'')+'</span></p>'+((p.notes_ko||[]).length?'<div class="updn"><b>이번 판에서 달라진 점 · What changed</b><ul>'+p.notes_ko.map(function(k){return '<li>'+esc(k)+'</li>';}).join('')+'</ul></div>':'')+
    '<a class="go" href="'+esc(p.url)+'" download>⬇ PDF 받기 · Download PDF</a>';}).catch(function(){st.innerHTML='<p>📶 인터넷에 연결되면 받을 수 있어요. · You can get it when you are online.</p>';});}
-function settingsCard(){return '<div class="card setc" id="setc"><b>⚙ 설정 · Settings</b><div class="n2">버전 · Version '+esc(APPV)+'</div>'+
+function settingsCard(){return '<div class="card setc" id="setc"><b>⚙ 설정 · Settings</b>'+bigBtn()+'<div class="n2">버전 · Version '+esc(APPV)+'</div>'+
  '<button id="updgo" class="big2">🔄 새 내용 받기 · Get updates</button><div id="updst"></div><button id="pdfgo" class="big2">📕 최신 PDF 받기 · Latest PDF</button><div id="pdfst"></div></div>';}
 function bindSettings(){var u=document.getElementById('updgo');if(!u)return;u.onclick=function(){vcheck(document.getElementById('updst'),false);};document.getElementById('pdfgo').onclick=function(){pdfInfo(document.getElementById('pdfst'));};
  if(location.hash==='#/update'||location.hash==='#/settings'){var g=location.hash;history.replaceState(null,'','#/');setTimeout(function(){homeGo(g);},60);}
@@ -112,13 +116,13 @@ window.addEventListener('hashchange',function(){if(/^#\/tr/.test(location.hash))
 /* after an update: refresh the days already downloaded, quietly */
 if(localStorage.getItem('de100redl')==='1'){localStorage.removeItem('de100redl');window.__redl=0;setTimeout(function(){if(!window.caches)return;caches.keys().then(function(ks){ks.filter(function(k){return /^de100-day-\d{3}$/.test(k);}).forEach(function(k){var n=+k.slice(-3);if(day(n))download(n,null,true).then(function(){window.__redl++;});});});},1500);window.__updated=APPV;}
 function home(){var p=prog(),t=todayDay(),td=day(t);
- var h=top('오늘의 영어','<div class="streak">'+streak()+'</div>');
+ var h=top('오늘의 영어','<div class="streak">'+streak()+'</div>')+bigBtn();
  if(window.deTR&&window.deTR.url())h+='<a class="trtop" href="#/tr">🗣 바로 통역 · Live interpreter<span>한국어 ↔ English · 누르고 바로 말하세요 · Tap and speak</span></a>';
  var rv=localStorage.getItem('de100revskip')===today()?[]:reviewItems();window.__revN=rv.length;
  if(rv.length)h+='<div class="card revcard"><b class="inst">🔁 오늘 복습 '+rv.length+'개</b>'+rv.map(function(x){return '<div class="rv"><div class="en">'+esc(x.en)+'</div><div class="n2">'+esc(x.ko)+' · '+(x.star?'⭐ 내가 저장한 문장 · Saved':'Day '+x.day)+'</div></div>';}).join('')+
   '<button id="revgo" class="go">▶ 복습 듣기 (2번씩)</button><button id="revskip" class="nolink">건너뛰기</button></div>';
  h+='<div class="card todaycard"><div class="k">오늘 · DAY '+t+'</div><div class="big">'+esc(td.title_ko)+'</div><div class="n2">'+esc(td.title_en)+'</div><a class="go" href="#/day/'+t+'">시작하기 ▶ · Start</a></div>';
- h+='<div class="card"><button id="remgo" class="big2">⏰ 매일 알림 받기 · Daily reminder</button><div id="rempick" hidden><p class="inst">언제 알려 드릴까요?</p><button class="big2 remh" data-h="7">아침 7시 · 7 AM</button><button class="big2 remh" data-h="12">낮 12시 · 12 PM</button><button class="big2 remh" data-h="21">저녁 9시 · 9 PM</button></div><div id="remst" class="n2"></div>'+bigBtn()+'</div>';
+ h+='<div class="card"><button id="remgo" class="big2">⏰ 매일 알림 받기 · Daily reminder</button><div id="rempick" hidden><p class="inst">언제 알려 드릴까요?</p><button class="big2 remh" data-h="7">아침 7시 · 7 AM</button><button class="big2 remh" data-h="12">낮 12시 · 12 PM</button><button class="big2 remh" data-h="21">저녁 9시 · 9 PM</button></div><div id="remst" class="n2"></div></div>';
  h+='<div class="card"><b>⬇ 지하철·차에서도 듣기</b><p class="n2">인터넷이 없어도 들을 수 있게 미리 내려받아요. (대화 연습·AI·음성 인식은 인터넷이 필요해요.)</p><button id="week" class="big2">이번 주 7일 내려받기 · Download this week</button> <span id="wkst" class="n2"></span><div id="use" class="n2"></div></div>';
  if(window.CKS&&window.CKS[0])h+='<div class="card"><b>🗣 말하기 점검</b><a class="go" href="#/ck/0">시작 점검 (Day 0)</a>'+(window.CKS[30]?'<a class="go" href="#/ck/30">30일 점검 · Day 30 check</a>':'')+'</div>';
  h+='<h2>Day 1–'+D.length+'</h2><ol class="days">'+D.map(function(d){return '<li><a href="#/day/'+d.id+'" class="'+(p.done[d.id]?'done':'')+(d.id===t?' now':'')+'"><span class="dn">'+d.id+'</span><span class="dt">'+esc(d.title_ko)+'</span><span class="mk" data-dl="'+d.id+'"></span>'+(p.done[d.id]?'<span class="ck">✓</span>':'')+'</a></li>';}).join('')+'</ol>';
@@ -131,12 +135,12 @@ function home(){var p=prog(),t=todayDay(),td=day(t);
   (function nx(){if(i>=ids.length){$('#wkst').textContent='완료! '+ids.length+'일치를 받았어요.';b.disabled=false;usage($('#use'));home.refresh&&home.refresh();return;}
    var n=ids[i++];download(n,function(s){$('#wkst').textContent='Day '+n+' '+s;}).then(nx);})();};}
 function dayScreen(n){var d=day(n);if(!d){location.hash='#/';return;}
- var h=top('DAY '+n+' · '+d.title_ko,esc(d.title_en),['#/','오늘 · Today']);
+ var h=top('DAY '+n+' · '+d.title_ko,esc(d.title_en),['#/','오늘 · Today'])+bigBtn();
  h+='<div class="card ten"><b>🎧 오늘의 10분</b>'+(d.shadow_all&&d.shadow_all.length?'<button class="sajump2" id="sajump">📚 모든 예문 · All sentences<small>책의 모든 문장 + 더 말해 보기 · Every book sentence + more practice</small></button>':'')+'<div class="tenb">'+
   '<button class="big2 top2" data-trk="shadow">▶ 쉐도잉 · Shadowing</button><button class="big2 top2" data-trk="x3all">🔁 3번씩 듣기 · Listen 3 times</button><button class="big2" data-trk="dlg">💬 대화 듣기 · Dialogue</button><button class="big2" data-trk="quiz">🗣 말해 보기 퀴즈 · Speaking quiz</button><button class="big2" data-trk="all">🔁 전체 듣기 · Play all</button>'+
   '</div>'+
   '<p class="drive">🚗 운전 중에는 <b>듣기·따라 말하기만</b> 하세요. 화면은 보지 마세요.</p>'+
-  bigBtn()+'<label class="bg"><input type="checkbox" id="bg"'+(S.bg?' checked':'')+'> 화면이 꺼져도 계속 듣기</label>'+(isIOS&&standalone?'<p class="n2">아이폰 홈 화면 앱에서 화면이 꺼질 때 소리가 멈추면, Safari에서 열어 들으세요.</p>':'')+'</div>';
+  '<label class="bg"><input type="checkbox" id="bg"'+(S.bg?' checked':'')+'> 화면이 꺼져도 계속 듣기</label>'+(isIOS&&standalone?'<p class="n2">아이폰 홈 화면 앱에서 화면이 꺼질 때 소리가 멈추면, Safari에서 열어 들으세요.</p>':'')+'</div>';
  h+='<div class="card dlc"><b>⬇ 이 날 내려받기</b> <span class="n2">약 '+d.mb+' MB</span><div><button id="dl" class="big2">내려받기 · Download</button> <button id="rm" hidden>지우기 · Delete</button> <span id="dlst" class="n2"></span></div></div>';
  if(d.check&&d.check.length)h=h.replace('<div class="card ten">','<a class="go ckgo" href="#/check/'+n+'">🗣 말하기 점검</a><div class="card ten">');
  h+='<div class="card acts"><a class="go aigo" href="#/ai/'+n+'">AI와 대화 · Talk with AI</a>'+(window.deTR&&window.deTR.url()?'<a class="go trgo" href="#/tr/'+n+'">🗣 바로 통역 · Live interpreter</a>':'')+(d.talk?'<a class="go" id="talkgo" href="#/talk/'+n+'">🗣 대화 연습 · Talk practice</a>':'<span class="n2">🗣 대화 연습은 곧 열려요.</span>')+

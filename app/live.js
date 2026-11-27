@@ -41,7 +41,9 @@ function Session(ws_url,s,h){var ws,ready=false,closed=false,me=this;
  this.sendAudio=function(d){if(ready&&!closed&&ws.readyState===1)ws.send(JSON.stringify({realtimeInput:{audio:{data:d,mimeType:'audio/pcm;rate=16000'}}}));};
  this.sendText=function(t){if(ready&&!closed&&ws.readyState===1)ws.send(JSON.stringify({clientContent:{turns:[{role:'user',parts:[{text:t}]}],turnComplete:true}}));};
  this.close=function(){closed=true;try{ws.close();}catch(e){}};}
-function tokens(U,body){var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ctl)ctl.abort();},7000);
+/* random id kept only on this phone: lets the server count per phone (a whole church shares one Wi-Fi address) */
+function devId(){var k='de100dev',v=null;try{v=localStorage.getItem(k);}catch(e){}if(!v||!/^[a-z0-9]{12,40}$/.test(v)){v=(Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2)+Date.now().toString(36)).replace(/[^a-z0-9]/g,'').slice(0,24);try{localStorage.setItem(k,v);}catch(e){}}return v;}
+function tokens(U,body){body=Object.assign({dev:devId()},body);var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ctl)ctl.abort();},7000);
  return fetch(U.replace(/\/$/,'')+'/live-token',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl?ctl.signal:undefined,body:JSON.stringify(body)})
   .then(function(r){clearTimeout(tm);return r.json().catch(function(){return {};}).then(function(j){if(r.status===200&&j.sessions)return j;throw {error:j.error||'http'+r.status,status:r.status};});},function(){clearTimeout(tm);throw {error:'network'};});}
-return {supported:supported,audio:audio,Mic:Mic,Player:Player,Session:Session,tokens:tokens};})();
+return {supported:supported,audio:audio,Mic:Mic,Player:Player,Session:Session,tokens:tokens,dev:devId};})();

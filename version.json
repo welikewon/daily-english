@@ -1,15 +1,15 @@
 {
- "version": "2026.11.27-7",
+ "version": "2026.11.27-8",
  "date": "2026-11-27",
  "notes_ko": [
-  "바로 통역 화면이 대화창처럼 바뀌었어요. 말하기 버튼은 늘 아래에 있고, 대화가 화면 가득 보여요. 다른 기능은 「⋯ 더보기」에 있어요.",
-  "화면 오른쪽 위에 「🔄 업데이트」와 「⚙ 설정」 버튼이 생겼어요. 앱 아이콘을 길게 눌러도 「새 내용 받기」가 나와요.",
-  "앱을 열 때마다 새 내용이 있는지 보고, 있으면 노란 띠로 알려 드려요."
+  "「글자 크기: 가 보통 · 가 크게」를 첫 화면·날짜 화면·설정·통역 「⋯ 더보기」에서 고를 수 있어요. 크게 볼 때는 위에 「가 보통 글씨로」 버튼이 있어요.",
+  "통역 화면 글씨를 조금 줄여서 한 화면에 대화가 더 많이 보여요.",
+  "실시간 음성 한도를 다 쓰면 자동으로 글 번역으로 이어져요."
  ],
  "notes_en": [
-  "The interpreter now looks like a chat: talk buttons stay at the bottom and the conversation fills the screen; more tools are under \"More\".",
-  "New \"Update\" and \"Settings\" buttons at the top right; \"Get updates\" is also in the app icon menu.",
-  "Every time you open the app it checks, and a yellow bar tells you when something is new."
+  "Choose the text size on home, each day, Settings and the interpreter; while big, a \"Normal text\" button sits at the top.",
+  "The interpreter shows more of the conversation on one screen.",
+  "When live voice is used up for the day, it continues with text translation."
  ],
  "pdf": {
   "pastors": {
