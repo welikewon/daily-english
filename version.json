@@ -1,13 +1,11 @@
 {
- "version": "2026.11.27-9",
+ "version": "2026.11.27-10",
  "date": "2026-11-27",
  "notes_ko": [
-  "AI 대화와 바로 통역을 처음 쓸 때 개인정보 안내가 나와요. 화면 위 ⓘ를 누르면 다시 볼 수 있어요.",
-  "AI 대화가 오늘 배운 날의 장면과 문장으로 이어져요. 연결이 안 되면 다른 AI 목소리로 자동으로 다시 연결해요."
+  "AI 대화·통역은 만 18세 이상만 쓸 수 있어요. 처음 쓸 때 한 번 물어봐요(생년월일은 묻지 않아요). 나머지 공부는 누구나 무료예요."
  ],
  "notes_en": [
-  "A privacy note appears the first time you use AI talk or the interpreter; tap ⓘ to see it again.",
-  "AI talk now follows each day's own scene and sentences, and reconnects automatically if the first connection fails."
+  "AI talk and the interpreter are for adults (18+). The app asks once (no birth date); everything else is free for everyone."
  ],
  "pdf": {
   "pastors": {
