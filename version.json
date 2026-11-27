@@ -1,17 +1,19 @@
 {
- "version": "2026.11.27-3",
+ "version": "2026.11.27-4",
  "date": "2026-11-27",
  "notes_ko": [
-  "「🔄 새 내용 받기」 버튼이 생겼어요. 한 번 누르면 최신 내용으로 바뀌어요.",
-  "바로 통역 버튼을 모든 화면에서 바로 누를 수 있어요.",
-  "쉐도잉에 책에 나온 모든 문장과 「더 말해 보기」 문장이 들어갔어요.",
-  "문장 글씨를 조금 작게 해서 한 화면에 더 많이 보여요. 「가 큰 글씨」로 크게 볼 수 있어요."
+  "바로 통역이 새로워졌어요. 말한 내용이 대화처럼 남고, 「다 했어요」를 누를 때까지 끊지 않아요.",
+  "들린 말을 고쳐서 다시 번역하고, 상대에게 어떻게 전달되는지 볼 수 있어요.",
+  "「자주 쓰는 말」, 「마주 보기」, 「대화 목록」이 생겼어요. 대화는 이 휴대폰에만 저장돼요.",
+  "「📝 말할 내용 준비」: 한국어로 말하거나 써서 영어 원고를 만들고 큰 글씨로 읽어요.",
+  "이미 내려받은 날도 새 내용 받기 후 자동으로 새로 받아요."
  ],
  "notes_en": [
-  "New \"Get updates\" button: one tap brings the latest version.",
-  "The interpreter button is on every screen.",
-  "Shadowing now has every sentence of the book page and More practice.",
-  "Sentence text is smaller so you see more at once; \"Big text\" makes it large again."
+  "The interpreter is new: the talk stays on screen and it waits until you tap Done.",
+  "Fix what was heard, translate again, and see what your partner hears.",
+  "New phrasebook, face-to-face mode and saved conversations (kept only on this phone).",
+  "New \"Prepare what to say\": make an English script from Korean and read it in big letters.",
+  "Days you downloaded are refreshed after an update."
  ],
  "pdf": {
   "pastors": {

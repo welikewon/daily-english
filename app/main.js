@@ -29,9 +29,9 @@ function setBg(v){S.bg=v;window.deKeepPlaying=v;localStorage.setItem('de100set',
 function urls(d){return d.files.map(function(f){return new URL(AU+did(d.id)+'/'+f+'.mp3',location.href).href.replace('/'+did(d.id)+'/../talk/','/talk/');});}
 function cname(n){return 'de100-day-'+('00'+n).slice(-3);}
 function has(n){if(!window.caches)return Promise.resolve(false);return caches.has(cname(n));}
-function download(n,cb){var d=day(n),u=urls(d),i=0,fail=0;if(!window.caches){cb&&cb('이 브라우저는 내려받기를 지원하지 않아요.');return Promise.resolve(false);}
+function download(n,cb,fresh){var d=day(n),u=urls(d),i=0,fail=0;if(!window.caches){cb&&cb('이 브라우저는 내려받기를 지원하지 않아요.');return Promise.resolve(false);}
  return caches.open(cname(n)).then(function(c){function next(){if(i>=u.length)return Promise.resolve();var x=u[i++];
-  return fetch(x).then(function(r){if(!r.ok)throw 0;return c.put(x,r);}).catch(function(){fail++;}).then(function(){cb&&cb(Math.round(100*i/u.length)+'%');return next();});}
+  return fetch(x,fresh?{cache:'reload'}:undefined).then(function(r){if(!r.ok)throw 0;return c.put(x,r);}).catch(function(){fail++;}).then(function(){cb&&cb(Math.round(100*i/u.length)+'%');return next();});}
   return next();}).then(function(){if(fail){cb&&cb('일부 파일을 받지 못했어요 ('+fail+'개). 인터넷 연결을 확인하고 다시 눌러 주세요.');return false;}cb&&cb('완료');return true;});}
 function remove(n){return window.caches?caches.delete(cname(n)):Promise.resolve(false);}
 function usage(el){if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){el.textContent='이 휴대폰에 저장한 양: 약 '+(e.usage/1e6).toFixed(1)+' MB';});}
@@ -70,7 +70,7 @@ function remind(h){var ics=icsFor(h);window.__ics=ics;var a=document.createEleme
  localStorage.setItem('de100remind',String(h));$('#remst').textContent='달력 앱이 열리면 「추가」 또는 「저장」을 누르세요. 매일 '+(h===7?'아침 7시 · 7 AM':h===12?'낮 12시 · 12 PM':'저녁 9시 · 9 PM')+'에 알려 줘요.';
  if(standalone&&'Notification' in window&&navigator.serviceWorker){Notification.requestPermission().then(function(pm){if(pm!=='granted')return;navigator.serviceWorker.ready.then(function(reg){if(reg.periodicSync)reg.periodicSync.register('de100-daily',{minInterval:12*3600*1000}).then(function(){window.__psync=1;}).catch(function(){});});});}}
 /* ---------- 🔄 새 내용 받기 · Get updates (version.json on the site; one tap = new files + reload) ---------- */
-var APPV='2026.11.27-3';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
+var APPV='2026.11.27-4';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
 function vfetch(){return fetch('../version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();});}
 function vnotes(j){return '<div class="updn"><b>이번에 달라진 점 · What is new</b><ul>'+(j.notes_ko||[]).map(function(k,i){return '<li>'+esc(k)+'<br><span class="n2">'+esc((j.notes_en||[])[i]||'')+'</span></li>';}).join('')+'</ul></div>';}
 function doUpdate(st){st.innerHTML='<p>⏳ 새 내용을 받는 중… · Downloading…</p>';localStorage.setItem('de100redl','1');
@@ -97,7 +97,7 @@ function bindSettings(){var u=document.getElementById('updgo');if(!u)return;u.on
   if(location.hash&&location.hash!=='#/')return;var b=document.createElement('button');b.id='updbar';b.textContent='🔄 새 내용이 있어요 · Tap to update';var v=document.getElementById('view')||document.body;v.insertBefore(b,v.firstChild);
   b.onclick=function(){b.remove();var c=document.getElementById('setc');if(c)c.scrollIntoView({behavior:'smooth'});vcheck(document.getElementById('updst'),false);};}).catch(function(){});}
 /* after an update: refresh the days already downloaded, quietly */
-if(localStorage.getItem('de100redl')==='1'){localStorage.removeItem('de100redl');window.__redl=0;setTimeout(function(){if(!window.caches)return;caches.keys().then(function(ks){ks.filter(function(k){return /^de100-day-\d{3}$/.test(k);}).forEach(function(k){var n=+k.slice(-3);if(day(n))download(n).then(function(){window.__redl++;});});});},1500);window.__updated=APPV;}
+if(localStorage.getItem('de100redl')==='1'){localStorage.removeItem('de100redl');window.__redl=0;setTimeout(function(){if(!window.caches)return;caches.keys().then(function(ks){ks.filter(function(k){return /^de100-day-\d{3}$/.test(k);}).forEach(function(k){var n=+k.slice(-3);if(day(n))download(n,null,true).then(function(){window.__redl++;});});});},1500);window.__updated=APPV;}
 function home(){var p=prog(),t=todayDay(),td=day(t);
  var h=top('오늘의 영어','<div class="streak">'+streak()+'</div>');
  if(window.deTR&&window.deTR.url())h+='<a class="trtop" href="#/tr">🗣 바로 통역 · Live interpreter<span>한국어 ↔ English · 누르고 바로 말하세요 · Tap and speak</span></a>';
