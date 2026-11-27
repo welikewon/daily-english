@@ -77,7 +77,7 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
  function bubble(l){var me=l.who==='me',toEn=l.from==='ko';
   return '<div class="tb2 '+(me?'me':'pt')+(l.pending?' pend':'')+'" data-id="'+l.id+'"><div class="src">'+(toEn?'🇰🇷 ':'🇺🇸 ')+esc(l.src)+'</div><div class="out '+(toEn?'en':'ko')+'">'+esc(l.out||'…')+'</div>'+
    (l.back?'<div class="back">↩ '+esc(L('상대에게 이렇게 전달돼요','They hear'))+': '+esc(l.back)+'</div>':'')+(l.pending?'<button class="retry">'+esc(L('🔁 다시 시도','Retry'))+'</button>':'')+
-   (l.out&&!l.pending?'<div class="qa"><button class="qplay" aria-label="'+esc(L('다시 듣기','Play'))+'">🔊</button><button class="qcopy">'+esc(L('📋 복사','Copy'))+'</button></div>':'')+
+   (l.out&&!l.pending?'<div class="qa"><button class="qplay">'+esc(L('🔊 듣기','Play'))+'</button><button class="qcopy">'+esc(L('📋 복사','Copy'))+'</button></div>':'')+
    '<div class="tm">'+fmtDate(l.t)+(l.star?' ⭐':'')+'</div></div>';}
  function draw(keepScroll){var c=$('#trchat');c.innerHTML=cur.lines.length?cur.lines.map(bubble).join(''):'<p class="n2 trempty">'+esc(L('아래 버튼을 누르고 말하세요. 다 말하면 「다 했어요」를 누르세요.','Tap a button below and speak. Tap Done when you finish.'))+'</p>';
   if(!keepScroll)c.scrollTop=c.scrollHeight;window.__trLines=cur.lines.length;}
