@@ -171,6 +171,8 @@ html.bigtext .trv2 .trtools .tb{font-size:18px;min-height:56px}html.bigtext .trm
 .trv2 .trtools .tb{flex-direction:column;line-height:1.1;font-size:13px;padding:2px 3px}.trv2 .trtools .tb small{font-size:11px;font-weight:600;opacity:.8}.trv2 .trtools .tb{white-space:nowrap;letter-spacing:-.2px}
 html.bigtext .trv2 .trtools .tb{font-size:16px;white-space:normal}html.bigtext .trv2 .trtools .tb small{font-size:13px}
 #view .trv2 .trtools .tb{min-height:44px}#view .trv2 .tb2 .qa button{min-height:44px}html.bigtext #view .trv2 .trtools .tb{min-height:56px}html.bigtext #view .trv2 .tb2 .qa button{min-height:52px}
+.privov{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px}.privbox{background:#fff;border-radius:16px;padding:16px;max-width:460px;font-size:17px;line-height:1.5}.privbox p{margin:8px 0 12px}
+.atop .privi{position:absolute;left:auto;right:8px;bottom:6px;min-width:44px;min-height:44px;border-radius:22px;border:0;background:rgba(255,255,255,.2);color:#fff;font-size:20px;font-weight:800}body.trmode .atop .privi{position:static;margin-left:auto;background:#e8eef8;color:#1F3A5F}
 
 #stuck{position:fixed;inset:0;z-index:40;background:#F4F6FA;overflow:auto;padding:12px 12px 110px;font-size:18px}
 #stuck .shead{display:flex;justify-content:space-between;align-items:center;font-size:22px;position:sticky;top:-12px;background:#F4F6FA;padding:8px 0;z-index:1}

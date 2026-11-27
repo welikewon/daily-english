@@ -1,15 +1,13 @@
 {
- "version": "2026.11.27-8",
+ "version": "2026.11.27-9",
  "date": "2026-11-27",
  "notes_ko": [
-  "「글자 크기: 가 보통 · 가 크게」를 첫 화면·날짜 화면·설정·통역 「⋯ 더보기」에서 고를 수 있어요. 크게 볼 때는 위에 「가 보통 글씨로」 버튼이 있어요.",
-  "통역 화면 글씨를 조금 줄여서 한 화면에 대화가 더 많이 보여요.",
-  "실시간 음성 한도를 다 쓰면 자동으로 글 번역으로 이어져요."
+  "AI 대화와 바로 통역을 처음 쓸 때 개인정보 안내가 나와요. 화면 위 ⓘ를 누르면 다시 볼 수 있어요.",
+  "AI 대화가 오늘 배운 날의 장면과 문장으로 이어져요. 연결이 안 되면 다른 AI 목소리로 자동으로 다시 연결해요."
  ],
  "notes_en": [
-  "Choose the text size on home, each day, Settings and the interpreter; while big, a \"Normal text\" button sits at the top.",
-  "The interpreter shows more of the conversation on one screen.",
-  "When live voice is used up for the day, it continues with text translation."
+  "A privacy note appears the first time you use AI talk or the interpreter; tap ⓘ to see it again.",
+  "AI talk now follows each day's own scene and sentences, and reconnects automatically if the first connection fails."
  ],
  "pdf": {
   "pastors": {

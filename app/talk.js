@@ -273,14 +273,15 @@ window.__aiLive=function(){return !!(window.TALK_AI_URL!=null?window.TALK_AI_URL
  function finishTurn(){if(!LV||!LV.cur)return;var txt=LV.curTxt.trim(),c=LV.cur,ch=LV.chunks.slice(),learner=LV.lastLearner||'';LV.cur=null;if(!txt)return;H.push({role:'partner',text:txt});
   var ag=el('button','again','🔁 다시 듣기 · Play again');c.appendChild(ag);ag.onclick=function(e){e.stopPropagation();if(!LV)return;var p=new deLive.Player();p.rate=$('#aislow').checked?0.8:1;ch.forEach(function(d){p.play(d);});};
   setTimeout(function(){if(LV&&!LV.pl.busy()){S.speaking=false;box.classList.remove('aispk');}},Math.max(200,(LV?LV.pl.endsIn():0)*1000+200));
-  fetch(U.replace(/\/$/,'')+'/hints',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({day:T.day,partner:txt,learner:learner,sid:sid})})
+  fetch(U.replace(/\/$/,'')+'/hints',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({day:T.day,partner:txt,learner:learner,sid:sid,dev:window.deLive&&deLive.dev?deLive.dev():undefined})})
    .then(function(r){return r.json();}).then(function(j){if(j.reply_ko)c.querySelector('.ko').textContent=j.reply_ko;
     if(j.natural){var tp=el('div','tip','💡 이렇게 말하면 더 자연스러워요 · More natural: <b>'+esc(j.natural)+'</b>');c.insertBefore(tp,c.querySelector('.hints'));if(S.nat.indexOf(j.natural)<0)S.nat.push(j.natural);}
     (j.hints||[]).forEach(function(h){var b=el('button','sug big2','🗣 '+esc(h.en)+'<br><span class="n2">'+esc(h.ko)+'</span>');
      b.onclick=function(e){e.stopPropagation();if(!LV||!LV.sess)return;closeMe();bubble(true,'<div class="who">나 · Me</div><div class="en">'+esc(h.en)+'</div>');H.push({role:'learner',text:h.en});LV.lastLearner=h.en;S.turns++;LV.pl.stop();LV.sess.sendText(h.en);};
      c.querySelector('.hints').appendChild(b);});}).catch(function(){});}
- function startLive(){S.mode='live';window.__aiMode='live';deLive.audio();var t0=Date.now(),wait=bubble(false,'<div class="n2 think">📞 연결 중… · Connecting…</div>');
-  deLive.tokens(U,{kind:'call',day:T.day,sid:sid}).then(function(j){if(!S.on){return;}var s=j.sessions.call;
+ function startLive(fb){S.mode='live';window.__aiMode='live';deLive.audio();var t0=Date.now(),wait=bubble(false,'<div class="n2 think">📞 연결 중… · Connecting…</div>');
+  deLive.tokens(U,{kind:'call',day:T.day,sid:sid,fallback:!!fb}).then(function(j){if(!S.on){return;}var s=j.sessions.call;
+   function again(){if(wait.parentNode)wait.remove();liveStop();window.__liveFb=1;startLive(true);}   /* first model did not start: one retry on the stable model */
    LV={pl:new deLive.Player(),cur:null,me:null,curTxt:'',meTxt:'',chunks:[],lastIn:0,started:false,firstAudio:false};
    LV.mic=new deLive.Mic(function(d,rms){if(LV&&!S.paused&&LV.sess){LV.sess.sendAudio(d);if(rms>0.01&&!S.speaking)LV.lastVoice=Date.now();}});
    LV.sess=new deLive.Session(j.ws,s,{
@@ -294,9 +295,9 @@ window.__aiLive=function(){return !!(window.TALK_AI_URL!=null?window.TALK_AI_URL
      if(!LV.firstAudio){LV.firstAudio=true;window.__liveFirstAudioMs=Date.now()-t0;}LV.pl.play(d);LV.chunks.push(d);S.speaking=true;box.classList.add('aispk');window.__aiSpoke=(window.__aiSpoke||0)+1;},
     interrupted:function(){if(!LV)return;LV.pl.stop();finishTurn();},
     turnDone:function(){finishTurn();},
-    closed:function(code,wasReady){window.__liveClose=code;if(!LV)return;if(!wasReady)return liveFail({error:'ws'+code});if(S.on)liveFail({error:'closed'+code});}});
+    closed:function(code,wasReady){window.__liveClose=code;if(!LV)return;if(!wasReady){if(!fb&&j.fb)return again();return liveFail({error:'ws'+code});}if(S.on)liveFail({error:'closed'+code});}});
    LV.sess.open();
-   setTimeout(function(){if(LV&&!LV.started)liveFail({error:'timeout'});},8000);
+   setTimeout(function(){if(LV&&!LV.started){if(!fb&&j.fb)again();else liveFail({error:'timeout'});}},8000);
   }).catch(function(e){if(wait.parentNode)wait.remove();liveFail(e);});}
  $('#aistart').onclick=function(){$('#aistart').hidden=true;$('#aictl').hidden=false;$('#aisum').hidden=true;S.on=true;S.paused=false;S.turns=0;S.nat=[];S.localN=0;
   if(liveOK())return startLive();

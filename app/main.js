@@ -74,7 +74,7 @@ function remind(h){var ics=icsFor(h);window.__ics=ics;var a=document.createEleme
  localStorage.setItem('de100remind',String(h));$('#remst').textContent='달력 앱이 열리면 「추가」 또는 「저장」을 누르세요. 매일 '+(h===7?'아침 7시 · 7 AM':h===12?'낮 12시 · 12 PM':'저녁 9시 · 9 PM')+'에 알려 줘요.';
  if(standalone&&'Notification' in window&&navigator.serviceWorker){Notification.requestPermission().then(function(pm){if(pm!=='granted')return;navigator.serviceWorker.ready.then(function(reg){if(reg.periodicSync)reg.periodicSync.register('de100-daily',{minInterval:12*3600*1000}).then(function(){window.__psync=1;}).catch(function(){});});});}}
 /* ---------- 🔄 새 내용 받기 · Get updates (version.json on the site; one tap = new files + reload) ---------- */
-var APPV='2026.11.27-8';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
+var APPV='2026.11.27-9';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
 function vfetch(){return fetch('../version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();});}
 function vnotes(j){return '<div class="updn"><b>이번에 달라진 점 · What is new</b><ul>'+(j.notes_ko||[]).map(function(k,i){return '<li>'+esc(k)+'<br><span class="n2">'+esc((j.notes_en||[])[i]||'')+'</span></li>';}).join('')+'</ul></div>';}
 function doUpdate(st){st.innerHTML='<p>⏳ 새 내용을 받는 중… · Downloading…</p>';localStorage.setItem('de100redl','1');
@@ -239,8 +239,13 @@ function install(){var ua=navigator.userAgent,inapp=/KAKAOTALK|NAVER\(|NAVER|Ins
 function trfab(r){var f=document.getElementById('trfab');if(!(window.deTR&&window.deTR.url())||r==='tr'){if(f)f.hidden=true;document.body.classList.remove('hasfab');return;}
  if(!f){f=document.createElement('a');f.id='trfab';f.textContent='🗣 통역 · Translate';document.body.appendChild(f);}
  var m=location.hash.match(/^#\/(?:day|talk|ai|check)\/(\d+)/);f.href=m?'#/tr/'+m[1]:'#/tr';f.hidden=false;document.body.classList.add('hasfab');}
+/* free-AI privacy notice: first use of the AI talk or the interpreter, then a small ⓘ in the header */
+var PRIV='무료 AI라 대화 내용이 서비스 개선을 위해 검토될 수 있어요. 이름·전화번호·주소 같은 개인정보는 말하지 마세요. · This free AI may be reviewed to improve the service; do not share personal details.';
+function privShow(){var o=document.createElement('div');o.className='privov';o.innerHTML='<div class="privbox"><b>ⓘ 알려 드려요 · Please note</b><p>'+esc(PRIV)+'</p><button class="go">확인 · OK</button></div>';document.body.appendChild(o);o.querySelector('button').onclick=function(){localStorage.setItem('de100priv','1');o.remove();};window.__privShown=(window.__privShown||0)+1;}
+function privNote(h){if(!((h[0]==='talk'&&h[1])||h[0]==='tr'))return;setTimeout(function(){var hd=document.querySelector('#view .atop');if(hd&&!hd.querySelector('.privi')){var b=document.createElement('button');b.className='privi';b.setAttribute('aria-label','개인정보 안내 · Privacy note');b.textContent='ⓘ';b.onclick=privShow;hd.appendChild(b);}
+ if(localStorage.getItem('de100priv')!=='1'&&!document.querySelector('.privov'))privShow();},50);}
 function route(){try{stopAll();}catch(e){}stopRec();window.deNext=null;var h=location.hash.replace(/^#\/?/,'').split('/');
- if(h[0]==='day'&&h[1])dayScreen(+h[1]);else if(h[0]==='talk'&&h[1])talkScreen(+h[1],h[2]);else if(h[0]==='ai'&&h[1])aiScreen(+h[1]);else if(h[0]==='check'&&h[1])checkScreen(+h[1]);else if(h[0]==='ck'&&h[1])ckScreen(+h[1]);else if(h[0]==='install')install();else if(h[0]==='tr'&&window.interpScreen)window.interpScreen(V,h[1]==='prep'?'#/tr':h[1]?'#/day/'+h[1]:'#/',h[1]==='prep'?'prep':null);else home();
+ if(h[0]==='day'&&h[1])dayScreen(+h[1]);else if(h[0]==='talk'&&h[1])talkScreen(+h[1],h[2]);else if(h[0]==='ai'&&h[1])aiScreen(+h[1]);else if(h[0]==='check'&&h[1])checkScreen(+h[1]);else if(h[0]==='ck'&&h[1])ckScreen(+h[1]);else if(h[0]==='install')install();else if(h[0]==='tr'&&window.interpScreen)window.interpScreen(V,h[1]==='prep'?'#/tr':h[1]?'#/day/'+h[1]:'#/',h[1]==='prep'?'prep':null);else home();privNote(h);
  ibar();trfab(h[0]);
  window.scrollTo(0,0);window.__route=location.hash||'#/';}
 window.addEventListener('hashchange',route);route();
