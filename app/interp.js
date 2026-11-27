@@ -57,21 +57,20 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
  var AUD={};   /* live audio of this visit, per line, for exact replay */
  V.innerHTML='<header class="atop"><a class="aback" id="trback" href="'+(back||'#/')+'">← <span class="lb" data-ko="뒤로" data-en="Back"></span></a><div class="k">웰컴 잉글리시 100</div><h1 class="lb" data-ko="🗣 바로 통역" data-en="Live interpreter"></h1></header>'+
   '<div id="trwrap" class="trv2">'+(U?'':'<div class="card warn">지금은 통역을 쓸 수 없어요. · The interpreter is not available.</div>')+
-  '<div class="trtools"><button id="trlist" class="tb lb" data-ko="📋 대화 목록" data-en="Conversations"></button><button id="trnew" class="tb lb" data-ko="➕ 새 대화" data-en="New talk"></button><a id="trprep" class="tb lb" href="#/tr/prep" data-ko="📝 말할 내용 준비" data-en="Prepare what to say"></a><button id="trpb" class="tb lb" data-ko="📖 자주 쓰는 말" data-en="Phrasebook"></button><button id="trf2f" class="tb lb" data-ko="👥 마주 보기" data-en="Face to face"></button><button id="trset" class="tb lb" data-ko="⚙ 설정" data-en="Settings"></button></div>'+
-  '<div id="trres" class="trres" hidden></div>'+
-  '<div id="trchat" class="trchat" aria-live="polite"></div>'+
-  '<div id="trlive" class="trlive2" hidden><div class="lvh"></div><div class="lvt"></div><div class="lvo"></div></div>'+
-  '<div id="trstatus" class="trstatus" hidden></div>'+
-  '<div class="trbar"><button id="trko" class="trmic ko lb" data-ko="🇰🇷 한국어로 말하기" data-en="Speak Korean"></button><button id="trauto" class="trmic au lb" hidden data-ko="🎤 자동" data-en="Auto"></button><button id="tren" class="trmic en lb" data-ko="🇺🇸 영어로 말하기" data-en="Speak English"></button>'+
-  '<button id="trdone" class="trdone lb" hidden data-ko="■ 다 했어요" data-en="Done"></button></div>'+
+  '<div class="trtools"><button id="trpb" class="tb lb" data-ko="📖 자주 쓰는 말" data-en="Phrases"></button><a id="trprep" class="tb lb" href="#/tr/prep" data-ko="📝 말할 내용 준비" data-en="Prepare"></a><button id="trmorebtn" class="tb lb" data-ko="⋯ 더보기" data-en="More"></button></div>'+
+  '<div id="trscroll" class="trscroll"><div id="trres" class="trres" hidden></div><div id="trchat" class="trchat" aria-live="polite"></div>'+
+  '<div id="trlive" class="trlive2" hidden><div class="lvh"></div><div class="lvt"></div><div class="lvo"></div></div></div>'+
+  '<div id="trmore" class="trmore" hidden><div class="trmg"><button id="trlist" class="tb lb" data-ko="📋 대화 목록" data-en="Conversations"></button><button id="trnew" class="tb lb" data-ko="➕ 새 대화" data-en="New talk"></button><button id="trf2f" class="tb lb" data-ko="👥 마주 보기" data-en="Face to face"></button><button id="trflip" class="tb lb" data-ko="🔄 상대에게 보여주기" data-en="Show to partner"></button><button id="trset" class="tb lb" data-ko="⚙ 통역 설정" data-en="Interpreter settings"></button><button id="trclear" class="tb lb" data-ko="🗑 모두 지우기" data-en="Clear all"></button></div>'+
   '<details class="trtype"><summary class="lb" data-ko="✍ 글로 쓰기" data-en="Type instead"></summary><textarea id="trtx" rows="3"></textarea><div class="trrow"><button id="trsendk" class="big2 lb" data-ko="한국어 → 영어" data-en="Korean → English"></button><button id="trsende" class="big2 lb" data-ko="영어 → 한국어" data-en="English → Korean"></button></div></details>'+
-  '<div class="trfoot"><button id="trclear" class="tb lb" data-ko="🗑 모두 지우기" data-en="Clear all"></button><button id="trflip" class="tb lb" data-ko="🔄 상대에게 보여주기" data-en="Show to partner"></button></div>'+
   '<p class="n2 lb" data-ko="말한 내용은 번역을 위해 구글 AI로 보내져요. 대화 기록은 이 휴대폰에만 저장돼요." data-en="Your words go to Google AI for translation. The transcript is kept only on this phone."></p>'+
   '<p class="n2 center trlinks"><span class="lb" data-ko="다른 번역기" data-en="Other translators"></span>: <a href="https://translate.google.com/?sl=ko&tl=en&op=translate" target="_blank" rel="noopener">Google</a> · <a href="https://papago.naver.com/?sk=ko&tk=en" target="_blank" rel="noopener">Papago</a></p></div>'+
+  '<div id="trdock" class="trdock"><div id="trstatus" class="trstatus" hidden></div>'+
+  '<div class="trbar"><button id="trko" class="trmic ko lb" data-ko="🇰🇷 한국어로 말하기" data-en="Speak Korean"></button><button id="trauto" class="trmic au lb" hidden data-ko="🎤 자동" data-en="Auto"></button><button id="tren" class="trmic en lb" data-ko="🇺🇸 영어로 말하기" data-en="Speak English"></button>'+
+  '<button id="trdone" class="trdone lb" hidden data-ko="■ 다 했어요" data-en="Done"></button></div></div></div>'+
   '<div id="trov" class="trov" hidden></div>';
  var $=function(s){return V.querySelector(s);},$$=function(s){return [].slice.call(V.querySelectorAll(s));};
- function labels(){$$('.lb').forEach(function(e){e.textContent=L(e.dataset.ko,e.dataset.en);});}
- function status(t){var s=$('#trstatus');if(!s)return;s.hidden=!t;s.textContent=t||'';}
+ function labels(){$$('.lb').forEach(function(e){var t=L(e.dataset.ko,e.dataset.en);if(e.classList.contains('trmic')||e.classList.contains('trdone')){var i=t.indexOf(' · ');e.innerHTML=esc(t.slice(0,i))+'<small>'+esc(t.slice(i+3))+'</small>';}else e.textContent=t;});}
+ function status(t){var s=$('#trstatus');if(!s)return;s.hidden=!t;s.textContent=t||'';fit();}
  function toast(t){status(t);clearTimeout(toast.t);toast.t=setTimeout(function(){status('');},4500);}
  /* ---------- chat ---------- */
  function bubble(l){var me=l.who==='me',toEn=l.from==='ko';
@@ -80,10 +79,10 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
    (l.out&&!l.pending?'<div class="qa"><button class="qplay">'+esc(L('🔊 듣기','Play'))+'</button><button class="qcopy">'+esc(L('📋 복사','Copy'))+'</button></div>':'')+
    '<div class="tm">'+fmtDate(l.t)+(l.star?' ⭐':'')+'</div></div>';}
  function draw(keepScroll){var c=$('#trchat');c.innerHTML=cur.lines.length?cur.lines.map(bubble).join(''):'<p class="n2 trempty">'+esc(L('아래 버튼을 누르고 말하세요. 다 말하면 「다 했어요」를 누르세요.','Tap a button below and speak. Tap Done when you finish.'))+'</p>';
-  if(!keepScroll)c.scrollTop=c.scrollHeight;window.__trLines=cur.lines.length;}
+  fit();if(!keepScroll)toEnd();window.__trLines=cur.lines.length;}
  function line(id){return cur.lines.filter(function(l){return l.id===id;})[0];}
  function addLine(l){l.id=l.id||uid();l.t=l.t||Date.now();cur.lines.push(l);persist();draw();return l;}
- function upd(){persist();draw(true);}
+ function upd(){var sc=$('#trscroll'),nb=sc&&sc.scrollHeight-sc.scrollTop-sc.clientHeight<260;persist();draw(true);if(nb)toEnd();}
  /* bubble actions: tap = menu, long-press = menu with delete */
  var pressT=null;
  $('#trchat').addEventListener('click',function(e){var b=e.target.closest('.tb2');if(!b)return;var l=line(b.dataset.id);if(!l)return;if(e.target.closest('.retry')){retry(l);return;}
@@ -91,8 +90,11 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
   if(e.target.closest('.qplay')){play(l);return;}menu(l);});
  $('#trchat').addEventListener('touchstart',function(e){var b=e.target.closest('.tb2');if(!b)return;pressT=setTimeout(function(){var l=line(b.dataset.id);if(l)menu(l,true);},650);},{passive:true});
  ['touchend','touchmove','touchcancel'].forEach(function(n){$('#trchat').addEventListener(n,function(){clearTimeout(pressT);},{passive:true});});
- function ov(html){var o=$('#trov');o.innerHTML='<div class="trsheet">'+html+'</div>';o.hidden=false;o.onclick=function(e){if(e.target===o)closeOv();};return o;}
- function closeOv(){var o=$('#trov');if(o){o.hidden=true;o.innerHTML='';}}
+ function rescue(){var m=V.querySelector('#trov #trmore');if(m){m.hidden=true;$('#trwrap').appendChild(m);}}
+ function fit(){var sc=$('#trscroll'),d=$('#trdock');if(!sc||!d||!document.body.contains(sc))return;window.scrollTo(0,0);var h=window.innerHeight-sc.getBoundingClientRect().top-d.offsetHeight-8;sc.style.height=Math.max(150,h)+'px';if(T)toEnd();}
+ function toEnd(){var sc=$('#trscroll');if(sc)sc.scrollTop=sc.scrollHeight;}
+ function ov(html){rescue();var o=$('#trov');o.innerHTML='<div class="trsheet">'+html+'</div>';o.hidden=false;o.onclick=function(e){if(e.target===o)closeOv();};return o;}
+ function closeOv(){rescue();var o=$('#trov');if(o){o.hidden=true;o.innerHTML='';}}
  function outLang(l){return l.from==='ko'?'en':'ko';}
  function play(l,rate){var a=AUD[l.id];if(a&&a.length&&window.deLive&&(rate||1)===1){deLive.audio();var p=new deLive.Player();p.rate=rate||1;a.forEach(function(d){p.play(d);});return;}say(l.out,outLang(l),outLang(l)==='en'?(rate||0.9):1);}
  function menu(l,del){var en=outLang(l)==='en';
@@ -134,12 +136,12 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
  function flush(){(T.aud[T.win]||[]).forEach(function(d){playChunk(T.win,d);});}
  var PL=null;function playChunk(from,d){if(from==='en'&&!prefs().kosnd)return;if(!PL&&window.deLive)PL=new deLive.Player();if(PL){PL.play(d);window.__trPlayed=(window.__trPlayed||0)+1;}}
  function liveDraw(){var lv=$('#trlive');if(!lv||!T)return;lv.hidden=false;var from=T.win||(T.from==='auto'?(T.src.ko&&T.src.ko.length>=(T.src.en||'').length?'ko':'en'):T.from);
-  lv.querySelector('.lvh').textContent=T.stopped?L('번역하는 중…','Translating…'):L('듣고 있어요…','Listening…');lv.querySelector('.lvt').textContent=(T.src[from]||'').trim();lv.querySelector('.lvo').textContent=T.out;}
+  lv.querySelector('.lvh').textContent=T.stopped?L('번역하는 중…','Translating…'):L('듣고 있어요…','Listening…');lv.querySelector('.lvt').textContent=(T.src[from]||'').trim();lv.querySelector('.lvo').textContent=T.out;toEnd();}
  /* ---------- one turn: speak until 「다 했어요」 (never cut off) ---------- */
- function setBar(rec){if(!$('#trdone'))return;$('#trdone').hidden=!rec;['#trko','#tren','#trauto'].forEach(function(s){var b=$(s);if(b)b.classList.toggle('dim',rec);});if(!prefs().auto)$('#trauto').hidden=true;else $('#trauto').hidden=false;}
+ function setBar(rec){if(!$('#trdone'))return;$('#trdone').hidden=!rec;['#trko','#tren','#trauto'].forEach(function(s){var b=$(s);if(b)b.classList.toggle('dim',rec);});if(!prefs().auto)$('#trauto').hidden=true;else $('#trauto').hidden=false;fit();}
  function startTurn(from){if(T)return;closeOv();try{speechSynthesis.cancel();}catch(e){}if(PL)PL.stop();wake();
   T={from:from,src:{},out:'',win:from==='auto'?null:from,aud:{},t0:Date.now(),live:false,stopped:false};window.__trTurn=T;setBar(true);
-  var lv=$('#trlive');lv.hidden=false;lv.querySelector('.lvh').textContent=L('듣고 있어요…','Listening…');lv.querySelector('.lvt').textContent='';lv.querySelector('.lvo').textContent='';
+  var lv=$('#trlive');lv.hidden=false;lv.querySelector('.lvh').textContent=L('듣고 있어요…','Listening…');lv.querySelector('.lvt').textContent='';lv.querySelector('.lvo').textContent='';toEnd();
   if(canLive&&!LS.dead){T.live=true;Q=[];if(!liveReady(from)){status(L('연결 중…','Connecting…'));connect().then(function(){status('');Q.forEach(send);Q=[];}).catch(function(){if(T&&T.live){T.live=false;status('');browserRec();}});}
    deLive.audio();if(!mic){mic=new deLive.Mic(function(d){if(!T||!T.live||T.stopped)return;if(!liveReady(T.from))Q.push(d);else send(d);});
     mic.start().then(function(){window.__trMicOn=1;}).catch(function(){micBlocked();});}else mic.pause(false);
@@ -184,6 +186,8 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
   o.querySelector('.trsheet').onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;if(b.dataset.a==='y'){var L2=talks().filter(function(t){return t.id!==cur.id;});saveTalks(L2);cur={id:uid(),title:'',created:Date.now(),updated:Date.now(),lines:[]};AUD={};draw();}closeOv();};};
  $('#trnew').onclick=function(){persist();cur={id:uid(),title:'',created:Date.now(),updated:Date.now(),lines:[]};AUD={};draw();toast(L('새 대화를 시작해요.','New conversation.'));};
  $('#trlist').onclick=listView;
+ $('#trmorebtn').onclick=function(){var o=ov('<b>'+esc(L('⋯ 더보기','More'))+'</b><div id="trmh"></div><button data-a="x">'+esc(L('닫기','Close'))+'</button>');var m=$('#trmore');o.querySelector('#trmh').appendChild(m);m.hidden=false;
+  o.querySelector('.trsheet').onclick=function(e){if(e.target.closest('[data-a=x]'))return closeOv();var b=e.target.closest('#trmore button');if(b)setTimeout(function(){if(V.querySelector('#trov #trmh'))closeOv();},0);};};
  function listView(){persist();var L2=talks();var o=ov('<b>'+esc(L('📋 대화 목록','Conversations'))+'</b>'+(L2.length?L2.map(function(t){return '<div class="tlrow" data-id="'+t.id+'"><div><b>'+esc(t.title||fmtDate(t.created))+'</b><br><span class="n2">'+fmtDate(t.updated)+' · '+t.lines.length+'</span></div>'+
    '<button data-a="open">'+esc(L('이어서 말하기','Continue'))+'</button><button data-a="ren">'+esc(L('✏ 이름','Rename'))+'</button><button data-a="del">'+esc(L('🗑 지우기','Delete'))+'</button></div>';}).join(''):'<p class="n2">'+esc(L('저장된 대화가 없어요.','No saved conversations.'))+'</p>')+'<button data-a="x">'+esc(L('닫기','Close'))+'</button>');
   o.querySelector('.trsheet').onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;var r=b.closest('.tlrow'),id=r&&r.dataset.id,t=talks().filter(function(x){return x.id===id;})[0];
@@ -231,8 +235,8 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
  function vis(){if(!document.body.contains($('#trwrap')))return;if(document.visibilityState==='hidden'){if(T)done();persist();}else{wake();if(canLive&&!LS.dead&&!(LS.ready.ko&&LS.ready.en))connect().catch(function(){});}}
  document.addEventListener('visibilitychange',vis);
  window.addEventListener('hashchange',function h(){if(/^#\/tr(\/\d+)?$/.test(location.hash)&&document.body.contains($('#trwrap')))return;window.removeEventListener('hashchange',h);document.removeEventListener('visibilitychange',vis);window.removeEventListener('popstate',onPop);
-  persist();endTurn(true);if(mic){mic.stop();mic=null;}['ko','en'].forEach(function(k){try{LS.s[k]&&LS.s[k].close();}catch(e){}});if(PL)PL.stop();if(WL){try{WL.release();}catch(e){}}});
- labels();setBar(false);draw();wake();if(resumed)toast(L('지난 대화를 이어서 해요. 새로 하려면 「➕ 새 대화」.','Continuing your last conversation. Tap New talk to start fresh.'));
+  document.body.classList.remove('trmode');window.removeEventListener('resize',fit);persist();endTurn(true);if(mic){mic.stop();mic=null;}['ko','en'].forEach(function(k){try{LS.s[k]&&LS.s[k].close();}catch(e){}});if(PL)PL.stop();if(WL){try{WL.release();}catch(e){}}});
+ document.body.classList.add('trmode');window.addEventListener('resize',fit);labels();setBar(false);draw();wake();if(resumed)toast(L('지난 대화를 이어서 해요. 새로 하려면 「➕ 새 대화」.','Continuing your last conversation. Tap New talk to start fresh.'));
  if(canLive)connect().catch(function(){});window.__trReady=1;};
 /* =================================================================== 말할 내용 준비 · Prepare what to say */
 function scripts(){return ld('de100scripts',[]);}

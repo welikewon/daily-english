@@ -36,7 +36,7 @@ function download(n,cb,fresh){var d=day(n),u=urls(d),i=0,fail=0;if(!window.cache
 function remove(n){return window.caches?caches.delete(cname(n)):Promise.resolve(false);}
 function usage(el){if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){el.textContent='이 휴대폰에 저장한 양: 약 '+(e.usage/1e6).toFixed(1)+' MB';});}
 /* ---------- screens ---------- */
-function top(title,sub,back){return '<header class="atop">'+(back?'<a class="aback" href="'+back[0]+'">← '+esc(back[1])+'</a>':'')+'<div class="k">웰컴 잉글리시 100</div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</header>';}
+function top(title,sub,back){return '<header class="atop">'+(back?'<a class="aback" href="'+back[0]+'">← '+esc(back[1])+'</a>':'')+'<div class="hbtn"><button data-go="#/update">🔄 업데이트<small>Update</small></button><button data-go="#/settings">⚙ 설정<small>Settings</small></button></div><div class="k">웰컴 잉글리시 100</div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</header>';}
 /* ---------- big text (persists) ---------- */
 function bigOn(){return localStorage.getItem('de100big')==='1';}
 document.documentElement.classList.toggle('bigtext',bigOn());
@@ -70,7 +70,7 @@ function remind(h){var ics=icsFor(h);window.__ics=ics;var a=document.createEleme
  localStorage.setItem('de100remind',String(h));$('#remst').textContent='달력 앱이 열리면 「추가」 또는 「저장」을 누르세요. 매일 '+(h===7?'아침 7시 · 7 AM':h===12?'낮 12시 · 12 PM':'저녁 9시 · 9 PM')+'에 알려 줘요.';
  if(standalone&&'Notification' in window&&navigator.serviceWorker){Notification.requestPermission().then(function(pm){if(pm!=='granted')return;navigator.serviceWorker.ready.then(function(reg){if(reg.periodicSync)reg.periodicSync.register('de100-daily',{minInterval:12*3600*1000}).then(function(){window.__psync=1;}).catch(function(){});});});}}
 /* ---------- 🔄 새 내용 받기 · Get updates (version.json on the site; one tap = new files + reload) ---------- */
-var APPV='2026.11.27-6';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
+var APPV='2026.11.27-7';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
 function vfetch(){return fetch('../version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();});}
 function vnotes(j){return '<div class="updn"><b>이번에 달라진 점 · What is new</b><ul>'+(j.notes_ko||[]).map(function(k,i){return '<li>'+esc(k)+'<br><span class="n2">'+esc((j.notes_en||[])[i]||'')+'</span></li>';}).join('')+'</ul></div>';}
 function doUpdate(st){st.innerHTML='<p>⏳ 새 내용을 받는 중… · Downloading…</p>';localStorage.setItem('de100redl','1');
@@ -91,9 +91,11 @@ function pdfInfo(st){st.innerHTML='<p>⏳ …</p>';vfetch().then(function(j){var
 function settingsCard(){return '<div class="card setc" id="setc"><b>⚙ 설정 · Settings</b><div class="n2">버전 · Version '+esc(APPV)+'</div>'+
  '<button id="updgo" class="big2">🔄 새 내용 받기 · Get updates</button><div id="updst"></div><button id="pdfgo" class="big2">📕 최신 PDF 받기 · Latest PDF</button><div id="pdfst"></div></div>';}
 function bindSettings(){var u=document.getElementById('updgo');if(!u)return;u.onclick=function(){vcheck(document.getElementById('updst'),false);};document.getElementById('pdfgo').onclick=function(){pdfInfo(document.getElementById('pdfst'));};
- var u2=document.getElementById('updgo2');if(u2)u2.onclick=function(){vcheck(document.getElementById('updst2'),false);};
- if(location.hash==='#/update'){history.replaceState(null,'','#/');vcheck(document.getElementById('updst2'),false);}
+ if(location.hash==='#/update'||location.hash==='#/settings'){var g=location.hash;history.replaceState(null,'','#/');setTimeout(function(){homeGo(g);},60);}
  vbar();}
+/* header buttons 「🔄 업데이트」 / 「⚙ 설정」 (every main screen) */
+function homeGo(g){var c=document.getElementById('setc');if(!c)return;c.scrollIntoView({block:'start'});c.classList.add('flash');setTimeout(function(){c.classList.remove('flash');},1500);if(g==='#/update')vcheck(document.getElementById('updst'),false);}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.hbtn [data-go]');if(!b)return;var g=b.dataset.go;if(document.getElementById('setc')&&(!location.hash||location.hash==='#/'))homeGo(g);else location.hash=g;});
 /* every time the app opens or comes back: yellow bar when a newer version exists (✕ hides it until the next version) */
 var vLast=0;
 var vJ=null;
@@ -103,7 +105,7 @@ function showBar(j){var old=document.getElementById('updbar');
   if(j.version===APPV||localStorage.getItem('de100vdis')===j.version||/^#\/tr/.test(location.hash)){if(old)old.remove();return;}if(old)return;
   var b=document.createElement('div');b.id='updbar';b.innerHTML='<button class="ubgo">🔄 새 내용이 있어요 · Tap to update</button><button class="ubx" aria-label="닫기 · Close">✕</button>';document.body.insertBefore(b,document.body.firstChild);
   b.querySelector('.ubx').onclick=function(){localStorage.setItem('de100vdis',j.version);b.remove();};
-  b.querySelector('.ubgo').onclick=function(){b.remove();if(location.hash&&location.hash!=='#/'){location.hash='#/update';}else vcheck(document.getElementById('updst2'),false);};}
+  b.querySelector('.ubgo').onclick=function(){b.remove();if(document.getElementById('setc')&&(!location.hash||location.hash==='#/'))homeGo('#/update');else location.hash='#/update';};}
 setTimeout(vbar,1200);
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'){vLast=0;vbar();}});
 window.addEventListener('hashchange',function(){if(/^#\/tr/.test(location.hash)){var o=document.getElementById('updbar');if(o)o.remove();}else if(vJ)showBar(vJ);});
@@ -112,7 +114,6 @@ if(localStorage.getItem('de100redl')==='1'){localStorage.removeItem('de100redl')
 function home(){var p=prog(),t=todayDay(),td=day(t);
  var h=top('오늘의 영어','<div class="streak">'+streak()+'</div>');
  if(window.deTR&&window.deTR.url())h+='<a class="trtop" href="#/tr">🗣 바로 통역 · Live interpreter<span>한국어 ↔ English · 누르고 바로 말하세요 · Tap and speak</span></a>';
- h+='<div class="updtop"><button id="updgo2">🔄 새 내용 받기 · Get updates</button><span class="updver">버전 · Version '+esc(APPV)+'</span></div><div id="updst2"></div>';
  var rv=localStorage.getItem('de100revskip')===today()?[]:reviewItems();window.__revN=rv.length;
  if(rv.length)h+='<div class="card revcard"><b class="inst">🔁 오늘 복습 '+rv.length+'개</b>'+rv.map(function(x){return '<div class="rv"><div class="en">'+esc(x.en)+'</div><div class="n2">'+esc(x.ko)+' · '+(x.star?'⭐ 내가 저장한 문장 · Saved':'Day '+x.day)+'</div></div>';}).join('')+
   '<button id="revgo" class="go">▶ 복습 듣기 (2번씩)</button><button id="revskip" class="nolink">건너뛰기</button></div>';
@@ -131,8 +132,8 @@ function home(){var p=prog(),t=todayDay(),td=day(t);
    var n=ids[i++];download(n,function(s){$('#wkst').textContent='Day '+n+' '+s;}).then(nx);})();};}
 function dayScreen(n){var d=day(n);if(!d){location.hash='#/';return;}
  var h=top('DAY '+n+' · '+d.title_ko,esc(d.title_en),['#/','오늘 · Today']);
- h+='<div class="card ten"><b>🎧 오늘의 10분</b><div class="tenb">'+
-  '<button class="big2 top2" data-trk="shadow">▶ 쉐도잉 · Shadowing</button><button class="big2 top2" data-trk="x3all">🔁 3번씩 듣기 · Listen 3 times</button><button class="big2" data-trk="dlg">💬 대화 듣기 · Dialogue</button><button class="big2" data-trk="quiz">🗣 말해 보기 퀴즈 · Speaking quiz</button><button class="big2" data-trk="all">🔁 전체 듣기 · Play all</button>'+(d.shadow_all&&d.shadow_all.length?'<button class="big2" id="sajump">📚 모든 예문 · All sentences</button>':'')+
+ h+='<div class="card ten"><b>🎧 오늘의 10분</b>'+(d.shadow_all&&d.shadow_all.length?'<button class="sajump2" id="sajump">📚 모든 예문 · All sentences<small>책의 모든 문장 + 더 말해 보기 · Every book sentence + more practice</small></button>':'')+'<div class="tenb">'+
+  '<button class="big2 top2" data-trk="shadow">▶ 쉐도잉 · Shadowing</button><button class="big2 top2" data-trk="x3all">🔁 3번씩 듣기 · Listen 3 times</button><button class="big2" data-trk="dlg">💬 대화 듣기 · Dialogue</button><button class="big2" data-trk="quiz">🗣 말해 보기 퀴즈 · Speaking quiz</button><button class="big2" data-trk="all">🔁 전체 듣기 · Play all</button>'+
   '</div>'+
   '<p class="drive">🚗 운전 중에는 <b>듣기·따라 말하기만</b> 하세요. 화면은 보지 마세요.</p>'+
   bigBtn()+'<label class="bg"><input type="checkbox" id="bg"'+(S.bg?' checked':'')+'> 화면이 꺼져도 계속 듣기</label>'+(isIOS&&standalone?'<p class="n2">아이폰 홈 화면 앱에서 화면이 꺼질 때 소리가 멈추면, Safari에서 열어 들으세요.</p>':'')+'</div>';
