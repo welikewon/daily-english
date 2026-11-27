@@ -74,7 +74,7 @@ function remind(h){var ics=icsFor(h);window.__ics=ics;var a=document.createEleme
  localStorage.setItem('de100remind',String(h));$('#remst').textContent='달력 앱이 열리면 「추가」 또는 「저장」을 누르세요. 매일 '+(h===7?'아침 7시 · 7 AM':h===12?'낮 12시 · 12 PM':'저녁 9시 · 9 PM')+'에 알려 줘요.';
  if(standalone&&'Notification' in window&&navigator.serviceWorker){Notification.requestPermission().then(function(pm){if(pm!=='granted')return;navigator.serviceWorker.ready.then(function(reg){if(reg.periodicSync)reg.periodicSync.register('de100-daily',{minInterval:12*3600*1000}).then(function(){window.__psync=1;}).catch(function(){});});});}}
 /* ---------- 🔄 새 내용 받기 · Get updates (version.json on the site; one tap = new files + reload) ---------- */
-var APPV='2026.11.27-10';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
+var APPV='2026.11.27-11';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
 function vfetch(){return fetch('../version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();});}
 function vnotes(j){return '<div class="updn"><b>이번에 달라진 점 · What is new</b><ul>'+(j.notes_ko||[]).map(function(k,i){return '<li>'+esc(k)+'<br><span class="n2">'+esc((j.notes_en||[])[i]||'')+'</span></li>';}).join('')+'</ul></div>';}
 function doUpdate(st){st.innerHTML='<p>⏳ 새 내용을 받는 중… · Downloading…</p>';localStorage.setItem('de100redl','1');
@@ -119,7 +119,9 @@ window.addEventListener('hashchange',function(){if(/^#\/tr/.test(location.hash))
 /* after an update: refresh the days already downloaded, quietly */
 if(localStorage.getItem('de100redl')==='1'){localStorage.removeItem('de100redl');window.__redl=0;setTimeout(function(){if(!window.caches)return;caches.keys().then(function(ks){ks.filter(function(k){return /^de100-day-\d{3}$/.test(k);}).forEach(function(k){var n=+k.slice(-3);if(day(n))download(n,null,true).then(function(){window.__redl++;});});});},1500);window.__updated=APPV;}
 function home(){var p=prog(),t=todayDay(),td=day(t);
- var h=top('오늘의 영어','<div class="streak">'+streak()+'</div>')+bigBtn();
+ var h=top('오늘의 영어','<div class="streak">'+streak()+'</div>');
+ if(window.callScreen&&window.deTR&&window.deTR.url())h+='<div class="callhero"><a class="callmain" href="#/call/'+t+'"><b>🎙 AI와 실시간 영어 대화</b><span>Talk with AI in real time · DAY '+t+' '+esc(td.title_ko)+'</span><em id="hcq">무료 · 가입 없음 · 결제 없음</em></a><a class="callfree" href="#/call/free">💬 아무 주제로 대화 · Any topic</a></div>';
+ h+=bigBtn();
  if(window.deTR&&window.deTR.url())h+='<a class="trtop" href="#/tr">🗣 바로 통역 · Live interpreter<span>한국어 ↔ English · 누르고 바로 말하세요 · Tap and speak</span></a>';
  var rv=localStorage.getItem('de100revskip')===today()?[]:reviewItems();window.__revN=rv.length;
  if(rv.length)h+='<div class="card revcard"><b class="inst">🔁 오늘 복습 '+rv.length+'개</b>'+rv.map(function(x){return '<div class="rv"><div class="en">'+esc(x.en)+'</div><div class="n2">'+esc(x.ko)+' · '+(x.star?'⭐ 내가 저장한 문장 · Saved':'Day '+x.day)+'</div></div>';}).join('')+
@@ -130,7 +132,7 @@ function home(){var p=prog(),t=todayDay(),td=day(t);
  if(window.CKS&&window.CKS[0])h+='<div class="card"><b>🗣 말하기 점검</b><a class="go" href="#/ck/0">시작 점검 (Day 0)</a>'+(window.CKS[30]?'<a class="go" href="#/ck/30">30일 점검 · Day 30 check</a>':'')+'</div>';
  h+='<h2>Day 1–'+D.length+'</h2><ol class="days">'+D.map(function(d){return '<li><a href="#/day/'+d.id+'" class="'+(p.done[d.id]?'done':'')+(d.id===t?' now':'')+'"><span class="dn">'+d.id+'</span><span class="dt">'+esc(d.title_ko)+'</span><span class="mk" data-dl="'+d.id+'"></span>'+(p.done[d.id]?'<span class="ck">✓</span>':'')+'</a></li>';}).join('')+'</ol>';
  h+='<p class="n2 center"><a href="#/install">설치 안내</a> · <a href="../index.html">웹 목록</a></p>';
- h+=settingsCard();V.innerHTML=h;bindSettings();
+ h+=settingsCard();V.innerHTML=h;bindSettings();if(window.deCallQuota&&$('#hcq'))window.deCallQuota($('#hcq'));
  bindBig();if($('#revgo')){$('#revgo').onclick=function(){playReview(rv,$('#revgo'));};$('#revskip').onclick=function(){localStorage.setItem('de100revskip',today());route();};}
  $('#remgo').onclick=function(){$('#rempick').hidden=false;$('#remgo').hidden=true;};$$('.remh').forEach(function(b){b.onclick=function(){remind(+b.dataset.h);};});usage($('#use'));
  D.forEach(function(d){has(d.id).then(function(x){if(x){var m=$('[data-dl="'+d.id+'"]');if(m)m.textContent='⬇';}});});
@@ -258,17 +260,17 @@ function ageNoNote(){var o=document.createElement('div');o.className='privov';o.
 /* the stuck helper's 「번역」 also uses the AI translator */
 if(window.deTR&&window.deTR.translate){var trO=window.deTR.translate;window.deTR.translate=function(){var me=this,ar=arguments;if(ageOK())return trO.apply(me,ar);
  return new Promise(function(res,rej){var no=function(){rej(new Error(AGEQ));};if(ageNo()){ageNoNote();return no();}ageGate(function(){trO.apply(me,ar).then(res,rej);},no);});};}
-function aiRoute(h){return (h[0]==='ai'&&h[1])||(h[0]==='talk'&&h[1]&&h[2]==='go')||h[0]==='tr';}
+function aiRoute(h){return (h[0]==='call'&&h[1])||(h[0]==='ai'&&h[1])||(h[0]==='talk'&&h[1]&&h[2]==='go')||h[0]==='tr';}
 /* the talk screen's 「대화 시작」 (AI) button */
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#aistart');if(!b||ageOK())return;e.stopImmediatePropagation();e.preventDefault();if(ageNo()){ageNoNote();return;}ageGate(function(){b.click();});},true);
 /* free-AI privacy notice: first use of the AI talk or the interpreter, then a small ⓘ in the header */
 var PRIV='무료 AI라 대화 내용이 서비스 개선을 위해 검토될 수 있어요. 이름·전화번호·주소 같은 개인정보는 말하지 마세요. AI 대화·통역은 만 18세 이상만 쓸 수 있어요. · This free AI may be reviewed to improve the service; do not share personal details. AI talk and the interpreter are for adults (18+) only.';
 function privShow(){var o=document.createElement('div');o.className='privov';o.innerHTML='<div class="privbox"><b>ⓘ 알려 드려요 · Please note</b><p>'+esc(PRIV)+'</p><button class="go">확인 · OK</button></div>';document.body.appendChild(o);o.querySelector('button').onclick=function(){localStorage.setItem('de100priv','1');o.remove();};window.__privShown=(window.__privShown||0)+1;}
-function privNote(h){if(!((h[0]==='talk'&&h[1])||h[0]==='tr'))return;setTimeout(function(){var hd=document.querySelector('#view .atop');if(hd&&!hd.querySelector('.privi')){var b=document.createElement('button');b.className='privi';b.setAttribute('aria-label','개인정보 안내 · Privacy note');b.textContent='ⓘ';b.onclick=privShow;hd.appendChild(b);}
+function privNote(h){if(!((h[0]==='talk'&&h[1])||h[0]==='tr'||(h[0]==='call'&&h[1])))return;setTimeout(function(){var hd=document.querySelector('#view .atop');if(hd&&!hd.querySelector('.privi')){var b=document.createElement('button');b.className='privi';b.setAttribute('aria-label','개인정보 안내 · Privacy note');b.textContent='ⓘ';b.onclick=privShow;hd.appendChild(b);}
  if(localStorage.getItem('de100priv')!=='1'&&!document.querySelector('.privov'))privShow();},50);}
-function route(){try{stopAll();}catch(e){}stopRec();window.deNext=null;var h=location.hash.replace(/^#\/?/,'').split('/');
+function route(){try{stopAll();}catch(e){}try{window.deCallStop&&window.deCallStop();}catch(e){}stopRec();window.deNext=null;var h=location.hash.replace(/^#\/?/,'').split('/');
  if(aiRoute(h)&&!ageOK()){if(ageNo()){location.replace('#/');setTimeout(ageNoNote,100);return;}var back=h[0]==='tr'?'#/':(h[1]?'#/day/'+h[1]:'#/');home();ageGate(function(){route();},function(){location.replace(back);});return;}
- if(h[0]==='day'&&h[1])dayScreen(+h[1]);else if(h[0]==='talk'&&h[1])talkScreen(+h[1],h[2]);else if(h[0]==='ai'&&h[1])aiScreen(+h[1]);else if(h[0]==='check'&&h[1])checkScreen(+h[1]);else if(h[0]==='ck'&&h[1])ckScreen(+h[1]);else if(h[0]==='install')install();else if(h[0]==='tr'&&window.interpScreen)window.interpScreen(V,h[1]==='prep'?'#/tr':h[1]?'#/day/'+h[1]:'#/',h[1]==='prep'?'prep':null);else home();privNote(h);
+ if(h[0]==='day'&&h[1])dayScreen(+h[1]);else if(h[0]==='talk'&&h[1])talkScreen(+h[1],h[2]);else if(h[0]==='call'&&h[1]&&window.callScreen)window.callScreen(V,h[1]==='free'?0:+h[1],h[1]==='free','#/'+(h[1]==='free'?'':'day/'+h[1]));else if(h[0]==='ai'&&h[1])aiScreen(+h[1]);else if(h[0]==='check'&&h[1])checkScreen(+h[1]);else if(h[0]==='ck'&&h[1])ckScreen(+h[1]);else if(h[0]==='install')install();else if(h[0]==='tr'&&window.interpScreen)window.interpScreen(V,h[1]==='prep'?'#/tr':h[1]?'#/day/'+h[1]:'#/',h[1]==='prep'?'prep':null);else home();privNote(h);
  ibar();trfab(h[0]);
  window.scrollTo(0,0);window.__route=location.hash||'#/';}
 window.addEventListener('hashchange',route);route();

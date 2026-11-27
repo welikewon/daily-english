@@ -177,6 +177,20 @@ html.bigtext .trv2 .trtools .tb{font-size:16px;white-space:normal}html.bigtext .
 html.noai .trtop,html.noai #trfab,html.noai a.aigo,html.noai a.trgo,html.noai a[href^="#/ai/"],html.noai a[href^="#/tr"],html.noai #aichat,html.noai #strn{display:none!important}
 html.noai body.hasfab{padding-bottom:0}html.noai .tstep[data-k="ai"]::after{content:"AI 대화는 만 18세 이상만 쓸 수 있어요. 나머지 공부는 누구나 무료로 쓸 수 있어요. · AI talk is for adults (18+); everything else is free for everyone.";display:block;padding:12px;font-size:17px;color:#555}
 .ageov .privbox button{display:block;width:100%;margin-top:8px}.agerow{margin:8px 0}.agerow .nolink{min-height:48px}
+/* headline: real-time AI English call */
+.callhero{margin:10px 0}.callhero .callmain{display:block;text-decoration:none;color:#fff;background:linear-gradient(135deg,#1F3A5F,#2E6FB7);border-radius:18px;padding:16px 18px;min-height:56px;box-shadow:0 3px 10px rgba(0,0,0,.18)}
+.callhero .callmain b{display:block;font-size:22px}.callhero .callmain span{display:block;font-size:14px;opacity:.9;margin-top:2px}.callhero .callmain em{display:inline-block;font-style:normal;font-size:14px;font-weight:700;background:rgba(255,255,255,.2);border-radius:12px;padding:3px 10px;margin-top:8px}
+.callhero .callfree{display:flex;align-items:center;justify-content:center;min-height:48px;margin-top:8px;border-radius:14px;background:#e8eef8;color:#1F3A5F;font-weight:800;text-decoration:none}
+html.noai .callhero{display:none!important}
+.callv .callgo{font-size:21px;min-height:60px;width:100%}.callv .cq{margin-top:6px;font-weight:700}.clog{padding:4px 0 150px}.cb{max-width:86%;margin:8px 0;padding:10px 12px;border-radius:14px;background:#f1f4f9;font-size:18px}.cb.me{margin-left:auto;background:#dff1e4}.cb .who{font-size:12px;color:#667}
+.cst2{padding:6px 2px}.cdock{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #dde;padding:8px;z-index:20}.ctype{display:flex;gap:6px}.ctype input{flex:1;min-height:48px;font-size:17px;border:1px solid #bbc;border-radius:12px;padding:0 10px}.ctype button{min-height:48px;min-width:64px}
+.ctype button small,.cbtns button small{display:block;font-size:11px}.cbtns{display:flex;gap:6px;margin-top:6px}.cbtns button{flex:1;min-height:48px}
+/* header: only the small brand line shares the row with 「업데이트」「설정」; title and streak use the full width below */
+.atop h1,.atop .sub{padding-right:0}.atop .k{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.atop>.hbtn:first-child+.k{min-height:58px}
+.atop>.aback{display:inline-block;max-width:calc(100% - 196px);box-sizing:border-box;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}html.bigtext .atop>.aback{max-width:calc(100% - 250px)}
+html.bigtext .atop>.hbtn:first-child+.k{visibility:hidden}
+.fsz{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.fsz>span{flex-basis:100%}.fsz .fszb{flex:1;white-space:nowrap}
+.atop>.aback{padding:8px 10px;font-size:15px}
 
 #stuck{position:fixed;inset:0;z-index:40;background:#F4F6FA;overflow:auto;padding:12px 12px 110px;font-size:18px}
 #stuck .shead{display:flex;justify-content:space-between;align-items:center;font-size:22px;position:sticky;top:-12px;background:#F4F6FA;padding:8px 0;z-index:1}

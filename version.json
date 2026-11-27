@@ -1,11 +1,13 @@
 {
- "version": "2026.11.27-10",
+ "version": "2026.11.27-11",
  "date": "2026-11-27",
  "notes_ko": [
-  "AI 대화·통역은 만 18세 이상만 쓸 수 있어요. 처음 쓸 때 한 번 물어봐요(생년월일은 묻지 않아요). 나머지 공부는 누구나 무료예요."
+  "첫 화면 맨 위에 「🎙 AI와 실시간 영어 대화」가 생겼어요. 오늘 배운 장면으로 대화하거나 「아무 주제로 대화」를 골라요. 오늘 남은 대화 횟수가 보여요.",
+  "말로 하기 어려우면 아래 칸에 영어로 써서 대화해도 돼요."
  ],
  "notes_en": [
-  "AI talk and the interpreter are for adults (18+). The app asks once (no birth date); everything else is free for everyone."
+  "New on the home screen: real-time AI English talk, in today's scene or on any topic, with today's remaining talks shown.",
+  "You can also type your answers."
  ],
  "pdf": {
   "pastors": {
