@@ -91,3 +91,8 @@ a.sajump{display:inline-flex;align-items:center;min-height:56px;padding:0 12px;b
 
 /* compact rows: one line of buttons, number inline */
 .sait{padding:5px 6px}.sal{display:inline-block;min-width:22px;font-size:14px;color:#8a8f9c;font-weight:800}.sab{flex-wrap:nowrap}.sab button{font-size:15px;padding:0 9px;white-space:nowrap}
+
+/* Today's 12 on the day page: compact (3-4 per screen); 「가 큰 글씨」 restores */
+#sent .sent{padding:5px 0}#sent .ch{flex-direction:row;align-items:baseline;gap:3px;font-size:15px;padding:1px 5px;border-width:1px}#sent .ch small{font-size:12px}
+#sent .ko{font-size:15px;margin:2px 0 0 32px}#sent .ko .n2{font-size:14px}#sent .ctl{flex-wrap:nowrap;overflow-x:auto;gap:4px}#sent .ctl button{font-size:14px;padding:0 7px;min-height:48px;white-space:nowrap;flex:0 0 auto}
+html.bigtext #sent .ch{flex-direction:column;font-size:20px}html.bigtext #sent .ch small{font-size:16px}html.bigtext #sent .ko{font-size:19px}html.bigtext #sent .ctl button{font-size:17px}

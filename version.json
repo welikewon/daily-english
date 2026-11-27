@@ -1,0 +1,24 @@
+{
+ "version": "2026.11.27-3",
+ "date": "2026-11-27",
+ "notes_ko": [
+  "「🔄 새 내용 받기」 버튼이 생겼어요. 한 번 누르면 최신 내용으로 바뀌어요.",
+  "바로 통역 버튼을 모든 화면에서 바로 누를 수 있어요.",
+  "쉐도잉에 책에 나온 모든 문장과 「더 말해 보기」 문장이 들어갔어요.",
+  "문장 글씨를 조금 작게 해서 한 화면에 더 많이 보여요. 「가 큰 글씨」로 크게 볼 수 있어요."
+ ],
+ "notes_en": [
+  "New \"Get updates\" button: one tap brings the latest version.",
+  "The interpreter button is on every screen.",
+  "Shadowing now has every sentence of the book page and More practice.",
+  "Sentence text is smaller so you see more at once; \"Big text\" makes it large again."
+ ],
+ "pdf": {
+  "pastors": {
+   "status": "soon"
+  },
+  "general": {
+   "status": "soon"
+  }
+ }
+}

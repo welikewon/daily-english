@@ -69,6 +69,35 @@ function icsFor(h){var now=new Date(),st=new Date();st.setHours(h,0,0,0);if(st<n
 function remind(h){var ics=icsFor(h);window.__ics=ics;var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar;charset=utf-8'}));a.download='웰컴영어_알림.ics';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();},1000);
  localStorage.setItem('de100remind',String(h));$('#remst').textContent='달력 앱이 열리면 「추가」 또는 「저장」을 누르세요. 매일 '+(h===7?'아침 7시 · 7 AM':h===12?'낮 12시 · 12 PM':'저녁 9시 · 9 PM')+'에 알려 줘요.';
  if(standalone&&'Notification' in window&&navigator.serviceWorker){Notification.requestPermission().then(function(pm){if(pm!=='granted')return;navigator.serviceWorker.ready.then(function(reg){if(reg.periodicSync)reg.periodicSync.register('de100-daily',{minInterval:12*3600*1000}).then(function(){window.__psync=1;}).catch(function(){});});});}}
+/* ---------- 🔄 새 내용 받기 · Get updates (version.json on the site; one tap = new files + reload) ---------- */
+var APPV='2026.11.27-3';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
+function vfetch(){return fetch('../version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();});}
+function vnotes(j){return '<div class="updn"><b>이번에 달라진 점 · What is new</b><ul>'+(j.notes_ko||[]).map(function(k,i){return '<li>'+esc(k)+'<br><span class="n2">'+esc((j.notes_en||[])[i]||'')+'</span></li>';}).join('')+'</ul></div>';}
+function doUpdate(st){st.innerHTML='<p>⏳ 새 내용을 받는 중… · Downloading…</p>';localStorage.setItem('de100redl','1');
+ var go=function(){location.reload();};if(!navigator.serviceWorker){go();return;}
+ navigator.serviceWorker.getRegistration().then(function(reg){if(!reg){go();return;}var t=setTimeout(go,15000);
+  navigator.serviceWorker.addEventListener('controllerchange',function(){clearTimeout(t);go();});
+  reg.update().then(function(){if(!reg.installing&&!reg.waiting){clearTimeout(t);go();}}).catch(function(){clearTimeout(t);go();});}).catch(go);}
+function vcheck(st,auto){if(!navigator.onLine){if(!auto)st.innerHTML='<p>📶 인터넷에 연결되면 받을 수 있어요. · You can get it when you are online.</p>';return Promise.resolve(null);}
+ if(!auto)st.innerHTML='<p>⏳ 확인하는 중… · Checking…</p>';
+ return vfetch().then(function(j){window.__vj=j;if(j.version===APPV){if(!auto)st.innerHTML='<p class="updok">✓ 최신 버전이에요 · Up to date<br><span class="n2">'+esc(j.version)+' · '+esc(j.date)+'</span></p>';return null;}
+  st.innerHTML='<div class="updnew"><b>🆕 새 버전이 있어요 · New version</b> <span class="n2">'+esc(j.version)+' · '+esc(j.date)+'</span>'+vnotes(j)+'<button class="go updnow">⬇ 지금 받기 · Update now</button></div>';
+  st.querySelector('.updnow').onclick=function(){doUpdate(st);};return j;})
+  .catch(function(){if(!auto)st.innerHTML='<p>📶 인터넷에 연결되면 받을 수 있어요. · You can get it when you are online.</p>';return null;});}
+function pdfInfo(st){st.innerHTML='<p>⏳ …</p>';vfetch().then(function(j){var p=(j.pdf||{})[EDN]||{};
+  if(p.status!=='ready'||!p.url){st.innerHTML='<p>📕 곧 나와요 · Coming soon</p>';return;}
+  st.innerHTML='<p><b>'+esc(p.title||'웰컴 잉글리시 100')+'</b><br><span class="n2">'+esc(p.version||'')+' · '+esc(p.date||'')+'</span></p>'+((p.notes_ko||[]).length?'<div class="updn"><b>이번 판에서 달라진 점 · What changed</b><ul>'+p.notes_ko.map(function(k){return '<li>'+esc(k)+'</li>';}).join('')+'</ul></div>':'')+
+   '<a class="go" href="'+esc(p.url)+'" download>⬇ PDF 받기 · Download PDF</a>';}).catch(function(){st.innerHTML='<p>📶 인터넷에 연결되면 받을 수 있어요. · You can get it when you are online.</p>';});}
+function settingsCard(){return '<div class="card setc" id="setc"><b>⚙ 설정 · Settings</b><div class="n2">버전 · Version '+esc(APPV)+'</div>'+
+ '<button id="updgo" class="big2">🔄 새 내용 받기 · Get updates</button><div id="updst"></div><button id="pdfgo" class="big2">📕 최신 PDF 받기 · Latest PDF</button><div id="pdfst"></div></div>';}
+function bindSettings(){var u=document.getElementById('updgo');if(!u)return;u.onclick=function(){vcheck(document.getElementById('updst'),false);};document.getElementById('pdfgo').onclick=function(){pdfInfo(document.getElementById('pdfst'));};
+ /* once a day, on the home screen only: a gentle yellow bar (never forced, never in a lesson) */
+ var k='de100vchk',t=today();if(localStorage.getItem(k)===t&&!sessionStorage.getItem('de100vnew'))return;localStorage.setItem(k,t);
+ vfetch().then(function(j){if(j.version===APPV){sessionStorage.removeItem('de100vnew');return;}sessionStorage.setItem('de100vnew',j.version);
+  if(location.hash&&location.hash!=='#/')return;var b=document.createElement('button');b.id='updbar';b.textContent='🔄 새 내용이 있어요 · Tap to update';var v=document.getElementById('view')||document.body;v.insertBefore(b,v.firstChild);
+  b.onclick=function(){b.remove();var c=document.getElementById('setc');if(c)c.scrollIntoView({behavior:'smooth'});vcheck(document.getElementById('updst'),false);};}).catch(function(){});}
+/* after an update: refresh the days already downloaded, quietly */
+if(localStorage.getItem('de100redl')==='1'){localStorage.removeItem('de100redl');window.__redl=0;setTimeout(function(){if(!window.caches)return;caches.keys().then(function(ks){ks.filter(function(k){return /^de100-day-\d{3}$/.test(k);}).forEach(function(k){var n=+k.slice(-3);if(day(n))download(n).then(function(){window.__redl++;});});});},1500);window.__updated=APPV;}
 function home(){var p=prog(),t=todayDay(),td=day(t);
  var h=top('오늘의 영어','<div class="streak">'+streak()+'</div>');
  if(window.deTR&&window.deTR.url())h+='<a class="trtop" href="#/tr">🗣 바로 통역 · Live interpreter<span>한국어 ↔ English · 누르고 바로 말하세요 · Tap and speak</span></a>';
@@ -81,7 +110,7 @@ function home(){var p=prog(),t=todayDay(),td=day(t);
  if(window.CKS&&window.CKS[0])h+='<div class="card"><b>🗣 말하기 점검</b><a class="go" href="#/ck/0">시작 점검 (Day 0)</a>'+(window.CKS[30]?'<a class="go" href="#/ck/30">30일 점검 · Day 30 check</a>':'')+'</div>';
  h+='<h2>Day 1–'+D.length+'</h2><ol class="days">'+D.map(function(d){return '<li><a href="#/day/'+d.id+'" class="'+(p.done[d.id]?'done':'')+(d.id===t?' now':'')+'"><span class="dn">'+d.id+'</span><span class="dt">'+esc(d.title_ko)+'</span><span class="mk" data-dl="'+d.id+'"></span>'+(p.done[d.id]?'<span class="ck">✓</span>':'')+'</a></li>';}).join('')+'</ol>';
  h+='<p class="n2 center"><a href="#/install">설치 안내</a> · <a href="../index.html">웹 목록</a></p>';
- V.innerHTML=h;
+ h+=settingsCard();V.innerHTML=h;bindSettings();
  bindBig();if($('#revgo')){$('#revgo').onclick=function(){playReview(rv,$('#revgo'));};$('#revskip').onclick=function(){localStorage.setItem('de100revskip',today());route();};}
  $('#remgo').onclick=function(){$('#rempick').hidden=false;$('#remgo').hidden=true;};$$('.remh').forEach(function(b){b.onclick=function(){remind(+b.dataset.h);};});usage($('#use'));
  D.forEach(function(d){has(d.id).then(function(x){if(x){var m=$('[data-dl="'+d.id+'"]');if(m)m.textContent='⬇';}});});
@@ -194,7 +223,7 @@ function trfab(r){var f=document.getElementById('trfab');if(!(window.deTR&&windo
  if(!f){f=document.createElement('a');f.id='trfab';f.textContent='🗣 통역 · Translate';document.body.appendChild(f);}
  var m=location.hash.match(/^#\/(?:day|talk|ai|check)\/(\d+)/);f.href=m?'#/tr/'+m[1]:'#/tr';f.hidden=false;document.body.classList.add('hasfab');}
 function route(){try{stopAll();}catch(e){}stopRec();window.deNext=null;var h=location.hash.replace(/^#\/?/,'').split('/');
- if(h[0]==='day'&&h[1])dayScreen(+h[1]);else if(h[0]==='talk'&&h[1])talkScreen(+h[1],h[2]);else if(h[0]==='ai'&&h[1])aiScreen(+h[1]);else if(h[0]==='check'&&h[1])checkScreen(+h[1]);else if(h[0]==='ck'&&h[1])ckScreen(+h[1]);else if(h[0]==='install')install();else if(h[0]==='tr'&&window.interpScreen)window.interpScreen(V,h[1]?'#/day/'+h[1]:'#/');else home();
+ if(h[0]==='day'&&h[1])dayScreen(+h[1]);else if(h[0]==='talk'&&h[1])talkScreen(+h[1],h[2]);else if(h[0]==='ai'&&h[1])aiScreen(+h[1]);else if(h[0]==='check'&&h[1])checkScreen(+h[1]);else if(h[0]==='ck'&&h[1])ckScreen(+h[1]);else if(h[0]==='install')install();else if(h[0]==='tr'&&window.interpScreen)window.interpScreen(V,h[1]==='prep'?'#/tr':h[1]?'#/day/'+h[1]:'#/',h[1]==='prep'?'prep':null);else home();
  ibar();trfab(h[0]);
  window.scrollTo(0,0);window.__route=location.hash||'#/';}
 window.addEventListener('hashchange',route);route();
