@@ -63,6 +63,33 @@ a.go.trgo{background:#2f7d32}a.trlink{display:block;text-align:center;margin:8px
 
 /* labels wrap */ button,.big2,a.go,a.big2,summary{white-space:normal;overflow-wrap:anywhere}
 
+/* interpreter: big top button on home + floating button on every screen */
+a.trtop{display:block;margin:10px 0 14px;padding:16px 14px;border-radius:16px;background:#E8590C;color:#fff;text-decoration:none;text-align:center;font-size:24px;font-weight:800;line-height:1.25;box-shadow:0 3px 10px rgba(232,89,12,.35);min-height:64px}
+a.trtop span{display:block;font-size:17px;font-weight:600;opacity:.95;margin-top:4px}
+#trfab{position:fixed;z-index:50;right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));min-height:56px;padding:0 18px;display:flex;align-items:center;border-radius:28px;background:#E8590C;color:#fff;font-size:19px;font-weight:800;text-decoration:none;box-shadow:0 3px 12px rgba(0,0,0,.3)}
+#trfab[hidden]{display:none}
+body.hasfab{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+
+/* 📚 shadow all (compact text so 4-6 sentences fit; 「가 큰 글씨」 restores the large size) */
+.sa{margin:10px 0}.sahead{background:#EEF4FF;border:2px solid #C9D8F2;border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.sahead b{display:block;font-size:20px;margin-bottom:6px}.sago,.sax3{display:block;width:100%;min-height:56px;font-size:20px;font-weight:800;border-radius:12px;border:0;background:#1F8A45;color:#fff;margin:6px 0}
+.sax3{background:#2563EB;min-height:48px;font-size:18px}.satg{display:inline-flex;align-items:center;gap:6px;min-height:48px;font-size:17px;margin-right:12px}.satg input{width:24px;height:24px}
+.sanote{font-size:15px;color:#555;margin:4px 0 0}.sasec{border:1px solid #d5ddeb;border-radius:12px;margin:8px 0;padding:0 10px 6px;background:#fff}
+.sasec summary{font-size:18px;font-weight:800;min-height:52px;display:flex;align-items:center;gap:6px;cursor:pointer;color:#1F3A5F}
+.sait{padding:6px 8px;border-bottom:1px solid #eef1f6;line-height:1.4}.sait.now{outline:3px solid #1E63C6;border-radius:8px;background:#F3F8FF}
+.sal{font-size:13px;color:#8a8f9c;font-weight:700}.saen{font-size:20px;color:#1F3A5F;font-weight:700}.sako{font-size:16px;color:#333}.sa.noko .sako{visibility:hidden}
+.sab{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.sab button{min-height:48px;font-size:16px;padding:0 12px;border-radius:10px;border:1px solid #b9c6dd;background:#F6F8FC}
+.sab button.act,.sago.act,.sax3.act{background:#E8590C;color:#fff}.sarep{font-size:17px;font-weight:800;color:#b45309;margin-top:4px}
+
+
+/* compact sentence cards (see 4-6 at once); 「가 큰 글씨」 = zoom 1.3 restores the large view */
+.sent{padding:10px 12px}.sent .en.big,.sent .en{font-size:20px;line-height:1.4}.sent .ko{font-size:16px;line-height:1.4;margin:2px 0 4px}.chips .ch b{font-size:17px}.sent .sb button{min-height:48px}
+
+/* compact rows: one line of buttons, number inline */
+.sait{padding:5px 6px}.sal{display:inline-block;min-width:22px;font-size:14px;color:#8a8f9c;font-weight:800}.sab{flex-wrap:nowrap}.sab button{font-size:15px;padding:0 9px;white-space:nowrap}
+.chips .ch b{font-size:15px}.chips .ch i{font-size:13px}.chips .ch{padding:2px 6px}.sent .sb{display:flex;flex-wrap:wrap;gap:4px}.sent .sb button{font-size:15px;padding:0 8px;min-height:48px}
+#trfab{transition:transform .25s}#trfab.away{transform:translateY(140px)}
+
 #stuck{position:fixed;inset:0;z-index:40;background:#F4F6FA;overflow:auto;padding:12px 12px 110px;font-size:18px}
 #stuck .shead{display:flex;justify-content:space-between;align-items:center;font-size:22px;position:sticky;top:-12px;background:#F4F6FA;padding:8px 0;z-index:1}
 #stuck h3{font-size:19px;margin:4px 0 8px;color:#1F3A5F}#stuck textarea{width:100%;font-size:18px;border:2px solid #1F3A5F;border-radius:10px;padding:8px}

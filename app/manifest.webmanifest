@@ -8,6 +8,20 @@
  "background_color": "#F4F6FA",
  "theme_color": "#1F3A5F",
  "description": "하루 10분, 듣고 따라 말하는 영어",
+ "shortcuts": [
+  {
+   "name": "바로 통역 · Live interpreter",
+   "short_name": "바로 통역",
+   "url": "./#/tr",
+   "icons": [
+    {
+     "src": "icon-192.png",
+     "sizes": "192x192",
+     "type": "image/png"
+    }
+   ]
+  }
+ ],
  "icons": [
   {
    "src": "icon-192.png",
