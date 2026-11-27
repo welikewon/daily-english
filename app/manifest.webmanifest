@@ -20,6 +20,18 @@
      "type": "image/png"
     }
    ]
+  },
+  {
+   "name": "새 내용 받기 · Get updates",
+   "short_name": "새 내용 받기",
+   "url": "./#/update",
+   "icons": [
+    {
+     "src": "icon-192.png",
+     "sizes": "192x192",
+     "type": "image/png"
+    }
+   ]
   }
  ],
  "icons": [

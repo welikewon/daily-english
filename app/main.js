@@ -70,7 +70,7 @@ function remind(h){var ics=icsFor(h);window.__ics=ics;var a=document.createEleme
  localStorage.setItem('de100remind',String(h));$('#remst').textContent='달력 앱이 열리면 「추가」 또는 「저장」을 누르세요. 매일 '+(h===7?'아침 7시 · 7 AM':h===12?'낮 12시 · 12 PM':'저녁 9시 · 9 PM')+'에 알려 줘요.';
  if(standalone&&'Notification' in window&&navigator.serviceWorker){Notification.requestPermission().then(function(pm){if(pm!=='granted')return;navigator.serviceWorker.ready.then(function(reg){if(reg.periodicSync)reg.periodicSync.register('de100-daily',{minInterval:12*3600*1000}).then(function(){window.__psync=1;}).catch(function(){});});});}}
 /* ---------- 🔄 새 내용 받기 · Get updates (version.json on the site; one tap = new files + reload) ---------- */
-var APPV='2026.11.27-5';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
+var APPV='2026.11.27-6';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
 function vfetch(){return fetch('../version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();});}
 function vnotes(j){return '<div class="updn"><b>이번에 달라진 점 · What is new</b><ul>'+(j.notes_ko||[]).map(function(k,i){return '<li>'+esc(k)+'<br><span class="n2">'+esc((j.notes_en||[])[i]||'')+'</span></li>';}).join('')+'</ul></div>';}
 function doUpdate(st){st.innerHTML='<p>⏳ 새 내용을 받는 중… · Downloading…</p>';localStorage.setItem('de100redl','1');
@@ -91,16 +91,28 @@ function pdfInfo(st){st.innerHTML='<p>⏳ …</p>';vfetch().then(function(j){var
 function settingsCard(){return '<div class="card setc" id="setc"><b>⚙ 설정 · Settings</b><div class="n2">버전 · Version '+esc(APPV)+'</div>'+
  '<button id="updgo" class="big2">🔄 새 내용 받기 · Get updates</button><div id="updst"></div><button id="pdfgo" class="big2">📕 최신 PDF 받기 · Latest PDF</button><div id="pdfst"></div></div>';}
 function bindSettings(){var u=document.getElementById('updgo');if(!u)return;u.onclick=function(){vcheck(document.getElementById('updst'),false);};document.getElementById('pdfgo').onclick=function(){pdfInfo(document.getElementById('pdfst'));};
- /* once a day, on the home screen only: a gentle yellow bar (never forced, never in a lesson) */
- var k='de100vchk',t=today();if(localStorage.getItem(k)===t&&!sessionStorage.getItem('de100vnew'))return;localStorage.setItem(k,t);
- vfetch().then(function(j){if(j.version===APPV){sessionStorage.removeItem('de100vnew');return;}sessionStorage.setItem('de100vnew',j.version);
-  if(location.hash&&location.hash!=='#/')return;var b=document.createElement('button');b.id='updbar';b.textContent='🔄 새 내용이 있어요 · Tap to update';var v=document.getElementById('view')||document.body;v.insertBefore(b,v.firstChild);
-  b.onclick=function(){b.remove();var c=document.getElementById('setc');if(c)c.scrollIntoView({behavior:'smooth'});vcheck(document.getElementById('updst'),false);};}).catch(function(){});}
+ var u2=document.getElementById('updgo2');if(u2)u2.onclick=function(){vcheck(document.getElementById('updst2'),false);};
+ if(location.hash==='#/update'){history.replaceState(null,'','#/');vcheck(document.getElementById('updst2'),false);}
+ vbar();}
+/* every time the app opens or comes back: yellow bar when a newer version exists (✕ hides it until the next version) */
+var vLast=0;
+var vJ=null;
+function vbar(){if(!navigator.onLine||Date.now()-vLast<30000){if(vJ)showBar(vJ);return;}vLast=Date.now();
+ vfetch().then(function(j){window.__vbarChecked=(window.__vbarChecked||0)+1;vJ=j;showBar(j);}).catch(function(){});}
+function showBar(j){var old=document.getElementById('updbar');
+  if(j.version===APPV||localStorage.getItem('de100vdis')===j.version||/^#\/tr/.test(location.hash)){if(old)old.remove();return;}if(old)return;
+  var b=document.createElement('div');b.id='updbar';b.innerHTML='<button class="ubgo">🔄 새 내용이 있어요 · Tap to update</button><button class="ubx" aria-label="닫기 · Close">✕</button>';document.body.insertBefore(b,document.body.firstChild);
+  b.querySelector('.ubx').onclick=function(){localStorage.setItem('de100vdis',j.version);b.remove();};
+  b.querySelector('.ubgo').onclick=function(){b.remove();if(location.hash&&location.hash!=='#/'){location.hash='#/update';}else vcheck(document.getElementById('updst2'),false);};}
+setTimeout(vbar,1200);
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'){vLast=0;vbar();}});
+window.addEventListener('hashchange',function(){if(/^#\/tr/.test(location.hash)){var o=document.getElementById('updbar');if(o)o.remove();}else if(vJ)showBar(vJ);});
 /* after an update: refresh the days already downloaded, quietly */
 if(localStorage.getItem('de100redl')==='1'){localStorage.removeItem('de100redl');window.__redl=0;setTimeout(function(){if(!window.caches)return;caches.keys().then(function(ks){ks.filter(function(k){return /^de100-day-\d{3}$/.test(k);}).forEach(function(k){var n=+k.slice(-3);if(day(n))download(n,null,true).then(function(){window.__redl++;});});});},1500);window.__updated=APPV;}
 function home(){var p=prog(),t=todayDay(),td=day(t);
  var h=top('오늘의 영어','<div class="streak">'+streak()+'</div>');
  if(window.deTR&&window.deTR.url())h+='<a class="trtop" href="#/tr">🗣 바로 통역 · Live interpreter<span>한국어 ↔ English · 누르고 바로 말하세요 · Tap and speak</span></a>';
+ h+='<div class="updtop"><button id="updgo2">🔄 새 내용 받기 · Get updates</button><span class="updver">버전 · Version '+esc(APPV)+'</span></div><div id="updst2"></div>';
  var rv=localStorage.getItem('de100revskip')===today()?[]:reviewItems();window.__revN=rv.length;
  if(rv.length)h+='<div class="card revcard"><b class="inst">🔁 오늘 복습 '+rv.length+'개</b>'+rv.map(function(x){return '<div class="rv"><div class="en">'+esc(x.en)+'</div><div class="n2">'+esc(x.ko)+' · '+(x.star?'⭐ 내가 저장한 문장 · Saved':'Day '+x.day)+'</div></div>';}).join('')+
   '<button id="revgo" class="go">▶ 복습 듣기 (2번씩)</button><button id="revskip" class="nolink">건너뛰기</button></div>';

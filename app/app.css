@@ -130,6 +130,11 @@ body.hasfab{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
 .sent .sb{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;overflow:visible}.sent .sb button{min-height:48px;height:auto;font-size:13px;line-height:1.15;padding:3px 2px;white-space:normal;margin:0}
 html.bigtext .sent .chips{flex-wrap:wrap}html.bigtext .sent .sb{grid-template-columns:repeat(2,1fr)}html.bigtext .sent .sb button{font-size:18px;min-height:56px}
 
+/* update button at the top of home + yellow bar on every screen */
+.updtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0}.updtop button{min-height:48px;font-size:16px;font-weight:700;padding:0 12px;border-radius:12px;border:2px solid #C99A00;background:#FFF8D6;color:#2B2100}.updver{font-size:13px;color:#667}
+#updbar{position:sticky;top:0;z-index:70;display:flex;width:100%;background:#FFD43B;border-bottom:3px solid #C99A00}#updbar .ubgo{flex:1;min-height:56px;background:none;border:0;font-size:19px;font-weight:800;color:#2B2100}#updbar .ubx{min-width:56px;min-height:56px;background:none;border:0;font-size:22px;color:#2B2100}
+html.bigtext .updtop button{font-size:20px;min-height:56px}
+
 #stuck{position:fixed;inset:0;z-index:40;background:#F4F6FA;overflow:auto;padding:12px 12px 110px;font-size:18px}
 #stuck .shead{display:flex;justify-content:space-between;align-items:center;font-size:22px;position:sticky;top:-12px;background:#F4F6FA;padding:8px 0;z-index:1}
 #stuck h3{font-size:19px;margin:4px 0 8px;color:#1F3A5F}#stuck textarea{width:100%;font-size:18px;border:2px solid #1F3A5F;border-radius:10px;padding:8px}
