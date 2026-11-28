@@ -1,13 +1,17 @@
 {
- "version": "2026.11.27-11",
- "date": "2026-11-27",
+ "version": "2026.11.28-1",
+ "date": "2026-11-28",
  "notes_ko": [
-  "첫 화면 맨 위에 「🎙 AI와 실시간 영어 대화」가 생겼어요. 오늘 배운 장면으로 대화하거나 「아무 주제로 대화」를 골라요. 오늘 남은 대화 횟수가 보여요.",
-  "말로 하기 어려우면 아래 칸에 영어로 써서 대화해도 돼요."
+  "AI 대화 아래에 「🇰🇷 한국어 뜻」「💡 뭐라고 말하지?」「✏ 방금 말 고쳐 줘」 버튼이 생겼어요.",
+  "내 말이 잘못 들렸으면 「제 말이 아니에요」를 눌러 고쳐 쓸 수 있어요.",
+  "오늘의 미션이 보이고, 말하면 ✅로 바뀌어요. 대화를 끝내면 정리 카드에 더 자연스러운 문장이 나와요(▶ 듣기 · 🎤 다시 말하기 · ⭐ 저장).",
+  "「🐢 천천히」와 「🎤 누르는 동안만 말하기」를 고를 수 있어요."
  ],
  "notes_en": [
-  "New on the home screen: real-time AI English talk, in today's scene or on any topic, with today's remaining talks shown.",
-  "You can also type your answers."
+  "New help buttons in AI talk: Korean meaning, what to say, and fix my last line.",
+  "If Jake heard you wrong, tap \"That's not what I said\" and type it.",
+  "Today's missions tick as you say them; the end-of-talk card shows better sentences to play, say again and save.",
+  "Choose a slow voice or hold-to-talk."
  ],
  "pdf": {
   "pastors": {

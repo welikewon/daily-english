@@ -191,6 +191,12 @@ html.noai .callhero{display:none!important}
 html.bigtext .atop>.hbtn:first-child+.k{visibility:hidden}
 .fsz{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.fsz>span{flex-basis:100%}.fsz .fszb{flex:1;white-space:nowrap}
 .atop>.aback{padding:8px 10px;font-size:15px}
+.copt{display:flex;align-items:center;gap:8px;min-height:48px;font-size:16px}.copt input{width:24px;height:24px}.copt small{color:#667;font-size:12px}
+.chelp{display:flex;gap:4px;margin-bottom:6px}.chelp button{flex:1;min-height:48px;font-size:13px;line-height:1.2;border-radius:10px;border:1px solid #c9d3e3;background:#f4f7fc;color:#1F3A5F;font-weight:700}.chelp small{display:block;font-size:10px;font-weight:400}
+.chout{max-height:30vh;overflow:auto;background:#fffbe6;border-radius:10px;padding:8px;margin-bottom:6px;font-size:16px}.chout .mini,.cend .mini{min-height:44px;min-width:44px}
+.chold{width:100%;min-height:64px;font-size:19px;margin-bottom:6px;touch-action:none;user-select:none}.chold.on{background:#c0392b}
+.cb .cnot{display:block;margin-top:4px;min-height:44px;font-size:12px;border:0;background:transparent;color:#556;text-decoration:underline}.cb.fixed .en{color:#155724}
+.cmis .cm{padding:6px 0;border-top:1px solid #eee}.cmis .cm.done{color:#155724}.cend .crow{border-top:1px solid #eee;padding:8px 0}.cend .said{text-decoration:line-through}.cend .qa{display:flex;gap:6px}.cend .qa button{flex:1;min-height:48px}.cend .qa small{display:block;font-size:11px}
 
 #stuck{position:fixed;inset:0;z-index:40;background:#F4F6FA;overflow:auto;padding:12px 12px 110px;font-size:18px}
 #stuck .shead{display:flex;justify-content:space-between;align-items:center;font-size:22px;position:sticky;top:-12px;background:#F4F6FA;padding:8px 0;z-index:1}

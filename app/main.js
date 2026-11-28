@@ -241,7 +241,7 @@ function install(){var ua=navigator.userAgent,inapp=/KAKAOTALK|NAVER\(|NAVER|Ins
  $$('.instbtn').forEach(function(b){b.onclick=function(){if(deferred){var dp=deferred;deferred=null;dp.prompt();(dp.userChoice||Promise.resolve({})).then(function(c){if(c&&c.outcome==='accepted'){installed();location.hash='#/';}});}};});}
 /* ---------- router ---------- */
 (function(){var y=0;window.addEventListener('scroll',function(){var f=document.getElementById('trfab');if(!f)return;var n=window.scrollY;if(n>y+8)f.classList.add('away');else if(n<y-8)f.classList.remove('away');y=n;},{passive:true});})();   /* hides while scrolling down, so it never sits on lesson buttons while reading */
-function trfab(r){var f=document.getElementById('trfab');if(!(window.deTR&&window.deTR.url())||r==='tr'){if(f)f.hidden=true;document.body.classList.remove('hasfab');return;}
+function trfab(r){var f=document.getElementById('trfab');if(!(window.deTR&&window.deTR.url())||r==='tr'||r==='call'){if(f)f.hidden=true;document.body.classList.remove('hasfab');return;}
  if(!f){f=document.createElement('a');f.id='trfab';f.textContent='🗣 통역 · Translate';document.body.appendChild(f);}
  var m=location.hash.match(/^#\/(?:day|talk|ai|check)\/(\d+)/);f.href=m?'#/tr/'+m[1]:'#/tr';f.hidden=false;document.body.classList.add('hasfab');}
 /* ---------- 18+ gate for every Gemini feature (AI talk, interpreter, Prepare, hints): stored on this phone only, no birth date ---------- */
