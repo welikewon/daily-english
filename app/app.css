@@ -282,3 +282,17 @@ details.nosnd{margin:10px 0;font-size:18px}details.nosnd summary{min-height:56px
 a.trlink{display:flex;align-items:center;justify-content:center;min-height:56px;font-size:18px;margin:8px 0;text-decoration:none}
 
 /* labels wrap */ button,.big2,a.go,a.big2,summary{white-space:normal;overflow-wrap:anywhere}
+
+/* header 「가 글자」 toggle (left of 업데이트); state shown from html.bigtext */
+.atop .hbtn .hbig .bb{display:none}html.bigtext .atop .hbtn .hbig .bb{display:inline}html.bigtext .atop .hbtn .hbig .bn{display:none}
+.atop .hbtn .hbig[aria-pressed=true]{background:#FFF1C2}
+/* the floating 통역 button never covers the end of the page */
+body:has(#trfab:not([hidden])) #view{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+/* Day list: small 'Day' label over the number, like the printed book */
+.days .dn{display:flex;flex-direction:column;align-items:center;line-height:1.05;min-width:40px}
+.days .dn small{font-size:14px;font-weight:700;color:#4A5566;letter-spacing:.02em}
+h2.bookh{font-size:20px;line-height:1.35}
+#trfab.dup{transform:translateY(140px);pointer-events:none}
+/* brand line wraps left of the three header buttons */
+.atop:not(:has(.aback))>.k{padding-right:270px;white-space:normal;font-size:14px;line-height:1.25}
+.atop:has(.aback) .hbtn{gap:4px;right:6px}.atop:has(.aback) .hbtn button{min-width:56px;padding:2px 6px}

@@ -36,7 +36,7 @@ function download(n,cb,fresh){var d=day(n),u=urls(d),i=0,fail=0;if(!window.cache
 function remove(n){return window.caches?caches.delete(cname(n)):Promise.resolve(false);}
 function usage(el){if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){el.textContent='이 휴대폰에 저장한 양: 약 '+(e.usage/1e6).toFixed(1)+' MB';});}
 /* ---------- screens ---------- */
-function top(title,sub,back){return '<button class="fsback" data-big="0">가 보통 글씨로 · Normal text</button><header class="atop">'+(back?'<a class="aback" href="'+back[0]+'">← '+esc(back[1])+'</a>':'')+'<div class="hbtn"><button data-go="#/update">🔄 업데이트<small>Update</small></button><button data-go="#/settings">⚙ 설정<small>Settings</small></button></div><div class="k">웰컴 잉글리시 100</div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</header>';}
+function top(title,sub,back){return '<button class="fsback" data-big="0">가 보통 글씨로 · Normal text</button><header class="atop">'+(back?'<a class="aback" href="'+back[0]+'" aria-label="'+esc(back[1])+'">← '+esc(String(back[1]).split(' · ')[0])+'</a>':'')+'<div class="hbtn"><button class="hbig" data-bigtog aria-pressed="'+bigOn()+'" aria-label="'+'글자 크기 바꾸기 · Text size: '+(bigOn()?'지금 크게 · now big':'지금 보통 · now normal')+'">가 글자<small><span class="bn">보통</span><span class="bb">크게</span> · Text</small></button><button data-go="#/update">🔄 업데이트<small>Update</small></button><button data-go="#/settings">⚙ 설정<small>Settings</small></button></div><div class="k">웰컴 잉글리시 100</div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</header>';}
 /* ---------- big text (persists) ---------- */
 function bigOn(){return localStorage.getItem('de100big')==='1';}
 document.documentElement.classList.toggle('bigtext',bigOn());
@@ -44,8 +44,11 @@ function bigBtn(){return '<div class="fsz" role="group"><span>글자 크기 · T
 window.deBigBtn=bigBtn;
 function bindBig(){}
 /* one handler for every 「글자 크기」 picker and the 「가 보통 글씨로」 button (state is shown by CSS from html.bigtext) */
-document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-big]');if(!b)return;var v=b.dataset.big==='1';if(v===bigOn())return;
- localStorage.setItem('de100big',v?'1':'0');document.documentElement.classList.toggle('bigtext',v);try{window.dispatchEvent(new Event('resize'));}catch(x){}});
+/* header 「가 글자」 button toggles normal <-> big */
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-big],[data-bigtog]');if(!b)return;var v=b.hasAttribute('data-bigtog')?!bigOn():b.dataset.big==='1';if(v===bigOn())return;
+ localStorage.setItem('de100big',v?'1':'0');document.documentElement.classList.toggle('bigtext',v);
+ [].forEach.call(document.querySelectorAll('.hbig'),function(x){x.setAttribute('aria-pressed',String(v));x.setAttribute('aria-label','글자 크기 바꾸기 · Text size: '+(bigOn()?'지금 크게 · now big':'지금 보통 · now normal'));});
+ try{window.dispatchEvent(new Event('resize'));}catch(x){}});
 /* ---------- auto review: must-say sentences from days done 1, 3, 7 days ago ---------- */
 function dstr(dt){return dt.getFullYear()+'-'+('0'+(dt.getMonth()+1)).slice(-2)+'-'+('0'+dt.getDate()).slice(-2);}
 function reviewItems(){var p=prog(),out=[],seen={};
@@ -121,7 +124,6 @@ if(localStorage.getItem('de100redl')==='1'){localStorage.removeItem('de100redl')
 function home(){var p=prog(),t=todayDay(),td=day(t);
  var h=top('오늘의 영어','<div class="streak">'+streak()+'</div>');
  if(window.callScreen&&window.deTR&&window.deTR.url())h+='<div class="callhero"><a class="callmain" href="#/call/'+t+'"><b>🎙 AI와 실시간 영어 대화</b><span>Talk with AI in real time · DAY '+t+' '+esc(td.title_ko)+'</span><em id="hcq">무료 · 가입 없음 · 결제 없음</em></a><a class="callfree" href="#/call/free">💬 아무 주제로 대화 · Any topic</a></div>';
- h+=bigBtn();
  if(window.deTR&&window.deTR.url())h+='<a class="trtop" href="#/tr">🗣 바로 통역 · Live interpreter<span>한국어 ↔ English · 누르고 바로 말하세요 · Tap and speak</span></a>';
  var rv=localStorage.getItem('de100revskip')===today()?[]:reviewItems();window.__revN=rv.length;
  if(rv.length)h+='<div class="card revcard"><b class="inst">🔁 오늘 복습 '+rv.length+'개</b>'+rv.map(function(x){return '<div class="rv"><div class="en">'+esc(x.en)+'</div><div class="n2">'+esc(x.ko)+' · '+(x.star?'⭐ 내가 저장한 문장 · Saved':'Day '+x.day)+'</div></div>';}).join('')+
@@ -129,8 +131,11 @@ function home(){var p=prog(),t=todayDay(),td=day(t);
  h+='<div class="card todaycard"><div class="k">오늘 · DAY '+t+'</div><div class="big">'+esc(td.title_ko)+'</div><div class="n2">'+esc(td.title_en)+'</div><a class="go" href="#/day/'+t+'">시작하기 ▶ · Start</a></div>';
  h+='<div class="card"><button id="remgo" class="big2">⏰ 매일 알림 받기 · Daily reminder</button><div id="rempick" hidden><p class="inst">언제 알려 드릴까요?</p><button class="big2 remh" data-h="7">아침 7시 · 7 AM</button><button class="big2 remh" data-h="12">낮 12시 · 12 PM</button><button class="big2 remh" data-h="21">저녁 9시 · 9 PM</button></div><div id="remst" class="n2"></div></div>';
  h+='<div class="card"><b>⬇ 지하철·차에서도 듣기</b><p class="n2">인터넷이 없어도 들을 수 있게 미리 내려받아요. (대화 연습·AI·음성 인식은 인터넷이 필요해요.)</p><button id="week" class="big2">이번 주 7일 내려받기 · Download this week</button> <span id="wkst" class="n2"></span><div id="use" class="n2"></div></div>';
- if(window.CKS&&window.CKS[0])h+='<div class="card"><b>🗣 말하기 점검</b><a class="go" href="#/ck/0">시작 점검 (Day 0)</a>'+(window.CKS[30]?'<a class="go" href="#/ck/30">30일 점검 · Day 30 check</a>':'')+'</div>';
- h+='<h2>Day 1–'+D.length+'</h2><ol class="days">'+D.map(function(d){return '<li><a href="#/day/'+d.id+'" class="'+(p.done[d.id]?'done':'')+(d.id===t?' now':'')+'"><span class="dn">'+d.id+'</span><span class="dt">'+esc(d.title_ko)+'</span><span class="mk" data-dl="'+d.id+'"></span>'+(p.done[d.id]?'<span class="ck">✓</span>':'')+'</a></li>';}).join('')+'</ol>';
+ if(window.CKS&&window.CKS[0])h+='<div class="card"><b>🗣 말하기 점검</b><a class="go" href="#/ck/0">📘 1권 시작 점검 (Day 0)</a>'+(window.CKS[30]?'<a class="go" href="#/ck/30">📘 1권 30일 점검 · Day 30 check</a>':'')+'</div>';
+ /* Day list per printed book: 'Day N' = the book's chapter */
+ var BOOKS=[[1,30,'📘 웰컴 잉글리시 1권'],[31,60,'📗 웰컴 잉글리시 2권']];
+ h+=BOOKS.map(function(b){var L=D.filter(function(d){return d.id>=b[0]&&d.id<=b[1];});if(!L.length)return '';
+  return '<h2 class="bookh">'+b[2]+' · Day '+L[0].id+'–'+L[L.length-1].id+'</h2><ol class="days">'+L.map(function(d){return '<li><a href="#/day/'+d.id+'" class="'+(p.done[d.id]?'done':'')+(d.id===t?' now':'')+'"><span class="dn"><small>Day</small>'+d.id+'</span><span class="dt">'+esc(d.title_ko)+'</span><span class="mk" data-dl="'+d.id+'"></span>'+(p.done[d.id]?'<span class="ck">✓</span>':'')+'</a></li>';}).join('')+'</ol>';}).join('');
  h+='<p class="n2 center"><a href="#/install">설치 안내</a> · <a href="../index.html">웹 목록</a></p>';
  h+=settingsCard();V.innerHTML=h;bindSettings();if(window.deCallQuota&&$('#hcq'))window.deCallQuota($('#hcq'));
  bindBig();if($('#revgo')){$('#revgo').onclick=function(){playReview(rv,$('#revgo'));};$('#revskip').onclick=function(){localStorage.setItem('de100revskip',today());route();};}
@@ -243,7 +248,10 @@ function install(){var ua=navigator.userAgent,inapp=/KAKAOTALK|NAVER\(|NAVER|Ins
 (function(){var y=0;window.addEventListener('scroll',function(){var f=document.getElementById('trfab');if(!f)return;var n=window.scrollY;if(n>y+8)f.classList.add('away');else if(n<y-8)f.classList.remove('away');y=n;},{passive:true});})();   /* hides while scrolling down, so it never sits on lesson buttons while reading */
 function trfab(r){var f=document.getElementById('trfab');if(!(window.deTR&&window.deTR.url())||r==='tr'||r==='call'){if(f)f.hidden=true;document.body.classList.remove('hasfab');return;}
  if(!f){f=document.createElement('a');f.id='trfab';f.textContent='🗣 통역 · Translate';document.body.appendChild(f);}
- var m=location.hash.match(/^#\/(?:day|talk|ai|check)\/(\d+)/);f.href=m?'#/tr/'+m[1]:'#/tr';f.hidden=false;document.body.classList.add('hasfab');}
+ var m=location.hash.match(/^#\/(?:day|talk|ai|check)\/(\d+)/);f.href=m?'#/tr/'+m[1]:'#/tr';f.hidden=false;document.body.classList.add('hasfab');
+ /* home: the big 「바로 통역」 card is already on screen - keep the floating copy tucked away until that card scrolls off, so it never sits on 「시작하기」 */
+ if(window.__fabIO)window.__fabIO.disconnect();f.classList.remove('dup');var tb=document.querySelector('#view a.trtop');
+ if(tb&&window.IntersectionObserver){f.classList.add('dup');window.__fabIO=new IntersectionObserver(function(es){f.classList.toggle('dup',es[0].isIntersecting||es[0].boundingClientRect.top>0);});window.__fabIO.observe(tb);}}
 /* ---------- 18+ gate for every Gemini feature (AI talk, interpreter, Prepare, hints): stored on this phone only, no birth date ---------- */
 var AGEQ='AI 대화·통역은 만 18세 이상만 쓸 수 있어요. · AI talk and the interpreter are for adults (18+) only.';
 function ageOK(){return localStorage.getItem('de100age')==='y';}
