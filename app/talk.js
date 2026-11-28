@@ -35,10 +35,11 @@ function colour(target,heard){var tw=String(target).split(/\s+/),h=norm(heard),u
   out.push('<span class="w '+cls+'">'+esc(w)+'</span>');});
  var tw0=fr||fy,tp=tw0?pronTip(tw0):null;window.__pronTip=tp&&tp.key;
  return {html:out.join(' ')+(tp?'<div class="ptip">💡 <b>'+esc(tw0.replace(/[^A-Za-z']/g,''))+'</b> — '+esc(tp.ko)+'</div>':''),score:(g+0.5*y)/Math.max(tw.length,1),tip:tp};}
-function accepted(turn,heard){var s=0;(turn.accept||[]).forEach(function(a){s=Math.max(s,sim(a,heard));});
+function accepted(turn,heard,prev){var s=0;(turn.accept||[]).forEach(function(a){s=Math.max(s,sim(a,heard));});
  var h=' '+norm(heard).join(' ')+' ';var key=(turn.keys||[]).some(function(k){return k.every(function(w){return h.indexOf(' '+norm(w).join(' ')+' ')>=0;});});
  /* not accepted when the turn is at least as close to the partner's line as to every accept (echo/parroting; same rule as call.js missions) */
- var echo=!!turn.partner_en&&sim(turn.partner_en,heard)>=s;
+ /* no partner line on this turn: the partner's last line is the previous turn's reply (the model answer) - repeating it is not an answer */
+  var pl=turn.partner_en||prev||'',echo=!!pl&&sim(pl,heard)>=s;
  return {ok:!echo&&(s>=0.6||key),score:s,key:key,echo:echo};}
 /* ---------- speech in (one utterance, push to talk) ---------- */
 var REC=null;
@@ -147,7 +148,7 @@ function roleplay(){var box=$('#rp'),R=T.roleplay,i=0;box.innerHTML='';
    var rb=el('button','lis','👂 다시 듣기');rb.onclick=function(){say(t.partner_audio);};c.appendChild(rb);}
   c.appendChild(el('div','task','🎯 '+esc(t.task_ko)));var fb=el('div','fb'),cw=el('div','cmpw');
   function done(h){if(h==null){log('roleplay',t.accept[0],null,null);reply();return;}
-   var a=accepted(t,h);cw.innerHTML='<span class="n2">들린 말:</span> '+esc(h||'(없음)');
+   var a=accepted(t,h,i>0?R.turns[i-1].reply_en:'');cw.innerHTML='<span class="n2">들린 말:</span> '+esc(h||'(없음)');
    if(a.ok){log('roleplay',t.accept[0],h,Math.max(a.score,a.key?0.8:0));reply();return;}
    tries++;log('roleplay',t.accept[0],h,a.score);
    if(tries===1){fb.innerHTML='<div class="who">'+esc(T.partner.name)+'</div><div class="en">'+esc(R.fallback_en)+'</div><div class="ko n2">'+esc(R.fallback_ko)+'</div>';say(R.fallback_audio);}

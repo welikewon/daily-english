@@ -208,19 +208,32 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
   try{if(window.speechSynthesis&&speechSynthesis.addEventListener)speechSynthesis.addEventListener('voiceschanged',function(){if(document.body.contains($('#trchat')))draw(true);});}catch(e){}
   /* 📷 scan: photo -> text as written + translation (image goes once to our proxy, nothing is saved) */
   function adult(){return localStorage.getItem('de100age')==='y';}
-  $('#trscan').onclick=function(){if(!U){toast(errMsg({error:'off'}));return;}
+  function scanAuto(){return ld('de100trp',{}).scanauto!==false;}
+  /* iOS/Safari: speech must start inside a tap; speak an empty line now so the later automatic reading is allowed */
+  function prime(){try{if(window.speechSynthesis&&scanAuto()){var u=new SpeechSynthesisUtterance('');u.volume=0;speechSynthesis.speak(u);window.__scanPrimed=(window.__scanPrimed||0)+1;}}catch(e){}}
+  $('#trscan').onclick=function(){prime();if(!U){toast(errMsg({error:'off'}));return;}
    if(!adult()){if(window.ageGate)ageGate(function(){$('#trscan').click();});else toast(L('18세 이상만 쓸 수 있어요.','Adults (18+) only.'));return;}
    if(!ld('de100scanok',false)){var o=ov('<b>'+esc(L('📷 글자 찍어 번역','Scan text'))+'</b><p class="scnote">사진 속 글자가 구글 AI로 보내져요. 개인정보(주민번호·통장 등)가 있는 사진은 찍지 마세요.</p><p class="n2">The text in the photo is sent to Google AI. Do not photograph personal data (ID numbers, bank details). Photos are not saved.</p><button data-a="ok" class="hot">'+esc(L('알겠어요','OK'))+'</button><button data-a="x">'+esc(L('닫기','Close'))+'</button>');
-    o.querySelector('.trsheet').onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;closeOv();if(b.dataset.a==='ok'){sv('de100scanok',true);$('#trscanf').click();}};return;}
+    o.querySelector('.trsheet').onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;closeOv();if(b.dataset.a==='ok'){prime();sv('de100scanok',true);$('#trscanf').click();}};return;}
    $('#trscanf').click();};
   $('#trscanf').onchange=function(){var f=this.files&&this.files[0];this.value='';if(!f)return;status(L('📷 글자를 읽는 중…','Reading the text…'));
    shrink(f,function(b64){if(!b64){status('');toast(L('사진을 열 수 없어요.','Could not open the photo.'));return;}window.__scanKB=Math.round(b64.length*0.75/1024);
     post('/scan',{image:b64,mime:'image/jpeg'},25000).then(function(j){status('');scanShow(j);},function(e){status('');toast(scanErr(e));});});};
   function scanShow(j){window.__scanShown=j;if(!j||!j.text){toast(L('사진에서 글자를 찾지 못했어요.','No text found in the photo.'));return;}var to=j.from==='ko'?'en':'ko',br=function(t){return esc(t).replace(/\n/g,'<br>');};
    var o=ov('<b>'+esc(L('📷 찍은 글자','Scanned text'))+'</b><div class="scsrc">'+br(j.text)+'</div><div class="qa">'+(hasVoice(j.from)?'<button data-a="ps">🔊 '+esc(L('듣기','Play'))+'</button>':'')+'<button data-a="cs">📋 '+esc(L('복사','Copy'))+'</button></div>'+
-    '<b>'+esc(L('번역','Translation'))+'</b><div class="scout '+to+'">'+br(j.translation)+'</div><div class="qa">'+(hasVoice(to)?'<button data-a="po">🔊 '+esc(L('듣기','Play'))+'</button>':'')+'<button data-a="co">📋 '+esc(L('복사','Copy'))+'</button></div><button data-a="x">'+esc(L('닫기','Close'))+'</button>');
+    '<b>'+esc(L('번역','Translation'))+'</b><div class="scout '+to+'">'+br(j.translation)+'</div><div class="qa">'+(hasVoice(to)?'<button data-a="po">🔊 '+esc(L('듣기','Play'))+'</button>':'')+'<button data-a="co">📋 '+esc(L('복사','Copy'))+'</button></div>'+
+    '<button data-a="big" class="big2 scbig" hidden>🔊 '+esc(L('들려주기','Play it'))+'</button><button data-a="stop" class="scstop" hidden>⏹ '+esc(L('멈추기','Stop'))+'</button>'+
+    '<button data-a="auto" class="scauto"></button><button data-a="x">'+esc(L('닫기','Close'))+'</button>');
+   var q=function(s){return o.querySelector(s);},hid=function(s,v){var e=q(s);if(e)e.hidden=v;};
+   function autoLbl(){var e=q('[data-a=auto]');if(e)e.textContent=scanAuto()?L('🔊 자동 읽기 켬','🔊 Auto read: on'):L('🔇 자동 읽기 끔','🔇 Auto read: off');}autoLbl();
+   /* read the translation in its own language; stop button while speaking; if the browser blocks it, a big play button */
+   function readOut(){var ss=window.speechSynthesis;if(!ss||!hasVoice(to)){hid('[data-a=big]',!ss);return;}ss.cancel();var u=new SpeechSynthesisUtterance(j.translation),v=voice(to),started=false;u.lang=to==='ko'?'ko-KR':'en-US';if(v)u.voice=v;u.rate=srate();
+    u.onstart=function(){started=true;hid('[data-a=stop]',false);hid('[data-a=big]',true);};u.onend=u.onerror=function(){started=true;hid('[data-a=stop]',true);};
+    ss.speak(u);window.__scanRead=(window.__scanRead||[]).concat([{t:j.translation,lang:u.lang,rate:u.rate}]);
+    setTimeout(function(){if(!started&&!ss.speaking){hid('[data-a=big]',false);window.__scanBlocked=1;}},1500);}
+   if(scanAuto())readOut();
    o.querySelector('.trsheet').onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a,cp=function(t){copy(t,function(ok){toast(ok?L('📋 복사했어요.','Copied.'):L('복사가 안 됐어요. 글을 길게 눌러 복사하세요.','Copy failed. Long-press the text to copy.'));});};
-    if(a==='ps')say(j.text,j.from,srate());else if(a==='po')say(j.translation,to,srate());else if(a==='cs')cp(j.text);else if(a==='co')cp(j.translation);else if(a==='x')closeOv();};}
+    if(a==='ps')say(j.text,j.from,srate());else if(a==='po'||a==='big')readOut();else if(a==='stop'){try{speechSynthesis.cancel();}catch(x){}b.hidden=true;}else if(a==='auto'){setPref('scanauto',!scanAuto());autoLbl();if(!scanAuto())try{speechSynthesis.cancel();}catch(x){}}else if(a==='cs')cp(j.text);else if(a==='co')cp(j.translation);else if(a==='x')closeOv();};}
  $('#trpb').onclick=function(){var o=ov('<b>'+esc(L('📖 자주 쓰는 말','Phrasebook'))+'</b>'+PB.map(function(g,gi){return '<details'+(gi===0?' open':'')+'><summary>'+esc(g[0])+'</summary>'+g[1].map(function(p,i){return '<button class="pbit" data-g="'+gi+'" data-i="'+i+'"><b>'+esc(p[1])+'</b><br><span>'+esc(p[0])+'</span></button>';}).join('')+'</details>';}).join('')+'<button data-a="x">'+esc(L('닫기','Close'))+'</button>');
   o.querySelector('.trsheet').onclick=function(e){var b=e.target.closest('.pbit');if(e.target.closest('[data-a=x]'))return closeOv();if(!b)return;var p=PB[+b.dataset.g][1][+b.dataset.i];closeOv();
    addLine({who:'me',from:'ko',src:p[0],out:p[1],phrase:true});say(p[1],'en',0.9);window.__trLast={src:p[0],out:p[1],from:'ko',phrase:true};};};
