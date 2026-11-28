@@ -1,11 +1,13 @@
 {
- "version": "2026.11.28-4",
+ "version": "2026.11.28-5",
  "date": "2026-11-28",
  "notes_ko": [
-  "2권(Day 31~55) 「🎭 우리 드라마」 소리와 듣기 연습이 준비됐어요."
+  "미니 드라마 「이렇게 들려요」 줄에 이름이 {NAME}으로 보이던 것을 고쳤어요.",
+  "1권 예문 6개를 새 문장으로 바꿨어요 (Day 1·8·10·20·25·27)."
  ],
  "notes_en": [
-  "Book 2 (Days 31-55) mini-drama audio and listening drills are ready."
+  "The mini-drama \"heard as\" line now shows the name instead of {NAME}.",
+  "Six Book 1 example sentences replaced with new ones (Days 1, 8, 10, 20, 25, 27)."
  ],
  "pdf": {
   "pastors": {
