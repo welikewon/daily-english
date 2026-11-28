@@ -77,7 +77,7 @@ function remind(h){var ics=icsFor(h);window.__ics=ics;var a=document.createEleme
  localStorage.setItem('de100remind',String(h));$('#remst').textContent='달력 앱이 열리면 「추가」 또는 「저장」을 누르세요. 매일 '+(h===7?'아침 7시 · 7 AM':h===12?'낮 12시 · 12 PM':'저녁 9시 · 9 PM')+'에 알려 줘요.';
  if(standalone&&'Notification' in window&&navigator.serviceWorker){Notification.requestPermission().then(function(pm){if(pm!=='granted')return;navigator.serviceWorker.ready.then(function(reg){if(reg.periodicSync)reg.periodicSync.register('de100-daily',{minInterval:12*3600*1000}).then(function(){window.__psync=1;}).catch(function(){});});});}}
 /* ---------- 🔄 새 내용 받기 · Get updates (version.json on the site; one tap = new files + reload) ---------- */
-var APPV='2026.11.27-11';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
+var APPV='2026.11.28-9';window.APPV=APPV;var EDN=/\/g\//.test(location.pathname)?'general':'pastors';
 function vfetch(){return fetch('../version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();});}
 function vnotes(j){return '<div class="updn"><b>이번에 달라진 점 · What is new</b><ul>'+(j.notes_ko||[]).map(function(k,i){return '<li>'+esc(k)+'<br><span class="n2">'+esc((j.notes_en||[])[i]||'')+'</span></li>';}).join('')+'</ul></div>';}
 function doUpdate(st){st.innerHTML='<p>⏳ 새 내용을 받는 중… · Downloading…</p>';localStorage.setItem('de100redl','1');
@@ -136,7 +136,7 @@ function home(){var p=prog(),t=todayDay(),td=day(t);
  var BOOKS=[[1,30,'📘 웰컴 잉글리시 1권'],[31,60,'📗 웰컴 잉글리시 2권']];
  h+=BOOKS.map(function(b){var L=D.filter(function(d){return d.id>=b[0]&&d.id<=b[1];});if(!L.length)return '';
   return '<h2 class="bookh">'+b[2]+' · Day '+L[0].id+'–'+L[L.length-1].id+'</h2><ol class="days">'+L.map(function(d){return '<li><a href="#/day/'+d.id+'" class="'+(p.done[d.id]?'done':'')+(d.id===t?' now':'')+'"><span class="dn"><small>Day</small>'+d.id+'</span><span class="dt">'+esc(d.title_ko)+'</span><span class="mk" data-dl="'+d.id+'"></span>'+(p.done[d.id]?'<span class="ck">✓</span>':'')+'</a></li>';}).join('')+'</ol>';}).join('');
- h+='<p class="n2 center"><a href="#/install">설치 안내</a> · <a href="../index.html">웹 목록</a></p>';
+ h+='<p class="n2 center"><a href="#/install">설치 안내</a> · <a href="../index.html?list">웹 목록</a></p>';
  h+=settingsCard();V.innerHTML=h;bindSettings();if(window.deCallQuota&&$('#hcq'))window.deCallQuota($('#hcq'));
  bindBig();if($('#revgo')){$('#revgo').onclick=function(){playReview(rv,$('#revgo'));};$('#revskip').onclick=function(){localStorage.setItem('de100revskip',today());route();};}
  $('#remgo').onclick=function(){$('#rempick').hidden=false;$('#remgo').hidden=true;};$$('.remh').forEach(function(b){b.onclick=function(){remind(+b.dataset.h);};});usage($('#use'));

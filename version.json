@@ -1,15 +1,13 @@
 {
- "version": "2026.11.28-8",
- "date": "2026-11-28",
+ "version": "2026.11.28-9",
+ "date": "2026-11-29",
  "notes_ko": [
-  "글자 크기 버튼을 맨 위 「업데이트」 왼쪽으로 옮겼어요 (누르면 보통 ↔ 크게).",
-  "첫 화면: 「🗣 통역」 둥근 버튼이 「시작하기」를 가리지 않아요.",
-  "Day 목록 제목이 「📘 웰컴 잉글리시 1권 · Day 1–30」으로 바뀌고, 줄마다 「Day」 표시가 있어요 (책과 같아요)."
+  "카톡 등으로 받은 주소(첫 화면)를 열면 바로 앱으로 들어가요. 맨 위에 「📱 앱으로 시작하기」 버튼도 있어요.",
+  "처음 들어온 분에게 「새 내용이 있어요」가 잘못 뜨던 문제를 고쳤어요."
  ],
  "notes_en": [
-  "Text size is now one button in the header, left of Update (tap: normal ↔ big).",
-  "Home: the floating Translate button no longer covers Start.",
-  "Day list: book heading and a 'Day' label on each row, like the printed book."
+  "The shared link now opens the app; a big \"Open the app\" button is at the top of the old page.",
+  "Fixed the false \"new version\" notice for first-time visitors."
  ],
  "pdf": {
   "pastors": {
