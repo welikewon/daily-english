@@ -67,7 +67,8 @@ window.callScreen=function(V,n,free,back){stop();
     else sayBack(x.better,b.closest('.crow').querySelector('.rr'));};
   },function(){box.innerHTML='<p class="n2">정리를 지금 만들 수 없어요. 내일 다시 해 봐요. · Could not make the summary now.</p>';});}
  function saveStar(en,ko){var L=[];try{L=JSON.parse(localStorage.getItem('de100star'))||[];}catch(e){}if(L.some(function(x){return x.en===en;}))return;L.unshift({en:en,ko:ko,saved:new Date().toISOString().slice(0,10)});localStorage.setItem('de100star',JSON.stringify(L.slice(0,200)));}
- function norm(s){return String(s||'').toLowerCase().replace(/[^a-z' ]/g,' ').split(/\s+/).filter(Boolean);}
+ /* digits become words first (window.TK.d2w from talk.js: 'At 11.' -> at eleven), so spoken and written numbers match */
+ function norm(s){s=String(s||'').toLowerCase().replace(/[’‘]/g,"'");if(window.TK&&window.TK.d2w)s=window.TK.d2w(s);return s.replace(/[^a-z' ]/g,' ').split(/\s+/).filter(Boolean);}
  function sayBack(want,out){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){out.textContent='이 휴대폰은 음성 인식이 안 돼요 · No speech recognition here';return;}
   var r=new SR();r.lang='en-US';r.interimResults=false;r.maxAlternatives=3;out.textContent='🎤 말해 보세요… · Say it now…';
   r.onresult=function(e){var best=0,heard='';for(var k=0;k<e.results[0].length;k++){var h=norm(e.results[0][k].transcript),w=norm(want),hit=w.filter(function(x){return h.indexOf(x)>=0;}).length/Math.max(1,w.length);if(hit>best){best=hit;heard=e.results[0][k].transcript;}}
@@ -81,7 +82,8 @@ window.callScreen=function(V,n,free,back){stop();
  function neg(w){return w.some(function(x){return NEG.test(x);});}
  function tick(c,said){if(!c.mis.length)return;var w=norm(said),ai=c.ai.filter(Boolean),pw=norm(ai[ai.length-1]||'');c.mis.forEach(function(x,i){if(x.done)return;
   var keys=(x.keys&&x.keys.length?x.keys:(x.accept||[]).map(function(a){return norm(a);}));
-  if(!keys.some(function(g){return g.length&&g.every(function(k){return w.indexOf(String(k).toLowerCase())>=0;});}))return;
+  var hs=' '+w.join(' ')+' ';   /* a key entry with spaces is a PHRASE: its words must come together, in order */
+  if(!keys.some(function(g){return g.length&&g.every(function(k){var p=norm(k).join(' ');return p&&hs.indexOf(' '+p+' ')>=0;});}))return;
   var best=Math.max.apply(null,[0].concat((x.accept||[]).concat([x.say_en||'']).map(function(a){return sim(w,norm(a));})));
   if(pw.length&&sim(w,pw)>=best)return;
   if(x.say_en&&neg(w)!==neg(norm(x.say_en)))return;

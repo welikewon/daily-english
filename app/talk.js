@@ -8,7 +8,18 @@ function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 /* ---------- text matching ---------- */
 var CONTR={"i'm":"i am","you're":"you are","it's":"it is","we're":"we are","they're":"they are","he's":"he is","she's":"she is","isn't":"is not","aren't":"are not","what's":"what is","let's":"let us","that's":"that is","don't":"do not","can't":"can not","i'll":"i will"};
-function norm(s){s=String(s||'').toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9' ]+/g,' ');
+var ONES='zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen'.split(' '),TENS='zero ten twenty thirty forty fifty sixty seventy eighty ninety'.split(' '),ORDW={one:'first',two:'second',three:'third',five:'fifth',eight:'eighth',nine:'ninth',twelve:'twelfth'};
+/* digits -> words the way speech recognition writes them (same rules as review/_도구/mission_gate.py digits_to_words): 15,000 -> fifteen thousand, 7:30 -> seven thirty, 7:05 -> seven oh five, 3rd -> third, 1985 -> nineteen eighty five, 2005 -> two thousand five */
+function numW(n){if(n<20)return ONES[n];if(n<100)return TENS[Math.floor(n/10)]+(n%10?' '+ONES[n%10]:'');
+ if(n>=1100&&n<=2099&&!(n>=2000&&n<=2009)){var hi=Math.floor(n/100),lo=n%100;return numW(hi)+(lo===0?' hundred':lo<10?' oh '+ONES[lo]:' '+numW(lo));}
+ if(n<1000)return ONES[Math.floor(n/100)]+' hundred'+(n%100?' '+numW(n%100):'');return numW(Math.floor(n/1000))+' thousand'+(n%1000?' '+numW(n%1000):'');}
+function ordW(n){var w=numW(n).split(' '),l=w[w.length-1];w[w.length-1]=ORDW[l]||(/y$/.test(l)?l.slice(0,-1)+'ieth':l+'th');return w.join(' ');}
+function d2w(s){s=String(s).replace(/(\d),(?=\d{3}\b)/g,'$1');
+ s=s.replace(/\b(\d{1,2}):(\d{2})\b/g,function(m,a,b){return numW(+a)+(b==='00'?'':b.charAt(0)==='0'?' oh '+ONES[+b]:' '+numW(+b));});
+ s=s.replace(/\b(\d+)(st|nd|rd|th)\b/g,function(m,a){return +a<1000000?ordW(+a):m;});
+ s=s.replace(/\b(\d+)\.(\d+)\b/g,function(m,a,b){return (+a<1000000?numW(+a):a)+' point '+b.split('').map(function(c){return ONES[+c];}).join(' ');});
+ return s.replace(/\b\d+\b/g,function(m){return +m<1000000?numW(+m):m;});}
+function norm(s){s=d2w(String(s||'').toLowerCase().replace(/[’‘]/g,"'")).replace(/[^a-z0-9' ]+/g,' ');
  return s.split(/\s+/).filter(Boolean).map(function(w){return CONTR[w]||w.replace(/'/g,'');}).join(' ').split(' ').filter(Boolean);}
 function lev(a,b){var d=[],i,j;for(j=0;j<=b.length;j++)d[j]=j;for(i=1;i<=a.length;i++){var p=d[0];d[0]=i;for(j=1;j<=b.length;j++){var t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]!==b[j-1]?1:0));p=t;}}return d[b.length];}
 function sim(a,b){var x=norm(a).sort().join(' '),y=norm(b).sort().join(' ');if(!x&&!y)return 1;return 1-lev(x,y)/Math.max(x.length,y.length,1);}
@@ -26,7 +37,9 @@ function colour(target,heard){var tw=String(target).split(/\s+/),h=norm(heard),u
  return {html:out.join(' ')+(tp?'<div class="ptip">💡 <b>'+esc(tw0.replace(/[^A-Za-z']/g,''))+'</b> — '+esc(tp.ko)+'</div>':''),score:(g+0.5*y)/Math.max(tw.length,1),tip:tp};}
 function accepted(turn,heard){var s=0;(turn.accept||[]).forEach(function(a){s=Math.max(s,sim(a,heard));});
  var h=' '+norm(heard).join(' ')+' ';var key=(turn.keys||[]).some(function(k){return k.every(function(w){return h.indexOf(' '+norm(w).join(' ')+' ')>=0;});});
- return {ok:s>=0.6||key,score:s,key:key};}
+ /* not accepted when the turn is at least as close to the partner's line as to every accept (echo/parroting; same rule as call.js missions) */
+ var echo=!!turn.partner_en&&sim(turn.partner_en,heard)>=s;
+ return {ok:!echo&&(s>=0.6||key),score:s,key:key,echo:echo};}
 /* ---------- speech in (one utterance, push to talk) ---------- */
 var REC=null;
 function barOn(lbl){document.body.classList.add('playing');var l=document.getElementById('plab');if(l)l.textContent=lbl;var g=document.getElementById('pprog');if(g)g.textContent='';var b=document.getElementById('pbar');if(b)b.style.setProperty('--m','#C62F55');}
@@ -68,7 +81,7 @@ function recBox(native){var w=el('div','recbox'),b=el('button','rec','🎙 내 �
  p.onclick=function(){if(!url)return;dePlay(native,{label:'👂 원어민',onend:function(){dePlay(url,{label:'🗣 내 목소리'});}});};
  w.appendChild(b);w.appendChild(p);w.appendChild(n);return w;}
 
-return {pronTip:pronTip,SR:SR,$:$,$$:$$,el:el,esc:esc,norm:norm,lev:lev,sim:sim,colour:colour,accepted:accepted,talkBox:talkBox,recBox:recBox,abortAll:abortAll};
+return {pronTip:pronTip,SR:SR,$:$,$$:$$,el:el,esc:esc,d2w:d2w,norm:norm,lev:lev,sim:sim,colour:colour,accepted:accepted,talkBox:talkBox,recBox:recBox,abortAll:abortAll};
 })();
 window.initTalk=function(){
 var T=window.TALK,AU=T.audio_base,TA=T.talk_base;
