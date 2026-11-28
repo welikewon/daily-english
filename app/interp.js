@@ -21,7 +21,12 @@ function say(t,lang,rate,cb){var ss=window.speechSynthesis;if(!ss||!t){cb&&cb();
 function errMsg(e){if(e&&e.status===429)return '오늘 쓸 수 있는 무료 통역을 다 썼어요. 내일 다시 쓸 수 있어요. · Today\'s free translations are used up. Try again tomorrow.';
  if(e&&(e.error==='off'||e.status===503))return '지금은 통역을 쓸 수 없어요. · The interpreter is off right now.';
  return '연결이 느려요. 다시 눌러 주세요. · The connection is slow. Please try again.';}
-window.deTR={url:aiUrl,translate:translate,say:say,err:errMsg};
+function hasVoice(lang){return !!window.speechSynthesis&&!!voice(lang);}   /* no voice for the language -> no 🔊 button */
+function srate(){var r=ld('de100trp',{}).rate;return r===0.8?0.8:1;}
+function scanErr(e){if(e&&e.status===429)return '오늘 찍어 번역을 다 썼어요. 내일 다시 쓸 수 있어요. · Today\'s photo translations are used up.';if(e&&e.status===413)return '사진이 너무 커요. 다시 찍어 주세요. · The photo is too big.';return errMsg(e);}
+function shrink(file,cb){var fr=new FileReader();fr.onerror=function(){cb(null);};fr.onload=function(){var im=new Image();im.onerror=function(){cb(null);};im.onload=function(){var M=1600,w=im.naturalWidth,h=im.naturalHeight,k=Math.min(1,M/Math.max(w,h)),c=document.createElement('canvas');
+ c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));c.getContext('2d').drawImage(im,0,0,c.width,c.height);var u=c.toDataURL('image/jpeg',0.82);cb(u.slice(u.indexOf(',')+1),c.width,c.height);};im.src=fr.result;};fr.readAsDataURL(file);}
+window.deTR={url:aiUrl,translate:translate,say:say,err:errMsg,hasVoice:hasVoice,shrink:shrink};
 /* ---------- saved sentences (⭐) feed the daily review ---------- */
 function stars(){try{return JSON.parse(localStorage.getItem('de100star')||'[]');}catch(e){return [];}}
 function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
@@ -59,7 +64,7 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
  var AUD={};   /* live audio of this visit, per line, for exact replay */
  V.innerHTML='<button class="fsback" data-big="0">가 보통 글씨로 · Normal text</button><header class="atop"><a class="aback" id="trback" href="'+(back||'#/')+'">← <span class="lb" data-ko="뒤로" data-en="Back"></span></a><div class="k">웰컴 잉글리시 100</div><h1 class="lb" data-ko="🗣 바로 통역" data-en="Live interpreter"></h1></header>'+
   '<div id="trwrap" class="trv2">'+(U?'':'<div class="card warn">지금은 통역을 쓸 수 없어요. · The interpreter is not available.</div>')+
-  '<div class="trtools"><button id="trpb" class="tb lb" data-ko="📖 자주 쓰는 말" data-en="Phrases"></button><a id="trprep" class="tb lb" href="#/tr/prep" data-ko="📝 말할 내용 준비" data-en="Prepare"></a><button id="trmorebtn" class="tb lb" data-ko="⋯ 더보기" data-en="More"></button></div>'+
+  '<div class="trtools"><button id="trpb" class="tb lb" data-ko="📖 자주 쓰는 말" data-en="Phrases"></button><a id="trprep" class="tb lb" href="#/tr/prep" data-ko="📝 말할 내용 준비" data-en="Prepare"></a><button id="trscan" class="tb lb" data-ko="📷 글자 찍어 번역" data-en="Scan text"></button><button id="trrate" class="tb"></button><button id="trmorebtn" class="tb lb" data-ko="⋯ 더보기" data-en="More"></button></div><input id="trscanf" type="file" accept="image/*" capture="environment" hidden>'+
   '<div id="trscroll" class="trscroll"><div id="trres" class="trres" hidden></div><div id="trchat" class="trchat" aria-live="polite"></div>'+
   '<div id="trlive" class="trlive2" hidden><div class="lvh"></div><div class="lvt"></div><div class="lvo"></div></div></div>'+
   '<div id="trmore" class="trmore" hidden><div class="trmg"><button id="trlist" class="tb lb" data-ko="📋 대화 목록" data-en="Conversations"></button><button id="trnew" class="tb lb" data-ko="➕ 새 대화" data-en="New talk"></button><button id="trf2f" class="tb lb" data-ko="👥 마주 보기" data-en="Face to face"></button><button id="trflip" class="tb lb" data-ko="🔄 상대에게 보여주기" data-en="Show to partner"></button><button id="trset" class="tb lb" data-ko="⚙ 통역 설정" data-en="Interpreter settings"></button><button id="trclear" class="tb lb" data-ko="🗑 모두 지우기" data-en="Clear all"></button></div>'+(window.deBigBtn?deBigBtn():'')+
@@ -78,7 +83,7 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
  function bubble(l){var me=l.who==='me',toEn=l.from==='ko';
   return '<div class="tb2 '+(me?'me':'pt')+(l.pending?' pend':'')+'" data-id="'+l.id+'"><div class="src">'+(toEn?'🇰🇷 ':'🇺🇸 ')+esc(l.src)+'</div><div class="out '+(toEn?'en':'ko')+'">'+esc(l.out||'…')+'</div>'+
    (l.back?'<div class="back">↩ '+esc(L('상대에게 이렇게 전달돼요','They hear'))+': '+esc(l.back)+'</div>':'')+(l.pending?'<button class="retry">'+esc(L('🔁 다시 시도','Retry'))+'</button>':'')+
-   (l.out&&!l.pending?'<div class="qa"><button class="qplay" aria-label="듣기 · Play"><span class="qi">🔊</span><span class="ql">듣기</span></button><button class="qcopy" aria-label="복사 · Copy"><span class="qi">📋</span><span class="ql">복사</span></button></div>':'')+
+   (l.out&&!l.pending?'<div class="qa">'+(hasVoice(l.from)?'<button class="qsrc" aria-label="원문 듣기 · Play original"><span class="qi">🔊</span><span class="ql">원문</span></button>':'')+((AUD[l.id]&&AUD[l.id].length)||hasVoice(outLang(l))?'<button class="qplay" aria-label="듣기 · Play"><span class="qi">🔊</span><span class="ql">듣기</span></button>':'')+'<button class="qcopy" aria-label="복사 · Copy"><span class="qi">📋</span><span class="ql">복사</span></button></div>':'')+
    '<div class="tm">'+fmtDate(l.t)+(l.star?' ⭐':'')+'</div></div>';}
  function draw(keepScroll){var c=$('#trchat');c.innerHTML=cur.lines.length?cur.lines.map(bubble).join(''):'<p class="n2 trempty">'+esc(L('아래 버튼을 누르고 말하세요. 다 말하면 「다 했어요」를 누르세요.','Tap a button below and speak. Tap Done when you finish.'))+'</p>';
   fit();if(!keepScroll)toEnd();window.__trLines=cur.lines.length;}
@@ -89,7 +94,7 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
  var pressT=null;
  $('#trchat').addEventListener('click',function(e){var b=e.target.closest('.tb2');if(!b)return;var l=line(b.dataset.id);if(!l)return;if(e.target.closest('.retry')){retry(l);return;}
   if(e.target.closest('.qcopy')){copy(l.out,function(ok){toast(ok?L('📋 복사했어요. 카톡·왓츠앱에 붙여 넣으세요.','Copied. Paste it into your chat app.'):L('복사가 안 됐어요. 글을 길게 눌러 복사하세요.','Copy failed. Long-press the text to copy.'));});return;}
-  if(e.target.closest('.qplay')){play(l);return;}menu(l);});
+  if(e.target.closest('.qplay')){play(l);return;}if(e.target.closest('.qsrc')){say(l.src,l.from,srate());return;}menu(l);});
  $('#trchat').addEventListener('touchstart',function(e){var b=e.target.closest('.tb2');if(!b)return;pressT=setTimeout(function(){var l=line(b.dataset.id);if(l)menu(l,true);},650);},{passive:true});
  ['touchend','touchmove','touchcancel'].forEach(function(n){$('#trchat').addEventListener(n,function(){clearTimeout(pressT);},{passive:true});});
  function rescue(){var m=V.querySelector('#trov #trmore');if(m){m.hidden=true;$('#trwrap').appendChild(m);}}
@@ -98,7 +103,7 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
  function ov(html){rescue();var o=$('#trov');o.innerHTML='<div class="trsheet">'+html+'</div>';o.hidden=false;o.onclick=function(e){if(e.target===o)closeOv();};return o;}
  function closeOv(){rescue();var o=$('#trov');if(o){o.hidden=true;o.innerHTML='';}}
  function outLang(l){return l.from==='ko'?'en':'ko';}
- function play(l,rate){var a=AUD[l.id];if(a&&a.length&&window.deLive&&(rate||1)===1){deLive.audio();var p=new deLive.Player();p.rate=rate||1;a.forEach(function(d){p.play(d);});return;}say(l.out,outLang(l),outLang(l)==='en'?(rate||0.9):1);}
+ function play(l,rate){var a=AUD[l.id];if(a&&a.length&&window.deLive&&!rate&&srate()===1){deLive.audio();var p=new deLive.Player();p.rate=1;a.forEach(function(d){p.play(d);});return;}say(l.out,outLang(l),rate||srate());}
  function menu(l,del){var en=outLang(l)==='en';
   var o=ov('<div class="shq">'+esc(l.out)+'</div>'+
    '<button data-a="play">'+esc(L('🔊 다시 듣기','Play again'))+'</button>'+(en?'<button data-a="slow">'+esc(L('🐢 천천히','Slower'))+'</button><button data-a="rep">'+esc(L('🗣 따라 말하기','Repeat after'))+'</button>':'')+
@@ -197,6 +202,25 @@ window.interpScreen=function(V,back,sub){if(sub==='prep')return prepScreen(V,bac
    if(b.dataset.a==='open'){cur=t;AUD={};closeOv();draw();}
    else if(b.dataset.a==='ren'){var n=prompt(L('대화 이름','Name'),t.title||'');if(n!=null){t.title=n.slice(0,40);var L3=talks().filter(function(x){return x.id!==id;});L3.push(t);saveTalks(L3);if(cur.id===id)cur.title=t.title;listView();}}
    else if(b.dataset.a==='del'){if(r.classList.contains('sure')){saveTalks(talks().filter(function(x){return x.id!==id;}));if(cur.id===id){cur={id:uid(),title:'',created:Date.now(),updated:Date.now(),lines:[]};draw();}listView();}else{r.classList.add('sure');b.textContent=L('한 번 더 누르면 지워져요','Tap again to delete');}}};}
+  /* 🔊 speed (0.8 / 1.0, kept on this phone) */
+  function rateLbl(){var b=$('#trrate');if(!b)return;b.hidden=!window.speechSynthesis;b.textContent=srate()===0.8?L('🐢 읽기 0.8×','🐢 Read 0.8×'):L('🔊 읽기 1.0×','🔊 Read 1.0×');}
+  rateLbl();$('#trrate').onclick=function(){setPref('rate',srate()===0.8?1:0.8);rateLbl();};
+  try{if(window.speechSynthesis&&speechSynthesis.addEventListener)speechSynthesis.addEventListener('voiceschanged',function(){if(document.body.contains($('#trchat')))draw(true);});}catch(e){}
+  /* 📷 scan: photo -> text as written + translation (image goes once to our proxy, nothing is saved) */
+  function adult(){return localStorage.getItem('de100age')==='y';}
+  $('#trscan').onclick=function(){if(!U){toast(errMsg({error:'off'}));return;}
+   if(!adult()){if(window.ageGate)ageGate(function(){$('#trscan').click();});else toast(L('18세 이상만 쓸 수 있어요.','Adults (18+) only.'));return;}
+   if(!ld('de100scanok',false)){var o=ov('<b>'+esc(L('📷 글자 찍어 번역','Scan text'))+'</b><p class="scnote">사진 속 글자가 구글 AI로 보내져요. 개인정보(주민번호·통장 등)가 있는 사진은 찍지 마세요.</p><p class="n2">The text in the photo is sent to Google AI. Do not photograph personal data (ID numbers, bank details). Photos are not saved.</p><button data-a="ok" class="hot">'+esc(L('알겠어요','OK'))+'</button><button data-a="x">'+esc(L('닫기','Close'))+'</button>');
+    o.querySelector('.trsheet').onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;closeOv();if(b.dataset.a==='ok'){sv('de100scanok',true);$('#trscanf').click();}};return;}
+   $('#trscanf').click();};
+  $('#trscanf').onchange=function(){var f=this.files&&this.files[0];this.value='';if(!f)return;status(L('📷 글자를 읽는 중…','Reading the text…'));
+   shrink(f,function(b64){if(!b64){status('');toast(L('사진을 열 수 없어요.','Could not open the photo.'));return;}window.__scanKB=Math.round(b64.length*0.75/1024);
+    post('/scan',{image:b64,mime:'image/jpeg'},25000).then(function(j){status('');scanShow(j);},function(e){status('');toast(scanErr(e));});});};
+  function scanShow(j){window.__scanShown=j;if(!j||!j.text){toast(L('사진에서 글자를 찾지 못했어요.','No text found in the photo.'));return;}var to=j.from==='ko'?'en':'ko',br=function(t){return esc(t).replace(/\n/g,'<br>');};
+   var o=ov('<b>'+esc(L('📷 찍은 글자','Scanned text'))+'</b><div class="scsrc">'+br(j.text)+'</div><div class="qa">'+(hasVoice(j.from)?'<button data-a="ps">🔊 '+esc(L('듣기','Play'))+'</button>':'')+'<button data-a="cs">📋 '+esc(L('복사','Copy'))+'</button></div>'+
+    '<b>'+esc(L('번역','Translation'))+'</b><div class="scout '+to+'">'+br(j.translation)+'</div><div class="qa">'+(hasVoice(to)?'<button data-a="po">🔊 '+esc(L('듣기','Play'))+'</button>':'')+'<button data-a="co">📋 '+esc(L('복사','Copy'))+'</button></div><button data-a="x">'+esc(L('닫기','Close'))+'</button>');
+   o.querySelector('.trsheet').onclick=function(e){var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a,cp=function(t){copy(t,function(ok){toast(ok?L('📋 복사했어요.','Copied.'):L('복사가 안 됐어요. 글을 길게 눌러 복사하세요.','Copy failed. Long-press the text to copy.'));});};
+    if(a==='ps')say(j.text,j.from,srate());else if(a==='po')say(j.translation,to,srate());else if(a==='cs')cp(j.text);else if(a==='co')cp(j.translation);else if(a==='x')closeOv();};}
  $('#trpb').onclick=function(){var o=ov('<b>'+esc(L('📖 자주 쓰는 말','Phrasebook'))+'</b>'+PB.map(function(g,gi){return '<details'+(gi===0?' open':'')+'><summary>'+esc(g[0])+'</summary>'+g[1].map(function(p,i){return '<button class="pbit" data-g="'+gi+'" data-i="'+i+'"><b>'+esc(p[1])+'</b><br><span>'+esc(p[0])+'</span></button>';}).join('')+'</details>';}).join('')+'<button data-a="x">'+esc(L('닫기','Close'))+'</button>');
   o.querySelector('.trsheet').onclick=function(e){var b=e.target.closest('.pbit');if(e.target.closest('[data-a=x]'))return closeOv();if(!b)return;var p=PB[+b.dataset.g][1][+b.dataset.i];closeOv();
    addLine({who:'me',from:'ko',src:p[0],out:p[1],phrase:true});say(p[1],'en',0.9);window.__trLast={src:p[0],out:p[1],from:'ko',phrase:true};};};

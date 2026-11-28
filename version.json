@@ -1,13 +1,13 @@
 {
- "version": "2026.11.28-5",
+ "version": "2026.11.28-6",
  "date": "2026-11-28",
  "notes_ko": [
-  "미니 드라마 「이렇게 들려요」 줄에 이름이 {NAME}으로 보이던 것을 고쳤어요.",
-  "1권 예문 6개를 새 문장으로 바꿨어요 (Day 1·8·10·20·25·27)."
+  "바로 통역: 원문과 번역 모두 🔊로 들을 수 있어요 (읽기 속도 0.8× / 1.0×).",
+  "📷 글자 찍어 번역: 간판·주보·메뉴 사진의 글자를 읽고 번역해요 (사진은 저장하지 않아요)."
  ],
  "notes_en": [
-  "The mini-drama \"heard as\" line now shows the name instead of {NAME}.",
-  "Six Book 1 example sentences replaced with new ones (Days 1, 8, 10, 20, 25, 27)."
+  "Interpreter: 🔊 read aloud on the original and the translation (speed 0.8× / 1.0×).",
+  "Scan text: photograph a sign, bulletin or menu to read and translate it (photos are not saved)."
  ],
  "pdf": {
   "pastors": {
