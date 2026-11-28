@@ -197,6 +197,13 @@ html.bigtext .atop>.hbtn:first-child+.k{visibility:hidden}
 .chold{width:100%;min-height:64px;font-size:19px;margin-bottom:6px;touch-action:none;user-select:none}.chold.on{background:#c0392b}
 .cb .cnot{display:block;margin-top:4px;min-height:44px;font-size:12px;border:0;background:transparent;color:#556;text-decoration:underline}.cb.fixed .en{color:#155724}
 .cmis .cm{padding:6px 0;border-top:1px solid #eee}.cmis .cm.done{color:#155724}.cend .crow{border-top:1px solid #eee;padding:8px 0}.cend .said{text-decoration:line-through}.cend .qa{display:flex;gap:6px}.cend .qa button{flex:1;min-height:48px}.cend .qa small{display:block;font-size:11px}
+/* our mini-drama */
+.dramaslot .dramago{display:block;margin:8px 0;text-align:center;min-height:56px}.dramaslot .dramago small{display:block;font-size:13px;font-weight:400}
+.dsp{display:flex;gap:4px;margin:8px 0}.dsp button{flex:1;min-height:52px;border-radius:12px;border:2px solid #1F3A5F;background:#fff;color:#1F3A5F;font-weight:800;font-size:15px}.dsp button.on{background:#1F3A5F;color:#fff}.dsp small{display:block;font-size:11px;font-weight:400}
+.dl{position:relative;padding:10px 56px 10px 8px;border-top:1px solid #eee}.dl.me{background:#f3faf5}.dl.on{background:#fff6d6}.dl .who{font-size:12px;color:#667}.dl .en{font-size:19px;font-weight:700}
+.dl .dh{display:none;margin-top:4px}.dlines.drama .dl .dh{display:block}.dl .hk{color:#8a4b00;font-weight:700}.dl .sp{font-size:15px;color:#335}.dl .reds .red{display:inline-block;margin:3px 4px 0 0;padding:2px 8px;border-radius:10px;background:#eef3fb;font-size:13px}
+.dl .dplay{position:absolute;right:4px;top:10px;min-width:48px;min-height:48px;border-radius:24px;border:0;background:#1F3A5F;color:#fff;font-size:18px}
+.ddrill .dqt{font-size:20px;font-weight:700;margin:10px 0}.ddrill .dch{display:block;width:100%;min-height:52px;margin:6px 0;border-radius:12px;border:2px solid #c9d3e3;background:#fff;font-size:17px}.ddrill .dch.ok{border-color:#1e8e3e;background:#e6f4ea}.ddrill .dch.no{border-color:#c0392b;background:#fdecea}
 
 #stuck{position:fixed;inset:0;z-index:40;background:#F4F6FA;overflow:auto;padding:12px 12px 110px;font-size:18px}
 #stuck .shead{display:flex;justify-content:space-between;align-items:center;font-size:22px;position:sticky;top:-12px;background:#F4F6FA;padding:8px 0;z-index:1}

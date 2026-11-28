@@ -140,7 +140,7 @@ function home(){var p=prog(),t=todayDay(),td=day(t);
   (function nx(){if(i>=ids.length){$('#wkst').textContent='완료! '+ids.length+'일치를 받았어요.';b.disabled=false;usage($('#use'));home.refresh&&home.refresh();return;}
    var n=ids[i++];download(n,function(s){$('#wkst').textContent='Day '+n+' '+s;}).then(nx);})();};}
 function dayScreen(n){var d=day(n);if(!d){location.hash='#/';return;}
- var h=top('DAY '+n+' · '+d.title_ko,esc(d.title_en),['#/','오늘 · Today'])+bigBtn();
+ var h=top('DAY '+n+' · '+d.title_ko,esc(d.title_en),['#/','오늘 · Today'])+bigBtn()+'<div id="dramaslot" class="dramaslot"></div>';setTimeout(function(){window.deDramaSlot&&window.deDramaSlot(n);},0);
  h+='<div class="card ten"><b>🎧 오늘의 10분</b>'+(d.shadow_all&&d.shadow_all.length?'<button class="sajump2" id="sajump">📚 모든 예문 · All sentences<small>책의 모든 문장 + 더 말해 보기 · Every book sentence + more practice</small></button>':'')+'<div class="tenb">'+
   '<button class="big2 top2" data-trk="shadow">▶ 쉐도잉 · Shadowing</button><button class="big2 top2" data-trk="x3all">🔁 3번씩 듣기 · Listen 3 times</button><button class="big2" data-trk="dlg">💬 대화 듣기 · Dialogue</button><button class="big2" data-trk="quiz">🗣 말해 보기 퀴즈 · Speaking quiz</button><button class="big2" data-trk="all">🔁 전체 듣기 · Play all</button>'+
   '</div>'+
@@ -268,9 +268,9 @@ var PRIV='무료 AI라 대화 내용이 서비스 개선을 위해 검토될 수
 function privShow(){var o=document.createElement('div');o.className='privov';o.innerHTML='<div class="privbox"><b>ⓘ 알려 드려요 · Please note</b><p>'+esc(PRIV)+'</p><button class="go">확인 · OK</button></div>';document.body.appendChild(o);o.querySelector('button').onclick=function(){localStorage.setItem('de100priv','1');o.remove();};window.__privShown=(window.__privShown||0)+1;}
 function privNote(h){if(!((h[0]==='talk'&&h[1])||h[0]==='tr'||(h[0]==='call'&&h[1])))return;setTimeout(function(){var hd=document.querySelector('#view .atop');if(hd&&!hd.querySelector('.privi')){var b=document.createElement('button');b.className='privi';b.setAttribute('aria-label','개인정보 안내 · Privacy note');b.textContent='ⓘ';b.onclick=privShow;hd.appendChild(b);}
  if(localStorage.getItem('de100priv')!=='1'&&!document.querySelector('.privov'))privShow();},50);}
-function route(){try{stopAll();}catch(e){}try{window.deCallStop&&window.deCallStop();}catch(e){}stopRec();window.deNext=null;var h=location.hash.replace(/^#\/?/,'').split('/');
+function route(){try{stopAll();}catch(e){}try{window.deCallStop&&window.deCallStop();}catch(e){}try{window.deDramaStop&&window.deDramaStop();}catch(e){}stopRec();window.deNext=null;var h=location.hash.replace(/^#\/?/,'').split('/');
  if(aiRoute(h)&&!ageOK()){if(ageNo()){location.replace('#/');setTimeout(ageNoNote,100);return;}var back=h[0]==='tr'?'#/':(h[1]?'#/day/'+h[1]:'#/');home();ageGate(function(){route();},function(){location.replace(back);});return;}
- if(h[0]==='day'&&h[1])dayScreen(+h[1]);else if(h[0]==='talk'&&h[1])talkScreen(+h[1],h[2]);else if(h[0]==='call'&&h[1]&&window.callScreen)window.callScreen(V,h[1]==='free'?0:+h[1],h[1]==='free','#/'+(h[1]==='free'?'':'day/'+h[1]));else if(h[0]==='ai'&&h[1])aiScreen(+h[1]);else if(h[0]==='check'&&h[1])checkScreen(+h[1]);else if(h[0]==='ck'&&h[1])ckScreen(+h[1]);else if(h[0]==='install')install();else if(h[0]==='tr'&&window.interpScreen)window.interpScreen(V,h[1]==='prep'?'#/tr':h[1]?'#/day/'+h[1]:'#/',h[1]==='prep'?'prep':null);else home();privNote(h);
+ if(h[0]==='day'&&h[1])dayScreen(+h[1]);else if(h[0]==='talk'&&h[1])talkScreen(+h[1],h[2]);else if(h[0]==='drama'&&h[1]&&window.dramaScreen)window.dramaScreen(V,+h[1],'#/day/'+h[1]);else if(h[0]==='call'&&h[1]&&window.callScreen)window.callScreen(V,h[1]==='free'?0:+h[1],h[1]==='free','#/'+(h[1]==='free'?'':'day/'+h[1]));else if(h[0]==='ai'&&h[1])aiScreen(+h[1]);else if(h[0]==='check'&&h[1])checkScreen(+h[1]);else if(h[0]==='ck'&&h[1])ckScreen(+h[1]);else if(h[0]==='install')install();else if(h[0]==='tr'&&window.interpScreen)window.interpScreen(V,h[1]==='prep'?'#/tr':h[1]?'#/day/'+h[1]:'#/',h[1]==='prep'?'prep':null);else home();privNote(h);
  ibar();trfab(h[0]);
  window.scrollTo(0,0);window.__route=location.hash||'#/';}
 window.addEventListener('hashchange',route);route();

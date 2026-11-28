@@ -1,17 +1,15 @@
 {
- "version": "2026.11.28-1",
+ "version": "2026.11.28-2",
  "date": "2026-11-28",
  "notes_ko": [
-  "AI 대화 아래에 「🇰🇷 한국어 뜻」「💡 뭐라고 말하지?」「✏ 방금 말 고쳐 줘」 버튼이 생겼어요.",
-  "내 말이 잘못 들렸으면 「제 말이 아니에요」를 눌러 고쳐 쓸 수 있어요.",
-  "오늘의 미션이 보이고, 말하면 ✅로 바뀌어요. 대화를 끝내면 정리 카드에 더 자연스러운 문장이 나와요(▶ 듣기 · 🎤 다시 말하기 · ⭐ 저장).",
-  "「🐢 천천히」와 「🎤 누르는 동안만 말하기」를 고를 수 있어요."
+  "날마다 「🎭 우리 드라마」가 생겼어요(Day 1~30). 천천히 → 보통 → 드라마 속도로 들어요.",
+  "드라마 속도에서는 「들리는 소리 → 원래 문장」 자막이 나와요.",
+  "드라마 아래 「👂 들리는 대로 고르기」로 듣기 연습을 해요."
  ],
  "notes_en": [
-  "New help buttons in AI talk: Korean meaning, what to say, and fix my last line.",
-  "If Jake heard you wrong, tap \"That's not what I said\" and type it.",
-  "Today's missions tick as you say them; the end-of-talk card shows better sentences to play, say again and save.",
-  "Choose a slow voice or hold-to-talk."
+  "New \"Our mini-drama\" for Days 1-30: listen slow, natural, then at drama speed.",
+  "At drama speed, captions show what you hear and the written words.",
+  "Listening drills under each drama: pick the words you heard."
  ],
  "pdf": {
   "pastors": {
